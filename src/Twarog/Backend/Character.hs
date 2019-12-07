@@ -4,6 +4,20 @@ import Twarog.Types
 import Twarog.Backend.Archetypes
 import Twarog.Backend.Item
 
+data CharacterRole = Civilian
+                   | Warrior
+                   | Stalker
+                   | Trickster
+                   | Ranger
+                   | Bard
+                   | Sorcerer
+                   | DwarfRole
+                   | ElfRole
+                   | GnomeRole
+                   | HalflingRole
+                   | OrcRole
+                   deriving (Show)
+
 data Sex = Male
          | Female
          deriving (Show)
@@ -26,9 +40,9 @@ data Morale = Nervous
             | Panic
             deriving (Show)
 
-data Encumbrance = LightLoad
-                 | MediumLoad
-                 | HeavyLoad
+data Encumbrance = LightLoad    -- ^ '0' MS mod
+                 | MediumLoad   -- ^ '-1' MS mod
+                 | HeavyLoad    -- ^ '-2' MS mod
                  deriving (Show)
 
 data Race = Dwarf
@@ -45,10 +59,48 @@ data Race = Dwarf
           | HighMan
           deriving (Show)
 
+data Skill = Acrobatics
+           | Acting
+           | Alchemy
+           | Climbing
+           | Crafts
+           | Dancing
+           | Dodging
+           | FlutePlaying
+           | Foraging
+           | Fortitude
+           | Healing
+           | LyrePlaying
+           | Mechanics
+           | Melee
+           | Missile
+           | Navigation
+           | Perception
+           | Poetry
+           | ReligiousTradition
+           | Riding
+           | RuneLore
+           | Seamanship
+           | Singing
+           | SocialSkills
+           | Stamina
+           | Stealth
+           | Swimming
+           | Tempo
+           | Tracking
+           | Trickery
+           | WorldLore
+           deriving (Show)
+
+{- |
+Character sheet, non-specific to combat mode, i.e. we 
+don't consider e.g. Morale.
+-}
 data Character = Player
   { playersName  :: String
   , charName     :: String
   , level        :: Lvl
+  , role         :: CharacterRole
   , age          :: Age
   , race         :: Race
   , height       :: Height
@@ -58,8 +110,28 @@ data Character = Player
   , stamina      :: SP
   , health       :: HP
   , experience   :: XP
-  , morale       :: Morale
+  , flaws        :: [Flaw]
+  , talents      :: [Talent]
+  , crSkills     :: [Skill]  -- ^ Character Role skills
+  , tSkills      :: [Skill]  -- ^ Trained skills
+  , equipment    :: Equipment
   , attributes   :: Attributes
+  } deriving (Show)
+
+data Equipment = Equipment
+  { belt          :: Maybe Bag
+  , pouch         :: Maybe Bag
+  , quiver        :: Maybe Bag
+  , leftShoulder  :: Maybe Bag
+  , rightShoulder :: Maybe Bag
+  , sack          :: Maybe Bag
+  , backpack      :: Maybe Bag
+  , armour        :: Maybe (Item (Armour BodyArmour))
+  , helmet        :: Maybe (Item (Armour Helmet))
+  , shield        :: Maybe (Item Shield)
+  , meleeWeapon   :: Maybe (Item Weapon)
+  , missileWeapon :: Maybe (Item Weapon)
+  , clothes       :: Maybe Bag
   } deriving (Show)
 
 data Attributes = Attributes
@@ -188,11 +260,12 @@ data Talent = Acrobatic
             | Thrower
             | Tough
             | Tracker
-            | Trickster
+            | TricksterTalent
             | Uranian
             | WarmHands
             | Zevsean
             | Aegirean
+            deriving (Show)
 
 data Flaw = Alcoholic Int
           | Annoying Int
