@@ -1,0 +1,60 @@
+cabal-version:       2.4
+
+name:                twarog
+version:             0.0.0.0
+-- synopsis:
+-- description:
+homepage:            szczerski.pl
+-- bug-reports:
+license:             GPL-2.0-only
+license-file:        LICENSE
+author:              Rafał Szczerski
+maintainer:          rafal@szczerski.pl
+-- copyright:
+category:            Game
+extra-source-files:  CHANGELOG.md
+
+common common-options
+  build-depends:       base >= 4.10.1.0 && < 4.14
+
+  ghc-options:         -Wall
+                       -Wincomplete-uni-patterns
+                       -Wincomplete-record-updates
+                       -Wcompat
+                       -Widentities
+                       -Wredundant-constraints
+                       -fhide-source-paths
+                       -Wmissing-export-lists
+                       -Wpartial-fields
+  if impl(ghc >= 8.8.1)
+    ghc-options:       -Wmissing-deriving-strategies
+                       -Werror=missing-deriving-strategies
+
+  default-language:    Haskell2010
+  default-extensions:  ConstraintKinds
+                       DeriveGeneric
+                       InstanceSigs
+                       GeneralizedNewtypeDeriving
+                       LambdaCase
+                       OverloadedStrings
+                       RecordWildCards
+                       ScopedTypeVariables
+                       StandaloneDeriving
+                       TupleSections
+                       TypeApplications
+                       ViewPatterns
+
+executable twarog
+  import:              common-options
+  main-is:             Main.hs
+  -- other-modules:
+  -- other-extensions:
+  build-depends:       base ^>=4.12.0.0
+                     , containers
+                     , miso
+                     , hedgehog
+  if !impl(ghcjs)                                                              
+    build-depends:                                                             
+       jsaddle, jsaddle-warp, transformers, warp, websockets
+  hs-source-dirs:      app, src
+  default-language:    Haskell2010
