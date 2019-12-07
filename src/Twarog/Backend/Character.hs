@@ -1,4 +1,9 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 module Twarog.Backend.Character where
+
+import Data.Set
+import Control.Lens
 
 import Twarog.Types
 import Twarog.Backend.Archetypes
@@ -90,33 +95,114 @@ data Skill = Acrobatics
            | Tracking
            | Trickery
            | WorldLore
-           deriving (Show)
+           deriving (Eq, Ord, Show)
+
+data Proficiency = Trained
+                 | Untrained
+                 | CharacterRoleSkill
+                 deriving (Eq, Ord, Show)
+
+data SkillType = MovementSkill
+               | SpecialSkill
+               | CombatSkill
+               deriving (Eq, Ord, Show)
+
+data CharacterSkill = CharacterSkill
+  { characterSkill :: Skill
+  , skillType      :: SkillType
+  , proficiency    :: Proficiency
+  } deriving (Eq, Ord, Show)
+
+class Applicable t
+instance Applicable Morale
+instance Applicable Encumbrance
+instance Applicable Condition
+instance Applicable CharacterSkill
+instance Applicable Race
+
+-- -- | Apply arbitrary modifier to given character 
+-- applyMod :: Applicable t => t -> Character -> Character
+-- applyMod Acrobatic
+-- applyMod Aggresive
+-- applyMod AnimalFriend
+-- applyMod Arachnean
+-- applyMod Argonautic
+-- applyMod Ascetic
+-- applyMod Athletic
+-- applyMod Bloodhound
+-- applyMod Calliopean
+-- applyMod Careful
+-- applyMod Caliopean
+-- applyMod Courageous
+-- applyMod Craftsman
+-- applyMod Curious
+-- applyMod DartThrower
+-- applyMod DeepBreather
+-- applyMod Dodger
+-- applyMod Durable
+-- applyMod Empathic
+-- applyMod Enduring
+-- applyMod Eratorean
+-- applyMod Euterpean
+-- applyMod Fast
+-- applyMod FastSleeper
+-- applyMod Favourite
+-- applyMod Fearless
+-- applyMod Fighter
+-- applyMod FistFighter
+-- applyMod Focused
+-- applyMod GoodReflexes
+-- applyMod HawkEyed
+-- applyMod Hephaestusean
+-- applyMod Heraklean
+-- applyMod Herbalist
+-- applyMod Humble
+-- applyMod Inquisitive
+-- applyMod Lancer
+-- applyMod LightFooted
+-- applyMod LynxEyes
+-- applyMod Mariner
+-- applyMod Marked
+-- applyMod Mechanic
+-- applyMod Malpogomeanean
+-- applyMod Mermaid
+-- applyMod Mule
+-- applyMod Nimble
+-- applyMod Perseusean
+-- applyMod Pietistic
+-- applyMod Polyhymnian
+-- applyMod Rider
+-- applyMod Sensitive
+-- applyMod Sharpshooter
+-- applyMod Shooter
+-- applyMod Sirenean
+-- applyMod Slinger
+-- applyMod SlowAgeing
+-- applyMod SpearThrower
+-- applyMod Springy
+-- applyMod StrongBack
+-- applyMod StrongGrip
+-- applyMod Survivor
+-- applyMod Swimmer
+-- applyMod SwordDancer
+-- applyMod Terpsichorean
+-- applyMod Thalian
+-- applyMod Thrower
+-- applyMod Tough
+-- applyMod Tracker
+-- applyMod TricksterTalent
+-- applyMod Uranian
+-- applyMod WarmHands
+-- applyMod Zevsean
+-- applyMod Aegirean
+
+data Toughness = Toughness Cold Electricity Heat Physical
+  deriving (Show)
 
 {- |
 Character sheet, non-specific to combat mode, i.e. we 
 don't consider e.g. Morale.
 -}
-data Character = Player
-  { playersName  :: String
-  , charName     :: String
-  , level        :: Lvl
-  , role         :: CharacterRole
-  , age          :: Age
-  , race         :: Race
-  , height       :: Height
-  , size         :: Size
-  , lifeStance   :: LifeStance
-  , alignment    :: Archetype
-  , stamina      :: SP
-  , health       :: HP
-  , experience   :: XP
-  , flaws        :: [Flaw]
-  , talents      :: [Talent]
-  , crSkills     :: [Skill]  -- ^ Character Role skills
-  , tSkills      :: [Skill]  -- ^ Trained skills
-  , equipment    :: Equipment
-  , attributes   :: Attributes
-  } deriving (Show)
 
 data Equipment = Equipment
   { belt          :: Maybe Bag
@@ -188,8 +274,8 @@ data CombatStats = CombatStats
   } deriving (Show)
 
 data Resistance = Resistance
-  { disease :: Int
-  , poison :: Int
+  { disease :: Disease
+  , poison  :: Poison
   } deriving (Show)
 
 data Talent = Acrobatic
@@ -316,3 +402,27 @@ data Flaw = Alcoholic Int
           | WeakMinded Int
           | Whiny Int
           deriving (Show)
+
+data Character = Player
+  { _playersName :: String
+  , _charName    :: String
+  , _level       :: Lvl
+  , _role        :: CharacterRole
+  , _age         :: Age
+  , _race        :: Race
+  , _height      :: Height
+  , _size        :: Size
+  , _lifeStance  :: LifeStance
+  , _alignment   :: Archetype
+  , _stamina     :: SP
+  , _health      :: HP
+  , _toughness   :: Toughness
+  , _experience  :: XP
+  , _resistance  :: Resistance
+  , _flaws       :: [Flaw]
+  , _talents     :: [Talent]
+  , _skills      :: Set CharacterSkill
+  , _equipment   :: Equipment
+  , _attributes  :: Attributes
+  } deriving (Show)
+makeLenses ''Character

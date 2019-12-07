@@ -1,5 +1,6 @@
 module Twarog.Types where
 
+-- | Current Combat Statistics
 type AV = Int
 type Damage = Int
 type OvMe = Int        
@@ -11,6 +12,7 @@ type TotalAv = Int
 type MsPenality = Int  
 type ShieldDvMe = Int  
 type ShieldBlock = Int 
+
 type BaseRange = Int
 
 type ArmourMs = Int
@@ -26,8 +28,15 @@ type ShieldMs = Int
 type CutMod = Int
 type ShockMod = Int
 
+-- | Resistance
 type Disease = Int
 type Poison = Int
+
+-- | Toughness
+type Cold = Int
+type Electricity = Int  
+type Heat = Int 
+type Physical = Int
 
 type XP = Int
 type HP = Int
