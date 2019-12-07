@@ -16,7 +16,7 @@ https://kowainik.github.io/posts/membrain
 {-# LANGUAGE NoStarIsType #-}
 #endif
 
-module Units where
+module Twarog.Backend.Units where
 
 import Data.Proxy (Proxy (..))
 import GHC.Exts (coerce)

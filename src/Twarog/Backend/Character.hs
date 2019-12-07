@@ -1,8 +1,8 @@
-module Character where
+module Twarog.Backend.Character where
 
-import Types
-import Archetypes
-import Item
+import Twarog.Types
+import Twarog.Backend.Archetypes
+import Twarog.Backend.Item
 
 data Sex = Male
          | Female
@@ -50,6 +50,7 @@ data Character = Player
   , charName     :: String
   , level        :: Lvl
   , age          :: Age
+  , race         :: Race
   , height       :: Height
   , size         :: Size
   , lifeStance   :: LifeStance
@@ -57,6 +58,7 @@ data Character = Player
   , stamina      :: SP
   , health       :: HP
   , experience   :: XP
+  , morale       :: Morale
   , attributes   :: Attributes
   } deriving (Show)
 

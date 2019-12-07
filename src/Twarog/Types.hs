@@ -1,5 +1,6 @@
-module Types where
+module Twarog.Types where
 
+type AV = Int
 type Damage = Int
 type OvMe = Int        
 type OvMi = Int        

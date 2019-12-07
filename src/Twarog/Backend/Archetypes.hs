@@ -1,4 +1,4 @@
-module Archetypes 
+module Twarog.Backend.Archetypes 
   ( Attitude
   , Sociability
   , Submissiveness
@@ -53,6 +53,7 @@ data Attitude = Attitude
 instance Trait Attitude where
   shadow (Attitude a b c d) =
     Attitude (shadow a) (shadow b) (shadow c) (shadow d)
+  shadow Neutral = Neutral
 
 data Archetype = Aphroditic
                | Apollonian
