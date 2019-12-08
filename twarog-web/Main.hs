@@ -1,12 +1,16 @@
+-- | Haskell language pragma
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE CPP #-}
 
-module Main where
+-- | Haskell module declaration
+module Main 
+  ( main )
+  where
 
+-- | Miso framework import
 import           Miso
 import           Miso.String
-import Twarog
 
 -- | JSAddle import
 #ifndef __GHCJS__
@@ -16,8 +20,10 @@ import           Network.WebSockets
 #endif
 import           Control.Monad.IO.Class
 
+-- | Type synonym for an application model
 type Model = Int
 
+-- | Sum type for application events
 data Action
   = AddOne
   | SubtractOne
@@ -49,7 +55,7 @@ main = runApp $ startApp App {..}
 
 -- | Updates model, optionally introduces side effects
 updateModel :: Action -> Model -> Effect Action Model
-updateModel AddOne m = noEff (m + 3)
+updateModel AddOne m = noEff (m + 1)
 updateModel SubtractOne m = noEff (m - 1)
 updateModel NoOp m = noEff m
 updateModel SayHelloWorld m = m <# do
@@ -60,5 +66,6 @@ viewModel :: Model -> View Action
 viewModel x = div_ [] [
    button_ [ onClick AddOne ] [ text "+" ]
  , text (ms x)
+ , text "Test"                      
  , button_ [ onClick SubtractOne ] [ text "-" ]
  ]

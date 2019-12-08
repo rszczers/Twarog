@@ -1,6 +1,15 @@
 {-# LANGUAGE GADTs #-}
 -- | Item datatype for all the game items.
-module Twarog.Backend.Item where 
+module Twarog.Backend.Item 
+  ( Item (..)
+  , Bag  
+  , Armour
+  , BodyArmour
+  , Helmet
+  , Shield
+  , Weapon
+  )
+  where 
 
 import Twarog.Backend.Types
 import Twarog.Backend.Units
@@ -69,12 +78,12 @@ data Other = Tool
            deriving (Show)
 
 -- | Wrapper for heterogeneous 'Bag'.
-data Pack = PackWeapon { unPackWeapon :: Item Weapon }
-          | PackArmour { unPackArmour :: Item (Armour BodyArmour) }
-          | PackHelmet { unPackHelmet :: Item (Armour Helmet) }
-          | PackShield { unPackShield :: Item Shield }
-          | PackBag    { unPackBag    :: Item Bag }
-          | PackOther  { unPackOther  :: Item Other  }
+data Pack = PackWeapon (Item Weapon) 
+          | PackArmour (Item (Armour BodyArmour)) 
+          | PackHelmet (Item (Armour Helmet)) 
+          | PackShield (Item Shield) 
+          | PackBag    (Item Bag) 
+          | PackOther  (Item Other)
           deriving (Show)
 
 {- | 

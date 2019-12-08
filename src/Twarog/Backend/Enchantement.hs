@@ -1,3 +1,6 @@
-module Twarog.Backend.Enchantement where
+module Twarog.Backend.Enchantement
+  ( Enchantement
+  )
+  where
 
 type Enchantement = Int

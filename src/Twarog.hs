@@ -1,4 +1,7 @@
-module Twarog where
+module Twarog
+  ( Character
+  )
+where
 
 import Twarog.Backend.Character
 import Twarog.Backend.Item

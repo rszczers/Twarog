@@ -1,0 +1,80 @@
+module Twarog.Backend.Talents
+  ( Talent (..)
+  )
+  where
+
+data Talent = Acrobatic
+            | Aggresive
+            | AnimalFriend
+            | Arachnean
+            | Argonautic
+            | Ascetic
+            | Athletic
+            | Bloodhound
+            | Calliopean
+            | Careful
+            | Caliopean
+            | Courageous
+            | Craftsman
+            | Curious
+            | DartThrower
+            | DeepBreather
+            | Dodger
+            | Durable
+            | Empathic
+            | Enduring
+            | Eratorean
+            | Euterpean
+            | Fast
+            | FastSleeper
+            | Favourite
+            | Fearless
+            | Fighter
+            | FistFighter
+            | Focused
+            | GoodReflexes
+            | HawkEyed
+            | Hephaestusean
+            | Heraklean
+            | Herbalist
+            | Humble
+            | Inquisitive
+            | Lancer
+            | LightFooted
+            | LynxEyes
+            | Mariner
+            | Marked
+            | Mechanic
+            | Malpogomeanean
+            | Mermaid
+            | Mule
+            | Nimble
+            | Perseusean
+            | Pietistic
+            | Polyhymnian
+            | Rider
+            | Sensitive
+            | Sharpshooter
+            | Shooter
+            | Sirenean
+            | Slinger
+            | SlowAgeing
+            | SpearThrower
+            | Springy
+            | StrongBack
+            | StrongGrip
+            | Survivor
+            | Swimmer
+            | SwordDancer
+            | Terpsichorean
+            | Thalian
+            | Thrower
+            | Tough
+            | Tracker
+            | TricksterTalent
+            | Uranian
+            | WarmHands
+            | Zevsean
+            | Aegirean
+            deriving (Show)
+

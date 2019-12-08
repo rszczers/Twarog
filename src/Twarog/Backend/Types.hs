@@ -9,6 +9,8 @@ module Twarog.Backend.Types
   , Size
   , LifeStance
   , Age
+  , Attitude
+  , Archetype
   , XP
   , Lvl
   , Hamingja
@@ -19,12 +21,14 @@ module Twarog.Backend.Types
   , STR
   , WIL
   , INT
+  , Attributes (..)
   -- ** Modifiers
   , Cha
   , Con
   , Dex
   , Str
   , Wil
+  , Modifiers (..)
   -- ** Combat statistics
   , OvMe
   , OvMi
@@ -40,6 +44,7 @@ module Twarog.Backend.Types
   , Electricity
   , Heat
   , Physical
+  , Toughness
   -- ** Condition
   , Condition
   -- ** Encumbrance
@@ -48,6 +53,7 @@ module Twarog.Backend.Types
   , HP
   , SP
   -- ** Resistance
+  , Resistance
   , Disease
   , Poison
   -- ** Morale
@@ -70,6 +76,8 @@ module Twarog.Backend.Types
   , ShockMod
   , BaseRange -- Bows and crossbows only
   ) where
+
+import Twarog.Backend.Archetypes (Attitude(..), Archetype(..))
 
 type AV = Int
 type Damage = Int
@@ -188,3 +196,26 @@ data Encumbrance = LightLoad    -- ^ '0' MS mod
                  | MediumLoad   -- ^ '-1' MS mod
                  | HeavyLoad    -- ^ '-2' MS mod
                  deriving (Show)
+
+data Resistance = Resistance
+  { disease :: Disease
+  , poison  :: Poison
+  } deriving (Show)
+
+data Attributes = Attributes
+  { cha :: CHA
+  , con :: CON
+  , dex :: DEX
+  , int :: INT
+  , str :: STR
+  , wil :: WIL
+  } deriving (Show)
+              
+data Modifiers = Modifiers
+  { chaMod :: Cha
+  , conMod :: Con
+  , dexMod :: Dex
+  , intMod :: Int -> Int
+  , strMod :: Str
+  , wilMod :: Wil
+  } 
