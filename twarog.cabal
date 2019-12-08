@@ -48,13 +48,10 @@ common common-options
 
 library                                                                        
   import:              common-options
-  exposed-modules:     Twarog.Backend.Item
-                     , Twarog.Backend.Units
-                     , Twarog.Backend.Enchantement
-                     , Twarog.Backend.Character
+  exposed-modules:     Twarog
   -- other-modules:                                                            
   -- other-extensions:                                                         
-  build-depends:       base ^>=4.12.0.0                                        
+  -- build-depends:       
   hs-source-dirs:      src                                                     
   default-language:    Haskell2010   
 
@@ -64,10 +61,21 @@ executable twarog
   -- other-modules:
   -- other-extensions:
   build-depends:       base ^>=4.12.0.0
+                     , twarog
                      , miso
                      , hedgehog
   if !impl(ghcjs)                                                              
     build-depends:                                                             
        jsaddle, jsaddle-warp, transformers, warp, websockets
-  hs-source-dirs:      app, src
+  hs-source-dirs:      app
   default-language:    Haskell2010
+
+test-Suite test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs 
+  hs-source-dirs: test
+  default-language: Haskell2010
+  build-depends:
+        base >= 4 && < 5
+      , hedgehog
+      , twarog

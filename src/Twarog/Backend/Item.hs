@@ -2,7 +2,7 @@
 -- | Item datatype for all the game items.
 module Twarog.Backend.Item where 
 
-import Twarog.Types
+import Twarog.Backend.Types
 import Twarog.Backend.Units
 import Twarog.Backend.Enchantement
 

@@ -5,64 +5,9 @@ module Twarog.Backend.Character where
 import Data.Set
 import Control.Lens
 
-import Twarog.Types
+import Twarog.Backend.Types
 import Twarog.Backend.Archetypes
 import Twarog.Backend.Item
-
-data CharacterRole = Civilian
-                   | Warrior
-                   | Stalker
-                   | Trickster
-                   | Ranger
-                   | Bard
-                   | Sorcerer
-                   | DwarfRole
-                   | ElfRole
-                   | GnomeRole
-                   | HalflingRole
-                   | OrcRole
-                   deriving (Show)
-
-data Sex = Male
-         | Female
-         deriving (Show)
-
-data LifeStance = Religious
-                | Traditional
-                deriving (Show)
-
-data Condition = Tired
-               | Weary
-               | Exhausted
-               | Wet
-               | SoakingWet
-               deriving (Show)
-
-data Morale = Nervous
-            | Afraid
-            | Anxious
-            | Terrified
-            | Panic
-            deriving (Show)
-
-data Encumbrance = LightLoad    -- ^ '0' MS mod
-                 | MediumLoad   -- ^ '-1' MS mod
-                 | HeavyLoad    -- ^ '-2' MS mod
-                 deriving (Show)
-
-data Race = Dwarf
-          | Elf
-          | Hobgoblin
-          | HalfOrc
-          | Goblin
-          | Ogre
-          | CommonOrc
-          | Gnome
-          | Halfling
-          | CommonMan
-          | LesserMan
-          | HighMan
-          deriving (Show)
 
 data Skill = Acrobatics
            | Acting

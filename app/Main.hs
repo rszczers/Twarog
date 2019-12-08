@@ -6,8 +6,7 @@ module Main where
 
 import           Miso
 import           Miso.String
-import Twarog.Backend.Character
-import Twarog.Backend.Item
+import Twarog
 
 -- | JSAddle import
 #ifndef __GHCJS__
