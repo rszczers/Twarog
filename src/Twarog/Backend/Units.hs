@@ -67,6 +67,8 @@ module Twarog.Backend.Units
   , Rest
   , Road
   -- ** Conversions 
+  , distance
+  , toDistance
   , milimetre
   , centimetre
   , scruple
@@ -303,6 +305,10 @@ distance = Distance . (* nat @dist)
 
 toDistance :: forall (to :: Nat) (from :: Nat) . Distance from -> Distance to
 toDistance = coerce
+
+instance Semigroup (Distance (dist :: Nat)) where
+    (<>) :: Distance dist -> Distance dist -> Distance dist 
+    (<>) = coerce ((+) @Natural)
 
 -- | Capacity units
 type Microlitre = 1

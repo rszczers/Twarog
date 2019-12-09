@@ -5,7 +5,7 @@ module Twarog.Backend.Types
   -- ** Descriptive part
     Race (..)
   , CharacterRole
-  , Sex
+  , Sex (..)
   , Height
   , Size
   , LifeStance (..)
@@ -94,6 +94,7 @@ module Twarog.Backend.Types
   ) where
 
 import Control.Lens
+import Twarog.Backend.Units
 
 type AV = Int
 type Damage = Int
@@ -106,6 +107,7 @@ type TotalAv = Int
 type MsPenality = Int  
 type ShieldDvMe = Int  
 type ShieldBlock = Int 
+
 
 type Hamingja = Int
 type BaseRange = Int
@@ -138,7 +140,7 @@ type HP = Int
 type SP = Int
 data Age = Immortal | Mortal Int
   deriving (Show)
-type Height = Int
+type Height = Distance Inch
 type Size = Int
 
 type Cha = Int -> Int
