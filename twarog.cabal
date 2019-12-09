@@ -75,6 +75,7 @@ library
                      , Twarog.Backend.Flaws
                      , Twarog.Backend.Item
                      , Twarog.Backend.Skills
+                     , Twarog.Backend.SkillMods
                      , Twarog.Backend.Races
                      , Twarog.Backend.Talents
                      , Twarog.Backend.Types

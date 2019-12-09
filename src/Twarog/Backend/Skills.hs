@@ -1,6 +1,9 @@
 module Twarog.Backend.Skills
   ( CharacterSkill (..)
   , Skill (..)
+  , SkillType (..)
+  , Proficiency (..)
+  , skillType
   )
   where
 
@@ -51,7 +54,40 @@ data SkillType = MovementSkill
 
 data CharacterSkill = CharacterSkill
   { characterSkill :: Skill
-  , skillType      :: SkillType
   , proficiency    :: Proficiency
   } deriving (Eq, Ord, Show)
+
+skillType :: Skill -> SkillType
+skillType = \case
+  Acrobatics -> MovementSkill
+  Acting -> SpecialSkill
+  Alchemy -> SpecialSkill
+  Climbing -> MovementSkill
+  Crafts -> SpecialSkill
+  Dancing -> MovementSkill
+  Dodging -> MovementSkill
+  FlutePlaying -> SpecialSkill
+  Foraging -> SpecialSkill
+  Fortitude -> SpecialSkill
+  Healing -> SpecialSkill
+  LyrePlaying -> SpecialSkill
+  Mechanics -> SpecialSkill
+  Melee -> CombatSkill
+  Missile -> CombatSkill
+  Navigation -> SpecialSkill
+  Perception -> SpecialSkill
+  Poetry -> SpecialSkill
+  ReligiousTradition -> SpecialSkill
+  Riding -> MovementSkill
+  RuneLore -> SpecialSkill
+  Seamanship -> SpecialSkill
+  Singing -> SpecialSkill
+  SocialSkills -> SpecialSkill
+  Stamina -> SpecialSkill
+  Stealth -> MovementSkill
+  Swimming -> MovementSkill
+  Tempo -> MovementSkill
+  Tracking -> SpecialSkill
+  Trickery -> SpecialSkill
+  WorldLore -> SpecialSkill
 
