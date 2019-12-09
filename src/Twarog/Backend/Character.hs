@@ -63,9 +63,9 @@ import Twarog.Backend.Archetypes
 import Twarog.Backend.Types
 import Twarog.Backend.Skills
 import Twarog.Backend.Flaws
+import Twarog.Backend.Races
 import Twarog.Backend.Talents
 import Twarog.Backend.Item
-
 
 data CombatStats = CombatStats
   { _ovMe        :: OvMe
@@ -130,3 +130,22 @@ data Character = Player
   } deriving (Show)
 makeLenses ''Character
 
+maximumAge :: Character -> Age
+maximumAge c = case c ^. race of
+  Dwarf     -> Mortal $ 30 * (c ^. attributes . con)
+  Elf       -> Immortal
+  Hobgoblin -> Mortal $ 30 * (c ^. attributes . con)
+  HalfOrc   -> Mortal $ 30 * (c ^. attributes . con)
+  Goblin    -> Mortal $ 30 * (c ^. attributes . con)
+  Ogre      -> Mortal $ 30 * (c ^. attributes . con)
+  CommonOrc -> Mortal $ 30 * (c ^. attributes . con)
+  Gnome     -> Mortal $ 30 * (c ^. attributes . con)
+  Halfling  -> Mortal $  6 * (c ^. attributes . con)
+  CommonMan -> Mortal $  5 * (c ^. attributes . con)
+  LesserMan -> Mortal $  4 * (c ^. attributes . con)
+  HighMan   -> Mortal $  6 * (c ^. attributes . con)
+
+acrobatics :: Character -> Int -> Int
+acrobatics c =
+  let baseMod = c ^. attributes . con . to toModifier
+   in baseMod

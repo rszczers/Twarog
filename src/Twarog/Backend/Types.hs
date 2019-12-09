@@ -3,16 +3,16 @@ module Twarog.Backend.Types
   ( 
   -- * Character sheet
   -- ** Descriptive part
-    Race (..)
-  , CharacterRole
+    CharacterRole
   , Sex (..)
   , Height
-  , Size
+  , Size (..)
   , LifeStance (..)
   , Age (..)
   , XP
   , Lvl
   , Hamingja
+  , Mod
   -- ** Attributes
   , CHA
   , CON
@@ -35,6 +35,7 @@ module Twarog.Backend.Types
   , Str
   , Wil
   , Modifiers (..)
+  , toModifier 
   -- *** Modifiers lenses
   , chaMod
   , conMod
@@ -108,6 +109,7 @@ type MsPenality = Int
 type ShieldDvMe = Int  
 type ShieldBlock = Int 
 
+type Mod = Int
 
 type Hamingja = Int
 type BaseRange = Int
@@ -141,7 +143,14 @@ type SP = Int
 data Age = Immortal | Mortal Int
   deriving (Show)
 type Height = Distance Inch
-type Size = Int
+
+type Size = Int -> Int
+instance Show Size where
+  show f = show $ f 0
+
+-- newtype Size = Size { unSize :: Int -> Int }
+-- instance Show Size where
+--   show (Size f) = show $ f 0
 
 type Cha = Int -> Int
 type Con = Int -> Int
@@ -157,20 +166,6 @@ type WIL = Int
 type INT = Int
 
 type Lvl = Int
-
-data Race = Dwarf
-          | Elf
-          | Hobgoblin
-          | HalfOrc
-          | Goblin
-          | Ogre
-          | CommonOrc
-          | Gnome
-          | Halfling
-          | CommonMan
-          | LesserMan
-          | HighMan
-          deriving (Show)
 
 data CharacterRole = Civilian
                    | Warrior
@@ -242,21 +237,23 @@ data Modifiers = Modifiers
   } 
 makeLenses ''Modifiers
 
+toModifier :: Int -> Int -> Int
+toModifier x  | x <= 1             = \x -> x - 5
+              | x == 2             = \x -> x - 4
+              | x == 3             = \x -> x - 3
+              | x == 4 || x == 5   = \x -> x - 2
+              | 6 <= x && x <= 8   = \x -> x - 1
+              | 9 <= x && x <= 12  = id 
+              | 13 <= x && x <= 15 = (+ 1)
+              | 16 <= x && x <= 17 = (+ 2)
+              | 18 <= x && x <= 19 = (+ 3)
+              | x == 20            = (+ 4)
+              | x == 21            = (+ 5)
+              | x >= 22            = (+ 6)
+
 -- | Convert Attributes to Modifiers
 modifiers :: Attributes -> Modifiers 
 modifiers (Attributes cha con dex int str wil) =
-  let xs = [cha, con, dex, int, str, wil]
-      f x | x <= 1             = \x -> x - 5
-          | x == 2             = \x -> x - 4
-          | x == 3             = \x -> x - 3
-          | x == 4 || x == 5   = \x -> x - 2
-          | 6 <= x && x <= 8   = \x -> x - 1
-          | 9 <= x && x <= 12  = id 
-          | 13 <= x && x <= 15 = (+ 1)
-          | 16 <= x && x <= 17 = (+ 2)
-          | 18 <= x && x <= 19 = (+ 3)
-          | x == 20            = (+ 4)
-          | x == 21            = (+ 5)
-          | x >= 22            = (+ 6)
-  in Modifiers (f cha) (f con) (f dex) (f int) (f str) (f wil)      
+  let f = toModifier
+   in Modifiers (f cha) (f con) (f dex) (f int) (f str) (f wil)      
 

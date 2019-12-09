@@ -1,5 +1,6 @@
 module Twarog.Backend.Skills
   ( CharacterSkill (..)
+  , Skill (..)
   )
   where
 

@@ -49,6 +49,8 @@ common common-options
                        TupleSections
                        TypeApplications
                        ViewPatterns
+                       TypeSynonymInstances
+                       FlexibleInstances
 
 executable twarog-web
   import:              common-options
@@ -73,6 +75,7 @@ library
                      , Twarog.Backend.Flaws
                      , Twarog.Backend.Item
                      , Twarog.Backend.Skills
+                     , Twarog.Backend.Races
                      , Twarog.Backend.Talents
                      , Twarog.Backend.Types
                      , Twarog.Backend.Units
