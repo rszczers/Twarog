@@ -1,16 +1,15 @@
+{-# LANGUAGE TemplateHaskell #-}
 module Twarog.Backend.Types
   ( 
   -- * Character sheet
   -- ** Descriptive part
-    Race 
+    Race (..)
   , CharacterRole
   , Sex
   , Height
   , Size
-  , LifeStance
-  , Age
-  , Attitude
-  , Archetype
+  , LifeStance (..)
+  , Age (..)
   , XP
   , Lvl
   , Hamingja
@@ -22,6 +21,13 @@ module Twarog.Backend.Types
   , WIL
   , INT
   , Attributes (..)
+  -- *** Attributes lenses
+  , cha
+  , con
+  , dex
+  , int
+  , str
+  , wil
   -- ** Modifiers
   , Cha
   , Con
@@ -29,6 +35,13 @@ module Twarog.Backend.Types
   , Str
   , Wil
   , Modifiers (..)
+  -- *** Modifiers lenses
+  , chaMod
+  , conMod
+  , dexMod
+  , intMod
+  , strMod
+  , wilMod
   -- ** Combat statistics
   , OvMe
   , OvMi
@@ -56,6 +69,9 @@ module Twarog.Backend.Types
   , Resistance
   , Disease
   , Poison
+  -- *** Resistance lenses
+  , disease
+  , poison 
   -- ** Morale
   , Morale
   -- * Item statistics
@@ -77,7 +93,7 @@ module Twarog.Backend.Types
   , BaseRange -- Bows and crossbows only
   ) where
 
-import Twarog.Backend.Archetypes (Attitude(..), Archetype(..))
+import Control.Lens
 
 type AV = Int
 type Damage = Int
@@ -120,7 +136,8 @@ type Physical = Int
 type XP = Int
 type HP = Int
 type SP = Int
-type Age = Int
+data Age = Immortal | Mortal Int
+  deriving (Show)
 type Height = Int
 type Size = Int
 
@@ -198,24 +215,46 @@ data Encumbrance = LightLoad    -- ^ '0' MS mod
                  deriving (Show)
 
 data Resistance = Resistance
-  { disease :: Disease
-  , poison  :: Poison
+  { _disease :: Disease
+  , _poison  :: Poison
   } deriving (Show)
+makeLenses ''Resistance
 
 data Attributes = Attributes
-  { cha :: CHA
-  , con :: CON
-  , dex :: DEX
-  , int :: INT
-  , str :: STR
-  , wil :: WIL
+  { _cha :: CHA
+  , _con :: CON
+  , _dex :: DEX
+  , _int :: INT
+  , _str :: STR
+  , _wil :: WIL
   } deriving (Show)
+makeLenses ''Attributes  
               
 data Modifiers = Modifiers
-  { chaMod :: Cha
-  , conMod :: Con
-  , dexMod :: Dex
-  , intMod :: Int -> Int
-  , strMod :: Str
-  , wilMod :: Wil
+  { _chaMod :: Cha
+  , _conMod :: Con
+  , _dexMod :: Dex
+  , _intMod :: Int -> Int
+  , _strMod :: Str
+  , _wilMod :: Wil
   } 
+makeLenses ''Modifiers
+
+-- | Convert Attributes to Modifiers
+modifiers :: Attributes -> Modifiers 
+modifiers (Attributes cha con dex int str wil) =
+  let xs = [cha, con, dex, int, str, wil]
+      f x | x <= 1             = \x -> x - 5
+          | x == 2             = \x -> x - 4
+          | x == 3             = \x -> x - 3
+          | x == 4 || x == 5   = \x -> x - 2
+          | 6 <= x && x <= 8   = \x -> x - 1
+          | 9 <= x && x <= 12  = id 
+          | 13 <= x && x <= 15 = (+ 1)
+          | 16 <= x && x <= 17 = (+ 2)
+          | 18 <= x && x <= 19 = (+ 3)
+          | x == 20            = (+ 4)
+          | x == 21            = (+ 5)
+          | x >= 22            = (+ 6)
+  in Modifiers (f cha) (f con) (f dex) (f int) (f str) (f wil)      
+

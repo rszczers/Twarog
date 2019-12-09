@@ -1,35 +1,71 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Twarog.Backend.Character 
-  ( Character (..)
+  ( -- * Character
+    Character
+  -- ** Character lenses
+  , playersName
+  , charName   
+  , level      
+  , role       
+  , age        
+  , race       
+  , height     
+  , size       
+  , lifeStance 
+  , alignment  
+  , stamina    
+  , health     
+  , toughness  
+  , experience 
+  , resistance 
+  , flaws      
+  , talents    
+  , skills     
+  , equipment  
+  , attributes 
+  , other      
+  -- * Equipment
+  , Equipment
+  -- ** Equipment lenses
+  , belt         
+  , pouch        
+  , quiver       
+  , leftShoulder 
+  , rightShoulder
+  , sack         
+  , backpack     
+  , armour       
+  , helmet       
+  , shield       
+  , meleeWeapon  
+  , missileWeapon
+  , clothes      
+  -- * Combat Statistics
+  , CombatStats
+  -- ## CombatStats lenses
+  , ovMe       
+  , ovMi       
+  , dvMe       
+  , dvMi       
+  , dodging    
+  , totalAv    
+  , msPenality 
+  , shieldDvMe 
+  , shieldBlock
   )
   where
 
-import Data.Set
+import qualified Data.Set as S
 import Control.Lens
 
+import Twarog.Backend.Archetypes
 import Twarog.Backend.Types
 import Twarog.Backend.Skills
 import Twarog.Backend.Flaws
 import Twarog.Backend.Talents
 import Twarog.Backend.Item
 
-modifiers :: Attributes -> Modifiers 
-modifiers (Attributes cha con dex int str wil) =
-  let xs = [cha, con, dex, int, str, wil]
-      f x | x <= 1             = \x -> x - 5
-          | x == 2             = \x -> x - 4
-          | x == 3             = \x -> x - 3
-          | x == 4 || x == 5   = \x -> x - 2
-          | 6 <= x && x <= 8   = \x -> x - 1
-          | 9 <= x && x <= 12  = id 
-          | 13 <= x && x <= 15 = (+ 1)
-          | 16 <= x && x <= 17 = (+ 2)
-          | 18 <= x && x <= 19 = (+ 3)
-          | x == 20            = (+ 4)
-          | x == 21            = (+ 5)
-          | x >= 22            = (+ 6)
-  in Modifiers (f cha) (f con) (f dex) (f int) (f str) (f wil)      
 
 data CombatStats = CombatStats
   { _ovMe        :: OvMe
@@ -87,8 +123,10 @@ data Character = Player
   , _resistance  :: Resistance
   , _flaws       :: [Flaw]
   , _talents     :: [Talent]
-  , _skills      :: Set CharacterSkill
+  , _skills      :: S.Set CharacterSkill
   , _equipment   :: Equipment
   , _attributes  :: Attributes
+  , _other       :: [String]
   } deriving (Show)
 makeLenses ''Character
+

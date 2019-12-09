@@ -11,6 +11,7 @@ module Main
 -- | Miso framework import
 import           Miso
 import           Miso.String
+import Twarog
 
 -- | JSAddle import
 #ifndef __GHCJS__
