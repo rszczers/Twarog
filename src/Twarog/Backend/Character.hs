@@ -56,7 +56,6 @@ module Twarog.Backend.Character
   , shieldBlock
   -- Utilities
   , expToLvl
-  , maxNormalLvl
   , maximumAge
   , crHPBonus
   )
@@ -213,6 +212,7 @@ isProperRole cr (Attributes cha con dex int str wil) ts ls race sex god arch =
     HalflingRole -> race == Halfling
     _ -> False
 
+-- | Helper function for @expToLvl@
 maxNormalLvl :: Race -> CharacterRole -> Sex -> Lvl
 maxNormalLvl race cr sex = case race of
   Dwarf       -> 9
@@ -245,6 +245,7 @@ maxNormalLvl race cr sex = case race of
     Warrior   -> 12
     _         -> error "Only High Man can be a Bard, Ranger or Sorcerer"
 
+-- | Experience points to PC level conversion
 expToLvl :: Race -> CharacterRole -> Sex
          -> XP -> Lvl
 expToLvl r cr s xp =
@@ -257,6 +258,230 @@ expToLvl r cr s xp =
    in fromInteger $ if p 
       then lvl
       else lvl'
+
+-- | Default number of Character Skills from @crSkills@
+-- that can be choosen.
+defaultCrSkillChoices :: CharacterRole -> Int
+defaultCrSkillChoices = \case
+  Civilian -> 4
+  _        -> 6
+
+-- | Additional Trained Skills for male and female PC,
+-- respectively
+additionalTrainedSkills :: Sex -> [Skill]
+additionalTrainedSkills = \case
+  Male   -> [ Crafts
+            , FlutePlaying
+            , Foraging
+            , LyrePlaying
+            , Melee
+            , Missile
+            , Poetry
+            , SocialSkills
+            , Stamina
+            , Swimming
+            , WorldLore
+            ]
+  Female -> [ Acting
+            , Crafts
+            , Healing
+            , Foraging
+            , ReligiousTradition
+            , Singing
+            , SocialSkills
+            , Swimming
+            , WorldLore
+            ]
+
+-- | Player can choose his Character Skills
+-- with regard to his PC role.
+crSkills :: CharacterRole -> [Skill]
+crSkills = \case
+  Civilian      -> [ Acrobatics
+                   , Acting
+                   , Alchemy
+                   , Climbing
+                   , Crafts
+                   , Dancing
+                   , Dodging
+                   , FlutePlaying
+                   , Foraging
+                   , Fortitude
+                   , Healing
+                   , LyrePlaying
+                   , Mechanics
+                   , Melee
+                   , Missile
+                   , Navigation
+                   , Perception
+                   , Poetry
+                   , ReligiousTradition
+                   , Riding
+                   , RuneLore
+                   , Seamanship
+                   , Singing
+                   , SocialSkills
+                   , Stamina
+                   , Stealth
+                   , Swimming
+                   , Tempo
+                   , Tracking
+                   , Trickery
+                   , WorldLore
+                   ]
+  Warrior       -> [ Acrobatics
+                   , Melee
+                   , Missile
+                   , Riding
+                   , Seamanship
+                   , Stamina
+                   ]
+  Stalker       -> [ Acrobatics
+                   , Climbing
+                   , Navigation
+                   , Riding
+                   , Stamina
+                   , Stealth
+                   , Swimming
+                   , Tracking
+                   ]
+  Trickster     -> [ Acrobatics
+                   , Acting
+                   , Climbing
+                   , Mechanics
+                   , SocialSkills
+                   , Stealth
+                   , Trickery
+                   ]
+  Ranger        -> [ Acrobatics
+                   , Foraging
+                   , Healing
+                   , Missile
+                   , Navigation
+                   , Poetry
+                   , ReligiousTradition
+                   , Stamina
+                   , Stealth
+                   , Swimming
+                   , Tracking
+                   ]
+  Bard          -> [ Acting
+                   , Alchemy
+                   , Dancing
+                   , FlutePlaying
+                   , Healing
+                   , LyrePlaying
+                   , Poetry
+                   , ReligiousTradition
+                   , Singing
+                   , SocialSkills
+                   , WorldLore
+                   ]
+  Sorcerer      -> [ Alchemy
+                   , Fortitude
+                   , Healing
+                   , Poetry
+                   , RuneLore
+                   , Singing
+                   , Stamina
+                   , WorldLore
+                   ]
+  DwarfRole     -> [ Climbing
+                   , Crafts
+                   , Foraging
+                   , Fortitude
+                   , Mechanics
+                   , Melee
+                   , Missile
+                   , RuneLore
+                   , Stamina
+                   , WorldLore
+                   ]
+  ElfRole       -> [ Acrobatics
+                   , Climbing
+                   , Crafts
+                   , Dancing
+                   , FlutePlaying
+                   , Foraging
+                   , Fortitude
+                   , Healing
+                   , Melee
+                   , Missile
+                   , Navigation
+                   , Poetry
+                   , RuneLore
+                   , Seamanship
+                   , Singing
+                   , Stealth
+                   , Swimming
+                   , Tracking
+                   , WorldLore
+                   ]
+  GnomeRole     -> [ Alchemy
+                   , Climbing
+                   , Foraging
+                   , Fortitude
+                   , Poetry
+                   , RuneLore
+                   , Singing
+                   , Stealth
+                   , Trickery
+                   , WorldLore
+                   ]
+  GoblinRole    -> [ Acrobatics
+                   , Climbing
+                   , Foraging
+                   , Melee
+                   , Missile
+                   , Navigation
+                   , Riding
+                   , Stamina
+                   , Stealth
+                   , Tracking
+                   ]
+  HalflingRole  -> [ Climbing
+                   , Dancing
+                   , Foraging
+                   , Fortitude
+                   , Missile
+                   , Navigation
+                   , Poetry
+                   , Singing
+                   , SocialSkills
+                   , Stealth
+                   , Trickery
+                   ]
+  OrcRole       -> [ Acrobatics
+                   , Climbing
+                   , Foraging
+                   , Melee
+                   , Missile
+                   , Stamina
+                   , Tracking
+                   ]
+  HalfOrcRole   -> [ Acrobatics
+                   , Climbing
+                   , Foraging
+                   , Mechanics
+                   , Melee
+                   , Missile
+                   , Navigation
+                   , Riding
+                   ]
+  OgreRole      -> [ Acrobatics
+                   , Climbing
+                   , Foraging
+                   , Melee
+                   , Stamina
+                   , Tracking
+                   ]
+  HobgoblinRole -> [ Acrobatics
+                   , Climbing
+                   , Foraging
+                   , Melee
+                   , Stamina
+                   , Tracking
+                   ]
 
 crHPBonus :: CharacterRole -> Int -> Int
 crHPBonus = \case
