@@ -8,6 +8,7 @@ module Twarog.Backend.SkillMods
 import Control.Lens
 import Data.Set
 
+import Twarog.Backend.Types (Lvl)
 import Twarog.Backend.Character
 import Twarog.Backend.Skills
 import Twarog.Backend.Talents
@@ -43,14 +44,14 @@ untrainedPenality skill =
             _ -> 0
    in \x -> x - y  
 
-crSkillMod :: Character -> Int -> Int
-crSkillMod c =
-  let m = c ^. level . to (`div` 2)
+crSkillMod :: Lvl -> Int -> Int
+crSkillMod level =
+  let m = level `div` 2
    in \x -> x + (min m 5)
 
-trainedSkillMod :: Character -> Int -> Int
-trainedSkillMod c =
-  let m = c ^. level . to (`div` 4)
+trainedSkillMod :: Lvl -> Int -> Int
+trainedSkillMod level =
+  let m = level `div` 4
    in \x -> x + (min m 4)
 
 skillMod = undefined

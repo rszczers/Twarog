@@ -136,7 +136,7 @@ godSkaudic = \case
   Saga      -> "Dodola"
   Thor      -> "Perun"
   Baldr     -> "Białobóg"
-  Jord      -> "Matka ziemia"
+  Jord      -> "Matka Ziemia"
   Njordr    -> "Mokosz"
   Forseti   -> "Strzybóg"
   Freyja    -> "Łada"

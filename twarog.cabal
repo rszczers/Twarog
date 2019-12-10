@@ -77,6 +77,7 @@ library
                      , Twarog.Backend.Skills
                      , Twarog.Backend.SkillMods
                      , Twarog.Backend.Races
+                     , Twarog.Backend.Gods
                      , Twarog.Backend.Talents
                      , Twarog.Backend.Types
                      , Twarog.Backend.Units

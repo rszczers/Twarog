@@ -2,7 +2,7 @@
 
 module Twarog.Backend.Character 
   ( -- * Character
-    Character (..)
+    CharacterSheet (..)
   , CharacterRole (..)
   -- ** Character lenses
   , playersName
@@ -44,7 +44,7 @@ module Twarog.Backend.Character
   , clothes      
   -- * Combat Statistics
   , CombatStats
-  -- ## CombatStats lenses
+  -- ** CombatStats lenses
   , ovMe       
   , ovMi       
   , dvMe       
@@ -54,6 +54,11 @@ module Twarog.Backend.Character
   , msPenality 
   , shieldDvMe 
   , shieldBlock
+  -- Utilities
+  , expToLvl
+  , maxNormalLvl
+  , maximumAge
+  , crHPBonus
   )
   where
 
@@ -79,8 +84,12 @@ data CharacterRole = Civilian
                    | DwarfRole
                    | ElfRole
                    | GnomeRole
+                   | GoblinRole
                    | HalflingRole
                    | OrcRole
+                   | HalfOrcRole
+                   | OgreRole
+                   | HobgoblinRole
                    deriving (Show)
 
 data CombatStats = CombatStats
@@ -121,7 +130,7 @@ instance Show Modifiers where
 {- | Character sheet, non-specific to combat mode, i.e. we 
 don't consider e.g. Morale.
 -}
-data Character = Player
+data CharacterSheet = Player
   { _playersName :: String
   , _charName    :: String
   , _level       :: Lvl
@@ -145,7 +154,7 @@ data Character = Player
   , _attributes  :: Attributes
   , _other       :: [String]
   } deriving (Show)
-makeLenses ''Character
+makeLenses ''CharacterSheet
 
 maximumAge :: Race -> CON -> Age
 maximumAge race con = case race of
@@ -162,48 +171,118 @@ maximumAge race con = case race of
   LesserMan -> Mortal $  4 * con
   HighMan   -> Mortal $  6 * con
 
-acrobatics :: Character -> Int -> Int
-acrobatics c =
-  let baseMod = c ^. attributes . con . to toModifier
-   in baseMod
-
 isProperRole :: CharacterRole 
              -> Attributes -> [Talent]
-             -> LifeStance ->  Race -> Sex 
+             -> LifeStance -> Race -> Sex -> God
              -> Archetype 
              -> Bool
-isProperRole cr (Attributes cha con dex int str wil) ts ls race sex arch =
+isProperRole cr (Attributes cha con dex int str wil) ts ls race sex god arch =
   case cr of
     Civilian -> True
-    Warrior -> con >= 9 
-            && str >= 13 
-            && wil >= 9 
-            && sex == Male
-    Stalker -> con >= 9 
-            && dex >= 9 
-            && int >= 9
+    Warrior   -> con >= 9 
+              && str >= 13 
+              && wil >= 9 
+              && sex == Male
+    Stalker   -> con >= 9 
+              && dex >= 9 
+              && int >= 9
     Trickster -> con >= 9 
               && dex >= 9 
               && int >= 9
-    Ranger -> race == HighMan 
-           && ls == Religious 
-           && arch == Artemisian
-           && cha >= 13
-           && con >= 9
-           && dex >= 9
-           && int >= 9
-           && wil >= 9
-    Bard -> race == HighMan
-         && ls == Religious
-         && cha >= 16
-         && Marked `elem` ts
-    Sorcerer -> race == HighMan
-             && ls == Traditional
-             && int >= 13
-             && wil >= 13
-             && Marked `elem` ts
+    Ranger    -> race == HighMan 
+              && ls == Religious 
+              && arch == Artemisian
+              && god == Skadi
+              && cha >= 13
+              && con >= 9
+              && dex >= 9
+              && int >= 9
+              && wil >= 9
+    Bard      -> race == HighMan
+              && ls == Religious
+              && cha >= 16
+              && Marked `elem` ts
+    Sorcerer  -> race == HighMan
+              && ls == Traditional
+              && int >= 13
+              && wil >= 13
+              && Marked `elem` ts
     DwarfRole -> race == Dwarf
-    ElfRole -> race == Elf
+    ElfRole   -> race == Elf
     GnomeRole -> race == Gnome
     HalflingRole -> race == Halfling
-    OrcRole -> False
+    _ -> False
+
+maxNormalLvl :: Race -> CharacterRole -> Sex -> Lvl
+maxNormalLvl race cr sex = case race of
+  Dwarf       -> 9
+  Elf         -> 9
+  Hobgoblin   -> 6
+  HalfOrc     -> 9
+  Goblin      -> 6
+  Ogre        -> 5
+  CommonOrc   -> 6
+  Gnome       -> 7
+  Halfling    -> 6
+  HighMan     -> case cr of
+    Bard      -> case sex of
+      Male    -> 12
+      Female  -> 14
+    Civilian  -> 12
+    Ranger    -> 12
+    Sorcerer  -> 12
+    Stalker   -> 12
+    Trickster -> case sex of
+      Male    -> 12
+      Female  -> 14
+    Warrior   -> 12
+  _           -> case cr of
+    Civilian  -> 12
+    Stalker   -> 12
+    Trickster -> case sex of
+      Male    -> 12
+      Female  -> 14
+    Warrior   -> 12
+    _         -> error "Only High Man can be a Bard, Ranger or Sorcerer"
+
+expToLvl :: Race -> CharacterRole -> Sex
+         -> XP -> Lvl
+expToLvl r cr s xp =
+  let squareRoot = floor . sqrt . (fromIntegral :: Int -> Double) -- ffs
+      lvl = squareRoot $ xp `div` 250
+      lvl' = squareRoot $ xp `div` 500
+      m = fromIntegral $ maxNormalLvl r cr s
+      p = lvl <= m
+      dlvl = lvl - m
+   in fromInteger $ if p 
+      then lvl
+      else lvl'
+
+crHPBonus :: CharacterRole -> Int -> Int
+crHPBonus = \case
+  Civilian      -> (+ 1)
+  Warrior       -> (+ 2)   
+  Stalker       -> (+ 1)       
+  Trickster     -> (+ 1) 
+  Ranger        -> (+ 1)    
+  Bard          -> (+ 1)      
+  Sorcerer      -> (+ 1)  
+  DwarfRole     -> (+ 3) 
+  ElfRole       -> (+ 1)   
+  GnomeRole     -> (+ 1) 
+  HalflingRole  -> (+ 1)
+  OrcRole       -> (+ 2)
+  GoblinRole    -> (+ 1)
+  HobgoblinRole -> (+ 3)
+  HalfOrcRole   -> (+ 2)
+  OgreRole      -> (+ 3)
+
+sp :: CharacterRole -> Con -> Lvl 
+   -> Int
+sp cr c lvl = 
+  let bonus = (* lvl) . crHPBonus cr 
+   in bonus . c $ 8
+
+hp :: CON -> Str -> Size -> Lvl
+   -> Int
+hp c str s lvl = str . s $ c

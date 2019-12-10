@@ -1,5 +1,5 @@
 module Twarog
-  ( Character
+  ( CharacterSheet
   )
 where
 

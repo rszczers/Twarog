@@ -6,6 +6,7 @@ module Twarog.Backend.Races
   , raceAdultAge
   , raceSizeMod
   , raceAttrMod
+  , isRaceTraditionalOnly
   -- ** Toughness mods
   , raceColdMod
   , raceHeatMod
@@ -268,4 +269,13 @@ raceSkillMod race skill = case race of
     Swimming ->   (\x -> x - 2)
     _ -> id
   _ -> id
+
+isRaceTraditionalOnly :: Race -> Bool
+isRaceTraditionalOnly = \case
+  Dwarf -> True
+  Elf -> True
+  CommonOrc -> True
+  Gnome -> True
+  _ -> False
+
 
