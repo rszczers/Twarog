@@ -1,11 +1,11 @@
 module Twarog.Backend.Archetypes 
-  ( Attitude
-  , Sociability
-  , Submissiveness
-  , Ontology
-  , Empathy
-  , Trait
-  , Archetype
+  ( Attitude (..)
+  , Sociability (..)
+  , Submissiveness (..)
+  , Ontology (..)
+  , Empathy (..)
+  , Trait (..)
+  , Archetype (..)
   ) where
 
 -- import System.Random
@@ -72,7 +72,7 @@ data Archetype = Aphroditic
                | Selenic
                | Uranic
                | Zevsean
-               deriving (Bounded, Enum, Show)
+               deriving (Bounded, Enum, Show, Eq)
 
 instance Trait Archetype where
   shadow = archetype . shadow . attitude

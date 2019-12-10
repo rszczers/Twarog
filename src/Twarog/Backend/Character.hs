@@ -2,7 +2,8 @@
 
 module Twarog.Backend.Character 
   ( -- * Character
-    Character
+    Character (..)
+  , CharacterRole (..)
   -- ** Character lenses
   , playersName
   , charName   
@@ -60,12 +61,27 @@ import qualified Data.Set as S
 import Control.Lens
 
 import Twarog.Backend.Archetypes
+import Twarog.Backend.Gods
 import Twarog.Backend.Types
 import Twarog.Backend.Skills
 import Twarog.Backend.Flaws
 import Twarog.Backend.Races
 import Twarog.Backend.Talents
 import Twarog.Backend.Item
+
+data CharacterRole = Civilian
+                   | Warrior
+                   | Stalker
+                   | Trickster
+                   | Ranger
+                   | Bard
+                   | Sorcerer
+                   | DwarfRole
+                   | ElfRole
+                   | GnomeRole
+                   | HalflingRole
+                   | OrcRole
+                   deriving (Show)
 
 data CombatStats = CombatStats
   { _ovMe        :: OvMe
@@ -115,6 +131,7 @@ data Character = Player
   , _height      :: Height
   , _size        :: Size
   , _lifeStance  :: LifeStance
+  , _favGod      :: Maybe God
   , _alignment   :: Archetype
   , _stamina     :: SP
   , _health      :: HP
@@ -130,22 +147,63 @@ data Character = Player
   } deriving (Show)
 makeLenses ''Character
 
-maximumAge :: Character -> Age
-maximumAge c = case c ^. race of
-  Dwarf     -> Mortal $ 30 * (c ^. attributes . con)
+maximumAge :: Race -> CON -> Age
+maximumAge race con = case race of
+  Dwarf     -> Mortal $ 30 *  con
   Elf       -> Immortal
-  Hobgoblin -> Mortal $ 30 * (c ^. attributes . con)
-  HalfOrc   -> Mortal $ 30 * (c ^. attributes . con)
-  Goblin    -> Mortal $ 30 * (c ^. attributes . con)
-  Ogre      -> Mortal $ 30 * (c ^. attributes . con)
-  CommonOrc -> Mortal $ 30 * (c ^. attributes . con)
-  Gnome     -> Mortal $ 30 * (c ^. attributes . con)
-  Halfling  -> Mortal $  6 * (c ^. attributes . con)
-  CommonMan -> Mortal $  5 * (c ^. attributes . con)
-  LesserMan -> Mortal $  4 * (c ^. attributes . con)
-  HighMan   -> Mortal $  6 * (c ^. attributes . con)
+  Hobgoblin -> Mortal $ 30 * con
+  HalfOrc   -> Mortal $ 30 * con
+  Goblin    -> Mortal $ 30 * con
+  Ogre      -> Mortal $ 30 * con
+  CommonOrc -> Mortal $ 30 * con
+  Gnome     -> Mortal $ 30 * con
+  Halfling  -> Mortal $  6 * con
+  CommonMan -> Mortal $  5 * con
+  LesserMan -> Mortal $  4 * con
+  HighMan   -> Mortal $  6 * con
 
 acrobatics :: Character -> Int -> Int
 acrobatics c =
   let baseMod = c ^. attributes . con . to toModifier
    in baseMod
+
+isProperRole :: CharacterRole 
+             -> Attributes -> [Talent]
+             -> LifeStance ->  Race -> Sex 
+             -> Archetype 
+             -> Bool
+isProperRole cr (Attributes cha con dex int str wil) ts ls race sex arch =
+  case cr of
+    Civilian -> True
+    Warrior -> con >= 9 
+            && str >= 13 
+            && wil >= 9 
+            && sex == Male
+    Stalker -> con >= 9 
+            && dex >= 9 
+            && int >= 9
+    Trickster -> con >= 9 
+              && dex >= 9 
+              && int >= 9
+    Ranger -> race == HighMan 
+           && ls == Religious 
+           && arch == Artemisian
+           && cha >= 13
+           && con >= 9
+           && dex >= 9
+           && int >= 9
+           && wil >= 9
+    Bard -> race == HighMan
+         && ls == Religious
+         && cha >= 16
+         && Marked `elem` ts
+    Sorcerer -> race == HighMan
+             && ls == Traditional
+             && int >= 13
+             && wil >= 13
+             && Marked `elem` ts
+    DwarfRole -> race == Dwarf
+    ElfRole -> race == Elf
+    GnomeRole -> race == Gnome
+    HalflingRole -> race == Halfling
+    OrcRole -> False

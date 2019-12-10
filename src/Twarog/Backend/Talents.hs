@@ -76,5 +76,5 @@ data Talent = Acrobatic
             | WarmHands
             | Zevsean
             | Aegirean
-            deriving (Show)
+            deriving (Eq, Show)
 

@@ -35,7 +35,7 @@ data Race = Dwarf
           | CommonMan
           | LesserMan
           | HighMan
-          deriving (Show)
+          deriving (Eq, Show)
 
 raceSizeMod :: Race -> Sex -> Size
 raceSizeMod race sex = case race of

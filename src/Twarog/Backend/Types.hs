@@ -3,8 +3,7 @@ module Twarog.Backend.Types
   ( 
   -- * Character sheet
   -- ** Descriptive part
-    CharacterRole
-  , Sex (..)
+    Sex (..)
   , Height
   , Size (..)
   , LifeStance (..)
@@ -167,27 +166,15 @@ type INT = Int
 
 type Lvl = Int
 
-data CharacterRole = Civilian
-                   | Warrior
-                   | Stalker
-                   | Trickster
-                   | Ranger
-                   | Bard
-                   | Sorcerer
-                   | DwarfRole
-                   | ElfRole
-                   | GnomeRole
-                   | HalflingRole
-                   | OrcRole
-                   deriving (Show)
 
 data Sex = Male
          | Female
-         deriving (Show)
+         | Non
+         deriving (Eq, Show)
 
 data LifeStance = Religious
                 | Traditional
-                deriving (Show)
+                deriving (Eq, Show)
 
 data Toughness = Toughness Cold Electricity Heat Physical
   deriving (Show)
