@@ -3,8 +3,11 @@ module Twarog.Backend.Calendar
   , Season (..)
   , month
   , monthGod
+  , monthSeason
   , seasonAttrMod
   ) where
+
+import Control.Lens 
 
 import Twarog.Backend.Gods
 import Twarog.Backend.Types
@@ -47,6 +50,22 @@ month = \case
   12 -> Thrymheimr
   13 -> Ydalir
 
+monthSeason :: Month -> Season
+monthSeason = \case
+  Valaskjolf  -> Winter
+  Himinbjorg  -> Winter
+  Landvidi    -> Winter
+  Sokkvabekkr -> Winter
+  Thrudheimr  -> Spring
+  Breidablik  -> Spring
+  Noatun      -> Spring
+  Glitnir     -> Summer
+  Folkvangr   -> Summer
+  Alfheimr    -> Summer
+  Gladsheimr  -> Autumn
+  Thrymheimr  -> Autumn
+  Ydalir      -> Autumn
+
 monthGod :: Month -> [God]
 monthGod = \case
   Valaskjolf  -> [Vali]
@@ -64,9 +83,9 @@ monthGod = \case
   Ydalir      -> [Hodr]
 
 seasonAttrMod :: Season -> Attributes -> Attributes
-seasonAttrMod season attr = case season of
-  Winter -> attr ^. int +~ 1
-  Spring -> attr ^. str +~ 1
-  Summer -> attr ^. wil +~ 1
-  Autumn -> attr ^. con +~ 1
-  NewYear -> attr ^. cha +~ 1
+seasonAttrMod season = case season of
+  Winter  -> int +~ 1
+  Spring  -> str +~ 1
+  Summer  -> wil +~ 1
+  Autumn  -> con +~ 1
+  NewYear -> cha +~ 1

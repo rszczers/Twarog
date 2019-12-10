@@ -1,9 +1,14 @@
 module Twarog
-  ( CharacterSheet
+  ( CharacterSheet (..)
+  , NewCharacter (..)
   )
-where
+    where
 
+import Twarog.Backend.Gods
+import Twarog.Backend.Races
+import Twarog.Backend.Calendar
 import Twarog.Backend.SkillMods
+import Twarog.Backend.Archetypes
 import Twarog.Backend.Character
 import Twarog.Backend.Item
 import Twarog.Backend.Units

@@ -10,6 +10,7 @@ import Data.Set
 
 import Twarog.Backend.Types (Lvl)
 import Twarog.Backend.Character
+import Twarog.Backend.Calendar
 import Twarog.Backend.Skills
 import Twarog.Backend.Talents
 import Twarog.Backend.Races

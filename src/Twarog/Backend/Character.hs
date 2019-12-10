@@ -4,6 +4,7 @@ module Twarog.Backend.Character
   ( -- * Character
     CharacterSheet (..)
   , CharacterRole (..)
+  , NewCharacter (..)
   -- ** Character lenses
   , playersName
   , charName   
@@ -54,7 +55,7 @@ module Twarog.Backend.Character
   , msPenality 
   , shieldDvMe 
   , shieldBlock
-  -- Utilities
+  -- * Utilities
   , expToLvl
   , maximumAge
   , crHPBonus
@@ -66,6 +67,7 @@ import Control.Lens
 
 import Twarog.Backend.Archetypes
 import Twarog.Backend.Gods
+import Twarog.Backend.Calendar
 import Twarog.Backend.Types
 import Twarog.Backend.Skills
 import Twarog.Backend.Flaws
@@ -135,6 +137,7 @@ data CharacterSheet = Player
   , _level       :: Lvl
   , _role        :: CharacterRole
   , _age         :: Age
+  , _maxAge      :: Age
   , _race        :: Race
   , _height      :: Height
   , _size        :: Size
@@ -143,18 +146,36 @@ data CharacterSheet = Player
   , _alignment   :: Archetype
   , _stamina     :: SP
   , _health      :: HP
+  , _combatStats :: CombatStats
   , _toughness   :: Toughness
   , _experience  :: XP
   , _resistance  :: Resistance
   , _flaws       :: [Flaw]
   , _talents     :: [Talent]
-  , _skills      :: S.Set CharacterSkill
+  , _skills      :: S.Set (CharacterSkill, Int)
   , _equipment   :: Equipment
   , _attributes  :: Attributes
   , _other       :: [String]
   } deriving (Show)
 makeLenses ''CharacterSheet
 
+-- | Minimal character model; fields are written
+-- in order of how forms should be completed
+data NewCharacter = NewCharacter
+  { _characterRace      :: Maybe Race
+  , _characterBirth     :: Maybe Month
+  , _characterAlignment :: Maybe Archetype
+  , _characterGod       :: Maybe (Maybe God)
+  , _characterSex       :: Maybe Sex
+  , _characterAttr      :: Maybe Attributes
+  , _characterHamingja  :: Maybe Hamingja
+  , _characterFlaws     :: Maybe [Flaw]
+  , _characterRole      :: Maybe CharacterRole
+  , _characterSkills    :: Maybe (S.Set CharacterSkill)
+  , _characterTalent    :: Maybe [Talent]
+  }
+ 
+-- | Maximal age that PC can live up to
 maximumAge :: Race -> CON -> Age
 maximumAge race con = case race of
   Dwarf     -> Mortal $ 30 *  con
@@ -170,6 +191,8 @@ maximumAge race con = case race of
   LesserMan -> Mortal $  4 * con
   HighMan   -> Mortal $  6 * con
 
+-- | Check if for given parameters given Character Role is
+-- allowed.
 isProperRole :: CharacterRole 
              -> Attributes -> [Talent]
              -> LifeStance -> Race -> Sex -> God
@@ -502,12 +525,8 @@ crHPBonus = \case
   HalfOrcRole   -> (+ 2)
   OgreRole      -> (+ 3)
 
-sp :: CharacterRole -> Con -> Lvl 
-   -> Int
-sp cr c lvl = 
-  let bonus = (* lvl) . crHPBonus cr 
-   in bonus . c $ 8
+hp :: CON -> Str -> Size -> CharacterRole -> Lvl -> HP
+hp c str size cr lvl =
+  let bonus = lvl * crHPBonus cr 0
+   in size . str $ c + bonus
 
-hp :: CON -> Str -> Size -> Lvl
-   -> Int
-hp c str s lvl = str . s $ c
