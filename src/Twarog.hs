@@ -10,5 +10,6 @@ import Twarog.Backend.Calendar
 import Twarog.Backend.SkillMods
 import Twarog.Backend.Archetypes
 import Twarog.Backend.Character
+import Twarog.Backend.CharacterSheet
 import Twarog.Backend.Item
 import Twarog.Backend.Units

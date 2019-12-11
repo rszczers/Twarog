@@ -92,6 +92,9 @@ godElement = \case
   Urdr      -> Water
   Audhumbla -> Spirit
 
+-- | Bards can chose favourite deity of the same sex.
+-- Heimdallr is an exception: it can be chosen both
+-- by male and female PCs.
 godSex :: God -> Sex
 godSex = \case
   Vali      -> Male
@@ -181,3 +184,4 @@ godArchetype = \case
   Skadi     -> Artemisian
   Mani      -> Selenic
   Hodr      -> Plutonic
+  _         -> error "Unsympathetic deity"

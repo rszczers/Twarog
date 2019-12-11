@@ -1,9 +1,12 @@
-{-# LANGUAGE TemplateHaskell #-}
 module Twarog.Backend.Types
   ( 
   -- * Character sheet
+  -- ** Sheet owner
+    Owner (..)
+  , CharacterName
+  , Note
   -- ** Descriptive part
-    Sex (..)
+  , Sex (..)
   , Height
   , Size (..)
   , LifeStance (..)
@@ -57,7 +60,7 @@ module Twarog.Backend.Types
   , Electricity
   , Heat
   , Physical
-  , Toughness
+  , Toughness (..)
   -- ** Condition
   , Condition
   -- ** Encumbrance
@@ -66,7 +69,7 @@ module Twarog.Backend.Types
   , HP
   , SP
   -- ** Resistance
-  , Resistance
+  , Resistance (..)
   , Disease
   , Poison
   -- *** Resistance lenses
@@ -96,6 +99,10 @@ module Twarog.Backend.Types
 import Control.Lens
 import Twarog.Backend.Units
 
+type Owner = String
+type CharacterName = String
+type Note = String
+
 type AV = Int
 type Damage = Int
 type OvMe = Int        
@@ -108,7 +115,7 @@ type MsPenality = Int
 type ShieldDvMe = Int  
 type ShieldBlock = Int 
 
-type Mod = Int
+type Mod = Int -> Int
 
 type Hamingja = Int
 type BaseRange = Int
@@ -223,6 +230,11 @@ data Modifiers = Modifiers
   , _wilMod :: Wil
   } 
 makeLenses ''Modifiers
+
+instance Show Modifiers where
+  show (Modifiers a b c d e f) =
+    let xs = [a, b, c, d, e, f] <*> [0]
+     in show xs
 
 toModifier :: Int -> Int -> Int
 toModifier x  | x <= 1             = \x -> x - 5

@@ -51,6 +51,7 @@ common common-options
                        ViewPatterns
                        TypeSynonymInstances
                        FlexibleInstances
+                       TemplateHaskell
 
 executable twarog-web
   import:              common-options
@@ -71,6 +72,7 @@ library
   exposed-modules:     Twarog
                      , Twarog.Backend.Archetypes
                      , Twarog.Backend.Character
+                     , Twarog.Backend.CharacterSheet
                      , Twarog.Backend.Enchantement
                      , Twarog.Backend.Flaws
                      , Twarog.Backend.Item
@@ -82,6 +84,7 @@ library
                      , Twarog.Backend.Talents
                      , Twarog.Backend.Types
                      , Twarog.Backend.Units
+                     , Twarog.Frontend.HamingjaStore
   -- other-modules:
   -- other-extensions:                                                         
   hs-source-dirs:      src
