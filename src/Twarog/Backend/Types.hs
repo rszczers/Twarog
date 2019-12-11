@@ -222,7 +222,7 @@ data Attributes = Attributes
   , _int :: INT
   , _str :: STR
   , _wil :: WIL
-  } deriving (Show)
+  } deriving (Eq, Show)
 makeLenses ''Attributes  
               
 data Modifiers = Modifiers

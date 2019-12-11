@@ -51,6 +51,6 @@ data Flaw = Alcoholic Int
           | Vulnerable Int
           | WeakMinded Int
           | Whiny Int
-          deriving (Show)
+          deriving (Eq, Show)
 
 

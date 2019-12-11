@@ -50,7 +50,7 @@ data CharacterRole = Civilian
                    | HalfOrcRole
                    | OgreRole
                    | HobgoblinRole
-                   deriving (Show)
+                   deriving (Eq, Show)
 
 data CombatStats = CombatStats
   { _ovMe        :: OvMe
@@ -81,7 +81,7 @@ data NewCharacter = NewCharacter
   , _characterRole      :: Maybe CharacterRole
   , _characterSkills    :: Maybe (S.Set CharacterSkill)
   , _characterTalent    :: Maybe [Talent]
-  } deriving (Show)
+  } deriving (Show, Eq)
  
 -- | Maximal age that PC can live up to
 maximumAge :: Race -> CON -> Age
