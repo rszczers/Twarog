@@ -99,7 +99,7 @@ data CharacterSheet = Player
   , _resistance  :: Resistance
   , _flaws       :: [Flaw]
   , _talents     :: [Talent]
-  , _skills      :: S.Set (CharacterSkill, SkillMod Mod)
+  , _skills      :: S.Set (CharacterSkill, SkillMod)
   , _equipment   :: Equipment
   , _attributes  :: Attributes
   , _other       :: [Note]
@@ -132,7 +132,7 @@ emptySheet =
                          _totalAv     = 0 
                          _msPenality  = 0 
                          _shieldDvMe  = 0 
-                         _shieldBlock = 0 
+                         _shieldBlock = \_ -> 0
                       in CombatStats {..}    
       _toughness = (Toughness 0 0 0 0)
       _experience = 0

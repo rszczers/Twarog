@@ -13,7 +13,7 @@ module Twarog.Backend.Item
 
 import Twarog.Backend.Types
 import Twarog.Backend.Units
-import Twarog.Backend.Enchantement
+import Twarog.Backend.Enchantment
 
 -- | Describes how damaged item is.
 data DamageDeg = Undamaged             -- ^ Item is perfectly fine.
@@ -23,9 +23,9 @@ data DamageDeg = Undamaged             -- ^ Item is perfectly fine.
                deriving (Show)
 
 -- | Describes how well item is made. 
-data Quality = Terrible      -- ^ -3 modification
-             | Poor          -- ^ -2 modification
-             | BelowAvarage  -- ^ -1 modification
+data Quality = Terrible      -- ^ '-3' modification
+             | Poor          -- ^ '-2' modification
+             | BelowAvarage  -- ^ '-1' modification
              | Avarage 
              | AboveAvarage  -- ^ 1 modification
              | High          -- ^ 2 modification
@@ -36,9 +36,9 @@ data Quality = Terrible      -- ^ -3 modification
 
 -- | Simplified notions for throwing range.
 data MissileRange = ShortRange   -- ^ 1 * 'BaseRange'.
-                  | MediumRange  -- ^ 2 * 'BaseRange'; '-2' OV Mod, -1 Damage.
-                  | LongRange    -- ^ 4 * 'BaseRange'; '-6' OV Mod, -2 Damage.
-                  | ExtremeRange -- ^ 8 * 'BaseRange'; '-12' OV Mod, -3 Damage.
+                  | MediumRange  -- ^ 2 * 'BaseRange'; '-2' OV Mod, '-1' Damage.
+                  | LongRange    -- ^ 4 * 'BaseRange'; '-6' OV Mod, '-2' Damage.
+                  | ExtremeRange -- ^ 8 * 'BaseRange'; '-12' OV Mod, '-3' Damage.
                   deriving (Show)
 
 -- | Melee weapon types
@@ -158,5 +158,5 @@ data Item d = Item
   , name         :: String
   , description  :: String
   , damageDegree :: DamageDeg
-  , enchantments :: [Enchantement]
+  , enchantments :: [Enchantment]
   } deriving (Show)

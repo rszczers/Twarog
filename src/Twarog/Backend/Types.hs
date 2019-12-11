@@ -113,7 +113,7 @@ type Dodging = Int
 type TotalAv = Int     
 type MsPenality = Int  
 type ShieldDvMe = Int  
-type ShieldBlock = Int 
+type ShieldBlock = Float -> Float
 
 type Mod = Int -> Int
 
@@ -123,7 +123,11 @@ type BaseRange = Int
 type ArmourMs = Int
 type StealthMod = Int
 type SwimmingMod = Int   
-type EncumbranceMod = Int 
+
+type EncumbranceMod = Float -> Float
+instance Show EncumbranceMod where
+  show f = show $ f 0.0
+
 type PerceptionMod = Int
 
 type ShieldMe = Int

@@ -73,7 +73,7 @@ library
                      , Twarog.Backend.Archetypes
                      , Twarog.Backend.Character
                      , Twarog.Backend.CharacterSheet
-                     , Twarog.Backend.Enchantement
+                     , Twarog.Backend.Enchantment
                      , Twarog.Backend.Flaws
                      , Twarog.Backend.Item
                      , Twarog.Backend.Skills

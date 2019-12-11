@@ -2,6 +2,7 @@ module Twarog.Backend.Skills
   ( CharacterSkill (..)
   , Skill (..)
   , SkillType (..)
+  , SkillMod (..)
   , Proficiency (..)
   , skillType
   )
@@ -90,4 +91,37 @@ skillType = \case
   Tracking -> SpecialSkill
   Trickery -> SpecialSkill
   WorldLore -> SpecialSkill
+
+data SkillMod = AcrobaticsMod Mod
+              | ActingMod Mod
+              | AlchemyMod Mod
+              | ClimbingMod Mod
+              | CraftsMod Mod
+              | DancingMod Mod
+              | DodgingMod Mod
+              | FlutePlayingMod Mod
+              | ForagingMod Mod
+              | FortitudeMod Mod
+              | HealingMod Mod
+              | LyrePlayingMod Mod
+              | MechanicsMod Mod
+              | MeleeMod Mod
+              | MissileMod Mod
+              | NavigationMod Mod
+              | PerceptionMod Mod
+              | PoetryMod Mod
+              | ReligiousTraditionMod Mod
+              | RidingMod Mod
+              | RuneLoreMod Mod
+              | SeamanshipMod Mod
+              | SingingMod Mod
+              | SocialSkillsMod Mod
+              | StaminaMod Mod
+              | StealthMod Mod
+              | SwimmingMod Mod
+              | TempoMod Mod
+              | TrackingMod Mod
+              | TrickeryMod Mod
+              | WorldLoreMod Mod
+              deriving (Show)
 

@@ -1,7 +1,6 @@
 module Twarog.Backend.SkillMods
   ( 
-    SkillMod (..)
-  , untrainedPenality
+    untrainedPenality
   )
   where
 
@@ -55,38 +54,6 @@ trainedSkillMod level =
   let m = level `div` 4
    in \x -> x + (min m 4)
 
-data SkillMod a = AcrobaticsMod a
-                | ActingMod a
-                | AlchemyMod a
-                | ClimbingMod a
-                | CraftsMod a
-                | DancingMod a
-                | DodgingMod a
-                | FlutePlayingMod a
-                | ForagingMod a
-                | FortitudeMod a
-                | HealingMod a
-                | LyrePlayingMod a
-                | MechanicsMod a
-                | MeleeMod a
-                | MissileMod a
-                | NavigationMod a
-                | PerceptionMod a
-                | PoetryMod a
-                | ReligiousTraditionMod a
-                | RidingMod a
-                | RuneLoreMod a
-                | SeamanshipMod a
-                | SingingMod
-                | SocialSkillsMod a
-                | StaminaMod a
-                | StealthMod a
-                | SwimmingMod a
-                | TempoMod a
-                | TrackingMod a
-                | TrickeryMod a
-                | WorldLoreMod a
-                deriving (Show, Eq)
 
 -- skillMod :: Character -> Skill -> Int -> Int
 -- skillMod c = \case
