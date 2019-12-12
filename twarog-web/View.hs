@@ -22,7 +22,7 @@ viewModel m@Model{..} =
             [ navbarElem m
              , div_ [class_ "hero-body"] [
                 div_ [class_ "container has-text-centered"] $
-                    [ breadcrumb [NameStage, RaceStage, TalentStage ]]
+                    [ breadcrumb [NameStage, RaceStage, TalentStage, (AtribStage 1)]]
                     ++ [getStage m]
                 ]
             ]
@@ -37,9 +37,9 @@ getStage :: Model -> View Msg
 getStage m = case m ^. currentStage of
                 OwnerStage -> askName m
                 NameStage -> askName m
-              --AtribStage
+                AtribStage n -> askAtributes m n
                 RaceStage -> askRace [Just Dwarf, Just Elf, Just Hobgoblin, Just HalfOrc, Just Goblin ] m
- {-               BirthStage
+ {-               BirthStagez
                 ArchetypeStage
                 GodStage
                 SexStage
@@ -125,7 +125,8 @@ makeCheckbox t m max =
                 div_ [ class_ "column has-text-centered" ] [
                     label_ [ class_ "checkbox radio is-size-5" ] [
                         input_ [ 
-                            type_ "checkbox", name_ "talent", style_  $ M.singleton "margin" "0.5rem"
+                            type_ "checkbox", name_ "talent"
+                            , style_  $ M.singleton "margin" "0.5rem"
                             , checked_ $ elem x talents
                             , disabled_ ( Prelude.length talents >= max
                                         && notElem x talents )
@@ -198,3 +199,40 @@ breadcrumb stages =
                 ])
                 stages
         ]
+
+askAtributes :: Model -> Int -> View Msg
+askAtributes m n = 
+    let 
+        atr = case n of 
+            1 -> "charisma" 
+            2 -> "constitution"
+            3 -> "dexterity"
+            4 -> "inteligence"
+            5 -> "strength"
+            6 -> "will power"
+    in        
+        div_ [] [
+            p_ [class_ "title is-1 has-text-weight-medium"] [text "Roll your dice!"]
+            , p_ [class_ "subtitle is-3"] [text $ ms $"Determine your " ++ atr ]
+            , p_ [class_ "subtitle"] [text "Three d6 two times" ]
+            , div_ [class_ "columns is-mobile is-centered"
+                    , style_  $ M.singleton "margin" "0.5rem" ] [
+                            input_ [class_ "input is-large column is-one-fifth"
+                                    , style_  $ M.singleton "margin-right" "0.5rem"
+                                    , type_ "number"
+                                    , max_ $ ms $ show $ maxAtrValue
+                                    , value_ (ms (show (m ^. currentRoll1)))
+                                    , onInput SetCurrentRoll1 ]
+                            , input_ [class_ "input is-large column is-one-fifth"
+                                    , type_ "number"
+                                    , max_ $ ms $ show $ maxAtrValue
+                                    , value_ (ms (show $ m ^. currentRoll2)) 
+                                    , onInput SetCurrentRoll2 ] 
+                        ]
+            , button_ [ class_ "button is-black"
+                        , onClick (SetAttribute (
+                                        max (m ^. currentRoll1) (m ^. currentRoll2))
+                                        n )
+                    ] 
+                        [text "Calculate"]
+            ]

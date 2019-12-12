@@ -2,10 +2,13 @@ module Model
     ( Model(..)
     , character
     , currentStage
+    , currentRoll1
+    , currentRoll2
     , Msg (..)
     , Stage (..)
     , initialModel
     , maxTalents
+    , maxAtrValue
 
     ) where
 
@@ -23,13 +26,15 @@ import           Twarog.Backend.Skills
 import           Twarog.Backend.Talents
 import           Twarog.Backend.Types
 
-data Stage = OwnerStage | NameStage | AtribStage | RaceStage | BirthStage
+data Stage = OwnerStage | NameStage | AtribStage Int | RaceStage | BirthStage
             | ArchetypeStage | GodStage | SexStage | HamingjaStage
             | FlawStage | RoleStage | SkilsStage | TalentStage
             deriving (Show, Eq)
 
 data Model = Model
     { _currentStage :: Stage
+    , _currentRoll1 :: Int
+    , _currentRoll2 :: Int
     , _character    :: NewCharacter
     } deriving (Show, Eq)
 makeLenses ''Model
@@ -38,20 +43,24 @@ data Msg =  Name MisoString
             | Talents [String]
             | RaceChecked (Maybe Race) Checked
             | TalentChecked Talent Checked
-            | UpdateField MisoString
-            | SayHelloWorld
             | NoOp
             | AskName
             | AskRace
             | AskTalents
             | ChangeStage Stage
+            | SetAttribute Int Int
+            | SetCurrentRoll1 MisoString
+            | SetCurrentRoll2 MisoString
             deriving (Show, Eq)
 
 maxTalents :: Int
 maxTalents = 3
 
+maxAtrValue :: Int
+maxAtrValue = 18
+
 initialModel :: Model
-initialModel = Model NameStage
+initialModel = Model (AtribStage 1) 0 0
                 $ NewCharacter Nothing Nothing Nothing
                                 Nothing Nothing Nothing
                                 Nothing Nothing Nothing
