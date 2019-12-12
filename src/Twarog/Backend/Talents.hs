@@ -2,13 +2,17 @@ module Twarog.Backend.Talents
   ( 
   -- * Talents
     Talent (..)
+  , talents
   -- ** Talent modifiers 
   , TalentMod (..)
   , talentMod
+  -- ** Utils
+  , availableTalents
   )
   where
 
 import Twarog.Backend.Types
+import Twarog.Backend.Races
 
 data Talent = Acrobatic
             | Aggresive
@@ -123,47 +127,60 @@ data Talent = Acrobatic
             | Aegirean
             deriving (Eq, Show, Enum)
 
-isTalentAvailable :: Talent -> [Talent] -> Bool
-isTalentAvailable = \case
-  AnimalFriend    -> elem Empathic
-  Arachnean       -> elem StrongGrip
-  Argonautic      -> elem Mariner
-  Bloodhound      -> elem Tracker
-  Calliopean      -> elem Polyhymnian
-  Careful         -> elem Focused
-  Cliopean        -> elem Curious
-  Craftsman       -> elem Nimble
-  DartThrower     -> elem Thrower
-  DeepBreather    -> elem Swimmer
-  Dodger          -> elem GoodReflexes
-  Eratorean       -> elem Polyhymnian
-  Euterpean       -> elem Polyhymnian
-  Fast            -> elem Athletic
-  Favourite       -> elem Marked
-  Fearless        -> elem Courageous
-  FistFighter     -> elem Fighter
-  Hephaestusean   -> elem Craftsman
-  Heraklean       -> elem Fighter
-  Inquisitive     -> elem Cliopean
-  Lancer          -> elem Fighter
-  Mechanic        -> elem Nimble
-  Mermaid         -> elem Swimmer
-  Mule            -> elem StrongBack
-  Perseusean      -> elem GoodReflexes
-  Pietistic       -> elem Humble
-  Rider           -> elem AnimalFriend 
-  Sensitive       -> elem Empathic
-  Sharpshooter    -> elem Shooter
-  Shooter         -> elem Focused
-  Sirenean        -> elem Polyhymnian
-  Slinger         -> elem Thrower
-  SpearThrower    -> elem Thrower
-  SwordDancer     -> elem Fighter
-  Terpsichorean   -> elem Acrobatic
-  Tracker         -> elem Focused
-  TricksterTalent -> elem Nimble
-  Zevsean         -> elem Thrower
-  _               -> \_ -> True
+-- | Check if PC has prerequisited talents
+isTalentAvailable :: [Talent] -> Race -> Talent -> Bool
+isTalentAvailable ts r t = if t `elem` ts then False 
+  else case t of
+    AnimalFriend    -> Empathic `elem` ts
+    Arachnean       -> StrongGrip `elem` ts
+    Argonautic      -> Mariner `elem` ts
+    Bloodhound      -> Tracker `elem` ts
+    Calliopean      -> Polyhymnian `elem` ts
+    Careful         -> Focused `elem` ts
+    Cliopean        -> Curious `elem` ts
+    Craftsman       -> Nimble `elem` ts
+    DartThrower     -> Thrower `elem` ts
+    DeepBreather    -> Swimmer `elem` ts
+    Dodger          -> GoodReflexes `elem` ts
+    Eratorean       -> Polyhymnian `elem` ts
+    Euterpean       -> Polyhymnian `elem` ts
+    Fast            -> Athletic `elem` ts
+    Favourite       -> Marked `elem` ts
+    Fearless        -> Courageous `elem` ts
+    FistFighter     -> Fighter `elem` ts
+    Hephaestusean   -> Craftsman `elem` ts
+    Heraklean       -> Fighter `elem` ts
+    Inquisitive     -> Cliopean `elem` ts
+    Lancer          -> Fighter `elem` ts
+    Mechanic        -> Nimble `elem` ts
+    Mermaid         -> Swimmer `elem` ts
+    Mule            -> StrongBack `elem` ts
+    Perseusean      -> GoodReflexes `elem` ts
+    Pietistic       -> Humble `elem` ts
+    Rider           -> AnimalFriend  `elem` ts
+    Sensitive       -> Empathic `elem` ts
+    Sharpshooter    -> Shooter `elem` ts
+    Shooter         -> Focused `elem` ts
+    Sirenean        -> Polyhymnian `elem` ts
+    Slinger         -> Thrower `elem` ts
+    SpearThrower    -> Thrower `elem` ts
+    SwordDancer     -> Fighter `elem` ts
+    Terpsichorean   -> Acrobatic `elem` ts
+    Tracker         -> Focused `elem` ts
+    TricksterTalent -> Nimble `elem` ts
+    Zevsean         -> Thrower `elem` ts
+    SlowAgeing      -> r /= Elf
+    _               -> True
+
+-- | List all talents
+talents :: [Talent]
+talents = enumFrom (toEnum 0)
+
+-- | Lists all achievable talents for given PC's talent list
+availableTalents :: Race -> [Talent] -> [Talent]
+availableTalents r ts = 
+  let p = isTalentAvailable ts r 
+   in filter p talents 
 
 data TalentMod  = -- Skills based
                   AcrobaticsTalent Mod
@@ -210,7 +227,6 @@ data TalentMod  = -- Skills based
                 | FrightTalent Mod
                 | OtherTalent Note
                 deriving (Show)
-
 
 talentMod :: Talent -> [TalentMod]
 talentMod = \case
@@ -330,5 +346,4 @@ talentMod = \case
   WarmHands       -> [ HealingTalent (+ 1) ]
   Zevsean         -> [ MissileTalent (+ 1) ]
   Aegirean        -> [ FrightTalent (\x -> x - 1) ]
-
 
