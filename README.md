@@ -2,7 +2,9 @@
 
 [![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
 
-*Tiny* player character online creator/manager for MYFAROG tabletop rpg.
+*Tiny* web-based player character creator/manager for MYFAROG tabletop rpg.
+
+Well, it does nothing spectacular yet. Come back here in a few days :neckbeard:
 
 ## Dev environment
 
