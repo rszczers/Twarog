@@ -2,6 +2,19 @@ module Twarog.Backend.Character
   ( -- * Character
     CharacterRole (..)
   , NewCharacter (..)
+  , characterOwner
+  , characterName
+  , characterAttr
+  , characterRace
+  , characterBirth
+  , characterAlignment
+  , characterGod
+  , characterSex  
+  , characterHamingja
+  , characterFlaws     
+  , characterRole    
+  , characterSkills
+  , characterTalent
   -- * Combat Statistics
   , CombatStats (..)
   -- ** CombatStats lenses
@@ -82,6 +95,7 @@ data NewCharacter = NewCharacter
   , _characterSkills    :: Maybe (S.Set CharacterSkill)
   , _characterTalent    :: Maybe [Talent]
   } deriving (Show, Eq)
+makeLenses ''NewCharacter
  
 -- | Maximal age that PC can live up to
 maximumAge :: Race -> CON -> Age
