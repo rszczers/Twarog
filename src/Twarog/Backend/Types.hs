@@ -63,8 +63,6 @@ module Twarog.Backend.Types
   , Toughness (..)
   -- ** Condition
   , Condition
-  -- ** Encumbrance
-  , Encumbrance
   -- ** Vitality
   , HP
   , SP
@@ -83,7 +81,6 @@ module Twarog.Backend.Types
   , ArmourMs
   , StealthMod
   , SwimmingMod
-  , EncumbranceMod
   , PerceptionMod -- For helmets only
   -- ** Shield statistics
   , ShieldMe
@@ -123,10 +120,6 @@ type BaseRange = Int
 type ArmourMs = Int
 type StealthMod = Int
 type SwimmingMod = Int   
-
-type EncumbranceMod = Float -> Float
-instance Show EncumbranceMod where
-  show f = show $ f 0.0
 
 type PerceptionMod = Int
 
@@ -203,11 +196,6 @@ data Morale = Nervous
             | Terrified
             | Panic
             deriving (Show)
-
-data Encumbrance = LightLoad    -- ^ '0' MS mod
-                 | MediumLoad   -- ^ '-1' MS mod
-                 | HeavyLoad    -- ^ '-2' MS mod
-                 deriving (Show)
 
 data Resistance = Resistance
   { _disease :: Disease
