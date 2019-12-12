@@ -57,14 +57,15 @@ askName m =
       [ h2_ [class_ "title is-1 has-text-weight-medium"] [ "Your name? "]
         , div_ [class_ "columns has-text-centered"] [
                 div_ [ class_ "column is-four-fifths"] [
-                            input_ [ class_ "input is-medium"
-                                   , value_ $ ms
-                                        $ fromMaybe "" (m^.character.characterName)
-                                   , onChange Name ]
-                        ]
+                        input_ [ class_ "input is-medium"
+                            , value_ $ ms
+                                $ fromMaybe "" (m^.character.characterName)
+                            , onChange Name 
+                            ]
+                    ]
                 , div_ [ class_ "column"] [
                             button_ [ class_ "button is-black is-medium"] [ text "Answer" ]
-                        ]
+                    ]
                 ]
       ]
 
@@ -77,55 +78,64 @@ askRace s m =
 
 askTalents :: [Talent] -> Model -> View Msg
 askTalents s m =
-    let talents = fromMaybe [] $ m ^. character . characterTalent
+    let 
+        talents = fromMaybe [] $ m ^. character . characterTalent
     in
-    div_ [ class_ "control has-text-centered" ] [
-        div_ [] [
-            p_ [class_ "title is-1 is-full has-text-weight-medium"] ["Your talents? "]
-            , div_ [ class_ ""]
-                [ p_ [class_ "subtitle"] $ ["You can choose "]
-                ++ [ text $ ms (maxTalents - Prelude.length talents)]
-                ++ [" more talents "]
-                ]
-            , div_ [ class_ "columns has-text-centered"]
-                $ makeCheckbox s m maxTalents
+        div_ [ class_ "control has-text-centered" ] [
+            div_ [] [
+                p_ [class_ "title is-1 is-full has-text-weight-medium"] ["Your talents? "]
+                , div_ [ class_ ""]
+                    [ p_ [class_ "subtitle"] $ ["You can choose "]
+                    ++ [ text $ ms (maxTalents - Prelude.length talents)]
+                    ++ [" more talents "]
+                    ]
+                , div_ [ class_ "columns has-text-centered"]
+                    $ makeCheckbox s m maxTalents
+            ]
         ]
-    ]
 
 makeRadio :: Model -> [Maybe Race] -> [View Msg]
 makeRadio m = 
-    let actualRace = m ^. character . characterRace 
+    let 
+        actualRace = m ^. character . characterRace 
     in
-    Prelude.map
-        (\x ->
-            div_ [class_ "column has-text-centered"]
-                [label_ [ class_ "radio is-size-5"]
-                    [input_
-                        [type_ "radio", name_ "race", onChecked $ RaceChecked x
-                        , checked_ (x == actualRace)
-                        , style_  $ M.singleton "margin" "0.5rem"]
-                    , text $ ms $ case x of 
-                                    Just a -> show a
-                                    Nothing -> ""
+        Prelude.map
+            (\x ->
+                div_ [class_ "column has-text-centered"] [
+                    label_ [ class_ "radio is-size-5"] [
+                        input_ [
+                            type_ "radio", name_ "race", onChecked $ RaceChecked x
+                            , checked_ (x == actualRace)
+                            , style_  $ M.singleton "margin" "0.5rem"
+                            ]
+                        , text $ ms $ case x of 
+                                        Just a -> show a
+                                        Nothing -> ""
+                        ]
                     ]
-                ]
-        )
+            )
 
 makeCheckbox :: [Talent] -> Model -> Int -> [View Msg]
-makeCheckbox t m max = let talents = fromMaybe [] $ m ^. character . characterTalent
-                        in
-                     Prelude.map ( \x ->
-                    div_ [ class_ "column has-text-centered" ] [
-                        label_ [ class_ "checkbox radio is-size-5" ] [
-                            input_ [ type_ "checkbox", name_ "talent", style_  $ M.singleton "margin" "0.5rem"
-                                    , checked_ $ elem x talents
-                                    , disabled_ ( Prelude.length talents >= max
-                                                && notElem x talents )
-                                    , onChecked $ TalentChecked x ]
-                            , text $ ms $ show x
+makeCheckbox t m max = 
+    let 
+        talents = fromMaybe [] $ m ^. character . characterTalent
+    in
+        Prelude.map 
+            ( \x ->
+                div_ [ class_ "column has-text-centered" ] [
+                    label_ [ class_ "checkbox radio is-size-5" ] [
+                        input_ [ 
+                            type_ "checkbox", name_ "talent", style_  $ M.singleton "margin" "0.5rem"
+                            , checked_ $ elem x talents
+                            , disabled_ ( Prelude.length talents >= max
+                                        && notElem x talents )
+                            , onChecked $ TalentChecked x 
                         ]
-                        ])
-                  t
+                    , text $ ms $ show x
+                    ]
+                ]
+            )
+            t
 
 navbarElem m =
     let
@@ -180,10 +190,11 @@ navbarElem m =
     ]
 
 breadcrumb :: [Stage] -> View Msg
-breadcrumb stages = nav_ [class_ "breadcrumb is-centered"] [
-                ul_ [] $ Prelude.map
-                        ( \x -> li_ [] [
-                            a_ [ onClick (ChangeStage x) ] [ text $ ms $ show x ]
-                        ])
-                        stages
-                ]
+breadcrumb stages = 
+    nav_ [class_ "breadcrumb is-centered"] [
+        ul_ [] $ Prelude.map
+                ( \x -> li_ [] [
+                    a_ [ onClick (ChangeStage x) ] [ text $ ms $ show x ]
+                ])
+                stages
+        ]
