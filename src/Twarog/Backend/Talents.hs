@@ -13,77 +13,157 @@ import Twarog.Backend.Types
 data Talent = Acrobatic
             | Aggresive
             | AnimalFriend
+              -- ^ Requires Empathic
             | Arachnean
+              -- ^ Requires Strong Grip
             | Argonautic
+              -- ^ Requires Mariner
             | Ascetic
             | Athletic
             | Bloodhound
+              -- ^ Requires Tracker
             | Calliopean
+              -- ^ Requires Polyhymnian
             | Careful
-            | Caliopean
+              -- ^ Requires Focused
+            | Cliopean
+              -- ^ Requires Curious
             | Courageous
             | Craftsman
+              -- ^ Requires Nimble
             | Curious
             | DartThrower
+              -- ^ Requires Thrower
             | DeepBreather
+              -- ^ Requires Swimmer
             | Dodger
+              -- ^ Requires Good Reflexes
             | Durable
             | Empathic
             | Enduring
             | Eratorean
+              -- ^ Requires Polyhymnian
             | Euterpean
+              -- ^ Requires Polyhymnian
             | Fast
+              -- ^ Requires Athletic
             | FastSleeper
             | Favourite
+              -- ^ Requires Marked
             | Fearless
+              -- ^ Requires Courageous
             | Fighter
             | FistFighter
+              -- ^ Requires Fighter
             | Focused
             | GoodReflexes
             | HawkEyed
             | Hephaestusean
+              -- ^ Requires Craftsman
             | Heraklean
+              -- ^ Requires Fighter
             | Herbalist
             | Humble
             | Inquisitive
+              -- ^ Requires Cliopean
             | Lancer
+              -- ^ Requires Fighter
             | LightFooted
             | LynxEyes
             | Mariner
             | Marked
             | Mechanic
+              -- ^ Requires Nimble
             | Malpogomeanean
             | Mermaid
+              -- ^ Requires Swimmer
             | Mule
+              -- ^ Requires Strong Back
             | Nimble
             | Perseusean
+              -- ^ Requires Good Reflexes
             | Pietistic
+              -- ^ Requires Humble
             | Polyhymnian
             | Rider
+              -- ^ Requires Animal Friend
             | Sensitive
+              -- ^ Requires Empathic
             | Sharpshooter
+              -- ^ Requires Shooter
             | Shooter
+              -- ^ Requires Focused
             | Sirenean
+              -- ^ Requires Polyhymnian
             | Slinger
+              -- ^ Requires Thrower
             | SlowAgeing
             | SpearThrower
+              -- ^ Requires Thrower
             | Springy
             | StrongBack
             | StrongGrip
             | Survivor
             | Swimmer
             | SwordDancer
+              -- ^ Requires Fighter
             | Terpsichorean
+              -- ^ Requires Acrobatic
             | Thalian
             | Thrower
             | Tough
             | Tracker
+              -- ^ Requires Focused
             | TricksterTalent
+              -- ^ Requires Nimble
             | Uranian
             | WarmHands
             | Zevsean
+              -- ^ Requires Thrower
             | Aegirean
-            deriving (Eq, Show)
+            deriving (Eq, Show, Enum)
+
+isTalentAvailable :: Talent -> [Talent] -> Bool
+isTalentAvailable = \case
+  AnimalFriend    -> elem Empathic
+  Arachnean       -> elem StrongGrip
+  Argonautic      -> elem Mariner
+  Bloodhound      -> elem Tracker
+  Calliopean      -> elem Polyhymnian
+  Careful         -> elem Focused
+  Cliopean        -> elem Curious
+  Craftsman       -> elem Nimble
+  DartThrower     -> elem Thrower
+  DeepBreather    -> elem Swimmer
+  Dodger          -> elem GoodReflexes
+  Eratorean       -> elem Polyhymnian
+  Euterpean       -> elem Polyhymnian
+  Fast            -> elem Athletic
+  Favourite       -> elem Marked
+  Fearless        -> elem Courageous
+  FistFighter     -> elem Fighter
+  Hephaestusean   -> elem Craftsman
+  Heraklean       -> elem Fighter
+  Inquisitive     -> elem Cliopean
+  Lancer          -> elem Fighter
+  Mechanic        -> elem Nimble
+  Mermaid         -> elem Swimmer
+  Mule            -> elem StrongBack
+  Perseusean      -> elem GoodReflexes
+  Pietistic       -> elem Humble
+  Rider           -> elem AnimalFriend 
+  Sensitive       -> elem Empathic
+  Sharpshooter    -> elem Shooter
+  Shooter         -> elem Focused
+  Sirenean        -> elem Polyhymnian
+  Slinger         -> elem Thrower
+  SpearThrower    -> elem Thrower
+  SwordDancer     -> elem Fighter
+  Terpsichorean   -> elem Acrobatic
+  Tracker         -> elem Focused
+  TricksterTalent -> elem Nimble
+  Zevsean         -> elem Thrower
+  _               -> \_ -> True
 
 data TalentMod  = -- Skills based
                   AcrobaticsTalent Mod
@@ -151,7 +231,7 @@ talentMod = \case
   Careful         -> [ PerceptionTalent (+ 1)
                      , StealthTalent (+ 1) 
                      ]
-  Caliopean       -> [ WorldLoreTalent (+ 1) ]
+  Cliopean       ->  [ WorldLoreTalent (+ 1) ]
   Courageous      -> [ MoraleTalent (+ 2) ]
   Craftsman       -> [ CraftsTalent (+ 1) ]
   Curious         -> [ WorldLoreTalent (+ 1) ]
@@ -250,4 +330,5 @@ talentMod = \case
   WarmHands       -> [ HealingTalent (+ 1) ]
   Zevsean         -> [ MissileTalent (+ 1) ]
   Aegirean        -> [ FrightTalent (\x -> x - 1) ]
+
 

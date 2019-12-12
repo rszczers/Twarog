@@ -25,30 +25,19 @@ data Month = Valaskjolf
            | Gladsheimr
            | Thrymheimr
            | Ydalir
-           deriving (Ord, Eq, Show)
+           deriving (Ord, Eq, Show, Enum)
 
-data Season = Winter
+data Season = NewYear
+            | Winter
             | Spring
             | Summer
             | Autumn
-            | NewYear
-            deriving (Eq, Show)
+            deriving (Eq, Show, Enum)
 
 month :: Int -> Month
-month = \case
-  1  -> Valaskjolf
-  2  -> Himinbjorg
-  3  -> Landvidi
-  4  -> Sokkvabekkr
-  5  -> Thrudheimr
-  6  -> Breidablik
-  7  -> Noatun
-  8  -> Glitnir
-  9  -> Folkvangr
-  10 -> Alfheimr
-  11 -> Gladsheimr
-  12 -> Thrymheimr
-  13 -> Ydalir
+month x = if x > 0 
+          then toEnum $ x - 1
+          else error "No such month"
 
 monthSeason :: Month -> Season
 monthSeason = \case

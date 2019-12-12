@@ -45,7 +45,7 @@ data God = Vali
          | Ymir
          | Urdr
          | Audhumbla
-         deriving (Ord, Show, Eq)
+         deriving (Ord, Show, Eq, Enum)
 
 data Element = Fire
              | Air
