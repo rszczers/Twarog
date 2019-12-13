@@ -12,6 +12,7 @@ module Twarog.Frontend.DiceGen
   , roll
   -- ** Attribute generator
   , genAttribute
+  , genAttributes
   )
   where
 
@@ -78,4 +79,4 @@ genAttributes = do
 
 -- | Generate random race
 genRace :: Gen Race
-genRace = Gen.choice $ Gen.constant <$> race 
+genRace = Gen.choice $ Gen.constant <$> races
