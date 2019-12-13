@@ -31,7 +31,7 @@ runApp app = app
 main :: IO ()
 main = runApp $ startApp App {..}
   where
-    initialAction = SayHelloWorld -- initial action to be executed on application load
+    initialAction = NoOp -- initial action to be executed on application load
     model  = initialModel         -- initial model
     update = updateModel          -- update function
     view   = viewModel            -- view function

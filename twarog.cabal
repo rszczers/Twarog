@@ -60,6 +60,7 @@ executable twarog-web
   main-is:             Main.hs
   build-depends:       miso
                      , twarog
+
   if !impl(ghcjs)
     build-depends:     jsaddle
                      , jsaddle-warp

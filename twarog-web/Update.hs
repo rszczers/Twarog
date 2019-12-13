@@ -8,6 +8,7 @@ module Update (updateModel) where
   import           Model
   import           Twarog.Backend.Character
   import           Twarog.Backend.Talents
+  import           Twarog.Backend.Types
   
   -- | Updates model, optionally introduces side effects
   updateModel :: Msg -> Model -> Effect Msg Model
@@ -32,6 +33,62 @@ module Update (updateModel) where
       noEff $ m & character . characterTalent .~
         (Just $ Prelude.filter (/= r) currTalents)
   updateModel (ChangeStage s) m = noEff $ m & currentStage .~ s
-  updateModel SayHelloWorld m = m <# do
-    liftIO (putStrLn "Hello World") >> pure NoOp
-  
+  updateModel (SetCurrentRoll1 n) m = 
+    let
+      toString = fromMisoString n 
+      result = case toString of
+                  "" -> 0
+                  _ -> read toString
+    in
+      noEff ( m & currentRoll1 .~  result)
+                                                                                                          
+  updateModel (SetCurrentRoll2 n) m = 
+    let
+      toString = fromMisoString n 
+      result = case toString of
+                  "" -> 0
+                  _ -> read toString
+    in
+      noEff ( m & currentRoll2 .~  result)
+
+  updateModel (SetAttribute n t) m =  
+    if t <= 6
+    then
+      let 
+        action = case t of
+          1 -> cha
+          2 -> con
+          3 -> dex
+          4 -> int
+          5 -> str
+          6 -> wil
+        newT = case t of
+                6 -> 1
+                _ -> t +1
+        value = if n >= 18 then 18 else n
+        atr = fromMaybe (Attributes 0 0 0 0 0 0) 
+                  (m ^. character . characterAttr)
+        newModel = (((m & currentAtribBounce .~ t)
+                    & (character . characterAttr .~ Just (atr & action .~ value))
+                    & currentRoll1 .~ 0 )
+                    & currentRoll2 .~ 0 )
+      in
+        noEff $ newModel & currentStage .~ (AtribStage newT)
+    else
+      noEff $ m & currentStage .~ (AtribStage 1)
+                
+  updateModel (FlawChecked f (Checked True)) m =  
+    let 
+      currFlaws = fromMaybe [] $ m ^. character . characterFlaws
+    in
+      noEff ( 
+        if Prelude.length currFlaws < maxFlaws
+        then m & character . characterFlaws .~ Just (currFlaws ++ [ f ])
+        else m 
+        )
+  updateModel (FlawChecked f (Checked False)) m = 
+    let 
+      currFlaws = fromMaybe [] $ m ^. character . characterFlaws
+    in
+      noEff $ m & character . characterFlaws .~
+        (Just $ Prelude.filter (/= f) currFlaws)
