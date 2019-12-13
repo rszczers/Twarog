@@ -31,6 +31,10 @@ viewModel m@Model{..} =
         [ rel_ "stylesheet"
         , href_ "https://cdnjs.cloudflare.com/ajax/libs/bulma/0.8.0/css/bulma.min.css"
         ]
+        , link_ 
+        [ rel_ "stylesheet"
+        , href_ "https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css"
+        ]
     ]
 
 getStage :: Model -> View Msg
@@ -138,6 +142,10 @@ makeCheckbox t m max =
             )
             t
 
+atribToBounce :: Model -> Int
+atribToBounce m = m ^. currentAtribBounce
+
+
 navbarElem m =
     let
         getAtr f = case m ^. character . characterAttr of
@@ -152,38 +160,62 @@ navbarElem m =
     in
     nav_ [class_ "level is-mobile"][
         div_ [class_ "level-item has-text-centered"] [
-            div_ [] [
+            div_ [ class_ 
+                (if atribToBounce m == 1 
+                then "animated bounce"
+                else "")
+            ] [
                 p_ [class_ "heading"] [ "Charisma"]
                 , p_ [class_ "title"] [ text $ ms $ show charisma
                                         ]
             ]
         ]
         , div_ [class_ "level-item has-text-centered"] [
-            div_ [] [
+            div_ [class_ 
+                (if atribToBounce m == 2 
+                then "animated bounce"
+                else "")
+                ] [
                 p_ [class_ "heading"] [ "Constitution"]
                 , p_ [class_ "title"] [ text $ ms $ show costitution ]
             ]
         ]
         , div_ [class_ "level-item has-text-centered"] [
-            div_ [] [
+            div_ [ class_ 
+                (if atribToBounce m == 3 
+                then "animated bounce"
+                else "")
+            ] [
                 p_ [class_ "heading"] [ "Dexterity"]
                 , p_ [class_ "title"] [ text $ ms $ show dexterity ]
             ]
         ]
         , div_ [class_ "level-item has-text-centered"] [
-            div_ [] [
+            div_ [class_ 
+                (if atribToBounce m == 4 
+                then "animated bounce"
+                else "")
+            ] [
                 p_ [class_ "heading"] [ "Inteligence"]
                 , p_ [class_ "title"] [ text $ ms $ show inteligence ]
             ]
         ]
         , div_ [class_ "level-item has-text-centered"] [
-            div_ [] [
+            div_ [ class_ 
+                (if atribToBounce m == 5 
+                then "animated bounce"
+                else "")
+            ] [
                 p_ [class_ "heading"] [ "Strength"]
                 , p_ [class_ "title"] [ text $ ms $ show strength ]
             ]
         ]
         , div_ [class_ "level-item has-text-centered"] [
-            div_ [] [
+            div_ [class_ 
+                (if atribToBounce m == 6 
+                then "animated bounce"
+                else "")
+            ] [
                 p_ [class_ "heading"] [ "Will"]
                 , p_ [class_ "title"] [ text $ ms $ show will ]
             ]
@@ -199,6 +231,7 @@ breadcrumb stages =
                 ])
                 stages
         ]
+
 
 askAtributes :: Model -> Int -> View Msg
 askAtributes m n = 

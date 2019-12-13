@@ -68,9 +68,11 @@ module Update (updateModel) where
         value = if n >= 18 then 18 else n
         atr = fromMaybe (Attributes 0 0 0 0 0 0) 
                   (m ^. character . characterAttr)
-        newModel = ((m & (character . characterAttr .~ Just (atr & action .~ value))
+        newModel = (((m & currentAtribBounce .~ t)
+                    & (character . characterAttr .~ Just (atr & action .~ value))
                     & currentRoll1 .~ 0 )
                     & currentRoll2 .~ 0 )
+                    
         
       in
         noEff $ newModel & currentStage .~ (AtribStage newT)

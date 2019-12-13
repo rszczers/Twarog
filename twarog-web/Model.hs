@@ -2,6 +2,7 @@ module Model
     ( Model(..)
     , character
     , currentStage
+    , currentAtribBounce
     , currentRoll1
     , currentRoll2
     , Msg (..)
@@ -33,6 +34,7 @@ data Stage = OwnerStage | NameStage | AtribStage Int | RaceStage | BirthStage
 
 data Model = Model
     { _currentStage :: Stage
+    , _currentAtribBounce :: Int
     , _currentRoll1 :: Int
     , _currentRoll2 :: Int
     , _character    :: NewCharacter
@@ -60,7 +62,7 @@ maxAtrValue :: Int
 maxAtrValue = 18
 
 initialModel :: Model
-initialModel = Model (AtribStage 1) 0 0
+initialModel = Model (AtribStage 1) 0 0 0
                 $ NewCharacter Nothing Nothing Nothing
                                 Nothing Nothing Nothing
                                 Nothing Nothing Nothing
