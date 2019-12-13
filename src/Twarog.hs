@@ -13,3 +13,4 @@ import Twarog.Backend.Character
 import Twarog.Backend.CharacterSheet
 import Twarog.Backend.Item
 import Twarog.Backend.Units
+import Twarog.Frontend.DiceGen

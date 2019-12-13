@@ -53,39 +53,3 @@ trainedSkillMod :: Lvl -> Int -> Int
 trainedSkillMod level =
   let m = level `div` 4
    in \x -> x + (min m 4)
-
-
--- skillMod :: Character -> Skill -> Int -> Int
--- skillMod c = \case
---   Acrobatics ->
---   Acting ->
---   Alchemy ->
---   Climbing ->
---   Crafts ->
---   Dancing ->
---   Dodging ->
---   FlutePlaying ->
---   Foraging ->
---   Fortitude ->
---   Healing ->
---   LyrePlaying ->
---   Mechanics ->
---   Melee ->
---   Missile ->
---   Navigation ->
---   Perception ->
---   Poetry ->
---   ReligiousTradition ->
---   Riding ->
---   RuneLore ->
---   Seamanship ->
---   Singing ->
---   SocialSkills ->
---   Stamina ->
---   Stealth ->
---   Swimming ->
---   Tempo ->
---   Tracking ->
---   Trickery ->
---   WorldLore ->
-

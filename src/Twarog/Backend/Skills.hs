@@ -48,6 +48,10 @@ data Proficiency = Trained
                  | CharacterRoleSkill
                  deriving (Eq, Ord, Show)
 
+-- | Skills are grouped in following categories:
+-- * CS -- Combat Skills
+-- * SS -- Special Skills
+-- * MS -- Movement Skills
 data SkillType = MovementSkill
                | SpecialSkill
                | CombatSkill
@@ -58,39 +62,40 @@ data CharacterSkill = CharacterSkill
   , proficiency    :: Proficiency
   } deriving (Eq, Ord, Show)
 
+-- | Assigns aprioprate category to given skill.
 skillType :: Skill -> SkillType
 skillType = \case
-  Acrobatics -> MovementSkill
-  Acting -> SpecialSkill
-  Alchemy -> SpecialSkill
-  Climbing -> MovementSkill
-  Crafts -> SpecialSkill
-  Dancing -> MovementSkill
-  Dodging -> MovementSkill
-  FlutePlaying -> SpecialSkill
-  Foraging -> SpecialSkill
-  Fortitude -> SpecialSkill
-  Healing -> SpecialSkill
-  LyrePlaying -> SpecialSkill
-  Mechanics -> SpecialSkill
-  Melee -> CombatSkill
-  Missile -> CombatSkill
-  Navigation -> SpecialSkill
-  Perception -> SpecialSkill
-  Poetry -> SpecialSkill
+  Acrobatics         -> MovementSkill
+  Acting             -> SpecialSkill
+  Alchemy            -> SpecialSkill
+  Climbing           -> MovementSkill
+  Crafts             -> SpecialSkill
+  Dancing            -> MovementSkill
+  Dodging            -> MovementSkill
+  FlutePlaying       -> SpecialSkill
+  Foraging           -> SpecialSkill
+  Fortitude          -> SpecialSkill
+  Healing            -> SpecialSkill
+  LyrePlaying        -> SpecialSkill
+  Mechanics          -> SpecialSkill
+  Melee              -> CombatSkill
+  Missile            -> CombatSkill
+  Navigation         -> SpecialSkill
+  Perception         -> SpecialSkill
+  Poetry             -> SpecialSkill
   ReligiousTradition -> SpecialSkill
-  Riding -> MovementSkill
-  RuneLore -> SpecialSkill
-  Seamanship -> SpecialSkill
-  Singing -> SpecialSkill
-  SocialSkills -> SpecialSkill
-  Stamina -> SpecialSkill
-  Stealth -> MovementSkill
-  Swimming -> MovementSkill
-  Tempo -> MovementSkill
-  Tracking -> SpecialSkill
-  Trickery -> SpecialSkill
-  WorldLore -> SpecialSkill
+  Riding             -> MovementSkill
+  RuneLore           -> SpecialSkill
+  Seamanship         -> SpecialSkill
+  Singing            -> SpecialSkill
+  SocialSkills       -> SpecialSkill
+  Stamina            -> SpecialSkill
+  Stealth            -> MovementSkill
+  Swimming           -> MovementSkill
+  Tempo              -> MovementSkill
+  Tracking           -> SpecialSkill
+  Trickery           -> SpecialSkill
+  WorldLore          -> SpecialSkill
 
 data SkillMod = AcrobaticsMod Mod
               | ActingMod Mod
