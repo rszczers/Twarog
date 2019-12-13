@@ -2,6 +2,10 @@ module Twarog.Backend.Character
   ( -- * Character
     CharacterRole (..)
   , NewCharacter (..)
+  -- ** Character Role Utils
+  , characterRoles 
+  , availableRoles 
+  -- ** Character lenses
   , characterOwner
   , characterName
   , characterAttr
@@ -63,7 +67,10 @@ data CharacterRole = Civilian
                    | HalfOrcRole
                    | OgreRole
                    | HobgoblinRole
-                   deriving (Eq, Show)
+                   deriving (Eq, Show, Enum)
+
+characterRoles :: [CharacterRole]
+characterRoles = enumFrom (toEnum 0)
 
 data CombatStats = CombatStats
   { _ovMe        :: OvMe
@@ -115,12 +122,12 @@ maximumAge race con = case race of
 
 -- | Check if for given parameters given Character Role is
 -- allowed.
-isProperRole :: CharacterRole 
-             -> Attributes -> [Talent]
+isProperRole :: Attributes -> [Talent]
              -> LifeStance -> Race -> Sex -> God
              -> Archetype 
+             -> CharacterRole 
              -> Bool
-isProperRole cr (Attributes cha con dex int str wil) ts ls race sex god arch =
+isProperRole (Attributes cha con dex int str wil) ts ls race sex god arch cr =
   case cr of
     Civilian -> True
     Warrior   -> con >= 9 
@@ -156,6 +163,13 @@ isProperRole cr (Attributes cha con dex int str wil) ts ls race sex god arch =
     GnomeRole -> race == Gnome
     HalflingRole -> race == Halfling
     _ -> False
+
+availableRoles :: Attributes -> [Talent]
+               -> LifeStance -> Race -> Sex -> God
+               -> Archetype 
+               -> [CharacterRole]
+availableRoles attr ts ls rc sx g arch =
+  filter (isProperRole attr ts ls rc sx g arch) characterRoles 
 
 -- | Helper function for @expToLvl@
 maxNormalLvl :: Race -> CharacterRole -> Sex -> Lvl

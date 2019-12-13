@@ -45,14 +45,15 @@ d100 = Gen.int $ Range.constant 1 100
 
 -- | Roll n-times given dice
 roll :: Int -> Dice -> Gen [Int]
-roll n = \case
-  D4   -> Gen.list (Range.singleton n) d4
-  D6   -> Gen.list (Range.singleton n) d4
-  D8   -> Gen.list (Range.singleton n) d8
-  D10  -> Gen.list (Range.singleton n) d10
-  D12  -> Gen.list (Range.singleton n) d12
-  D20  -> Gen.list (Range.singleton n) d20
-  D100 -> Gen.list (Range.singleton n) d100
+roll n dice = Gen.list (Range.singleton n) $
+  case dice of
+    D4   -> d4
+    D6   -> d4
+    D8   -> d8
+    D10  -> d10
+    D12  -> d12
+    D20  -> d20
+    D100 -> d100
 
 -- | Generate random valid attribute
 genAttribute :: Gen Int
