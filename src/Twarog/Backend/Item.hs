@@ -14,6 +14,7 @@ module Twarog.Backend.Item
 import Twarog.Backend.Types
 import Twarog.Backend.Units
 import Twarog.Backend.Enchantment
+import Twarog.Backend.Encumbrance
 
 -- | Describes how damaged item is.
 data DamageDeg = Undamaged             -- ^ Item is perfectly fine.

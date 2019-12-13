@@ -13,6 +13,7 @@ module Twarog.Backend.Talents
 
 import Twarog.Backend.Types
 import Twarog.Backend.Races
+import Twarog.Backend.Encumbrance
 
 data Talent = Acrobatic
             | Aggresive

@@ -83,6 +83,7 @@ library
                      , Twarog.Backend.Gods
                      , Twarog.Backend.Calendar
                      , Twarog.Backend.Talents
+                     , Twarog.Backend.Encumbrance
                      , Twarog.Backend.Types
                      , Twarog.Backend.Units
                      , Twarog.Frontend.HamingjaStore
