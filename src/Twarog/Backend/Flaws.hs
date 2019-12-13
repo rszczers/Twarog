@@ -421,20 +421,20 @@ flawMod = \case
                          ]
   OverConfident fl    -> case fl of
     FlawLevel1        -> [ OtherFlaw $
-                            "You always believe thinhs are easier than " ++
+                            "You always believe things are easier than " ++
                             "they actually are."
                          ]   
     FlawLevel2        -> [ OtherFlaw $
-                            "You always believe thinhs are easier than " ++
+                            "You always believe things are easier than " ++
                             "they actually are."
                          ]
     FlawLevel3        -> [ OtherFlaw $
-                            "You always believe thinhs are easier than " ++
+                            "You always believe things are easier than " ++
                             "they actually are."
                          ]
   Paranoid fl         -> case fl of
     _                 -> [ OtherFlaw $
-                            "You tend to interpret otheres and what they " ++
+                            "You tend to interpret others and what they " ++
                             "do as a threat to you and what you do, " ++
                             "even if they are not."
                          ]

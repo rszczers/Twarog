@@ -1,8 +1,10 @@
 module Twarog.Backend.Types
   ( 
+  -- * Dices
+    Dice (..)
   -- * Character sheet
   -- ** Sheet owner
-    Owner (..)
+  , Owner (..)
   , CharacterName
   , Note
   -- ** Descriptive part
@@ -95,6 +97,15 @@ module Twarog.Backend.Types
 
 import Control.Lens
 import Twarog.Backend.Units
+
+data Dice = D4
+          | D6
+          | D8
+          | D10
+          | D12
+          | D20
+          | D100
+          deriving (Show, Eq)
 
 type Owner = String
 type CharacterName = String
