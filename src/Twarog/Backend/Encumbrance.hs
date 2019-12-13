@@ -28,7 +28,7 @@ encumbrance :: Float -> Encumbrance
 encumbrance x | x <= 1          = LightLoad
               | 1 < x && x <= 2 = MediumLoad
               | 2 < x && x <= 3 = HeavyLoad
-              | x > 3           = AbsurdLoad -- ^ PC can only lift sth or push it
+              | x > 3           = AbsurdLoad -- PC can only lift sth or push it
 
 -- | Gets list of flaws caused by encumbrance
 encumbranceMod :: Float -> [FlawMod]
