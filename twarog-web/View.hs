@@ -1,4 +1,5 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE FlexibleInstances #-}
 module View (viewModel) where
 
 import           Miso
@@ -8,10 +9,12 @@ import           Twarog.Backend.Character
 import           Twarog.Backend.Races
 import           Twarog.Backend.Talents
 import           Twarog.Backend.Types
+import           Twarog.Backend.Flaws
 
 import           Control.Lens
 import qualified Data.Map                 as M
 import           Data.Maybe
+import           Data.Typeable
 
 viewModel :: Model -> View Msg
 viewModel m@Model{..} =
@@ -22,7 +25,7 @@ viewModel m@Model{..} =
             [ navbarElem m
              , div_ [class_ "hero-body"] [
                 div_ [class_ "container has-text-centered"] $
-                    [ breadcrumb [NameStage, RaceStage, TalentStage, (AtribStage 1)]]
+                    [ breadcrumb [NameStage, RaceStage, TalentStage, (AtribStage 1), FlawStage]]
                     ++ [getStage m]
                 ]
             ]
@@ -42,18 +45,23 @@ getStage m = case m ^. currentStage of
                 OwnerStage -> askName m
                 NameStage -> askName m
                 AtribStage n -> askAtributes m n
-                RaceStage -> askRace [Just Dwarf, Just Elf, Just Hobgoblin, Just HalfOrc, Just Goblin ] m
- {-               BirthStagez
+                RaceStage -> displayRadioQuestion [Just Dwarf, Just Elf, Just Hobgoblin, Just HalfOrc, Just Goblin ] m
+                                    characterRace "Your race?" RaceChecked 
+{-               BirthStagez
                 ArchetypeStage
                 GodStage
                 SexStage
-                HamingjaStage
-                FlawStage
-                RoleStage
+                HamingjaStage -}
+                FlawStage -> displayCheckboxQuestion [ Alcoholic FlawLevel1
+                                        , Annoying FlawLevel1
+                                        , BadBack FlawLevel1
+                                        , BadSight FlawLevel1
+                                        , BadTempered FlawLevel1
+                                        , ChronicPain FlawLevel1] m characterFlaws "What are your flaws?" maxFlaws FlawChecked
+            {-    RoleStage
                 SkilsStage -}
-                TalentStage -> askTalents [ Acrobatic, Aggresive, AnimalFriend, Arachnean, Argonautic, Ascetic ] m
-
-askSample m = div_ [] [text $ ms $ show $ m ^. character . characterName ]
+                TalentStage -> displayCheckboxQuestion [ Acrobatic, Aggresive, AnimalFriend, Arachnean, Argonautic, Ascetic ] m
+                                                        characterTalent "What are your talents?" maxTalents TalentChecked
 
 askName :: Model -> View Msg
 askName m =
@@ -73,78 +81,69 @@ askName m =
                 ]
       ]
 
-askRace :: [Maybe Race] -> Model -> View Msg
-askRace s m =
-  div_ [ class_ "control has-text-centered" ] [
-        h2_ [class_ "title is-1 has-text-weight-medium"] [ "Your race? "]
-        , div_ [ class_ "columns has-text-centered" ] $ makeRadio m s
-        ]
 
-askTalents :: [Talent] -> Model -> View Msg
-askTalents s m =
+
+--dispaleyCheckboxQuestion :: [a] -> Model -> (characterField) -> String -> Int -> (a -> Bool -> View Msg)
+displayCheckboxQuestion valueList model characterField question max msg =
     let 
-        talents = fromMaybe [] $ m ^. character . characterTalent
+        content = fromMaybe [] $ model ^. character . characterField
+        isDisabled x =  Prelude.length content >= max
+                        && notElem x content 
     in
         div_ [ class_ "control has-text-centered" ] [
             div_ [] [
-                p_ [class_ "title is-1 is-full has-text-weight-medium"] ["Your talents? "]
+                p_ [class_ "title is-1 is-full has-text-weight-medium"] [ question ]
                 , div_ [ class_ ""]
                     [ p_ [class_ "subtitle"] $ ["You can choose "]
-                    ++ [ text $ ms (maxTalents - Prelude.length talents)]
-                    ++ [" more talents "]
+                    ++ [ text $ ms (maxFlaws - Prelude.length content)]
+                    ++ [" more "]
                     ]
                 , div_ [ class_ "columns has-text-centered"]
-                    $ makeCheckbox s m maxTalents
+                    $ Prelude.map 
+                        ( \x ->
+                            div_ [ class_ "column has-text-centered" ] [
+                                label_ [ class_ "checkbox radio is-size-5" ] [
+                                    input_ [ 
+                                        type_ "checkbox", name_ "talent"
+                                        , style_  $ M.singleton "margin" "0.5rem"
+                                        , checked_ $ elem x content
+                                        , disabled_ $ isDisabled x
+                                        , onChecked $ msg x 
+                                    ]
+                                , text $ ms $ show x
+                                ]
+                            ]
+                        ) valueList
             ]
         ]
-
-makeRadio :: Model -> [Maybe Race] -> [View Msg]
-makeRadio m = 
+     
+--dispaleyRadioQuestion :: [a] -> Model -> (characterField) -> String ->  (a -> Bool -> View Msg)
+displayRadioQuestion valueList model characterField question msg =
     let 
-        actualRace = m ^. character . characterRace 
+        content = model ^. character . characterField 
     in
-        Prelude.map
-            (\x ->
-                div_ [class_ "column has-text-centered"] [
-                    label_ [ class_ "radio is-size-5"] [
-                        input_ [
-                            type_ "radio", name_ "race", onChecked $ RaceChecked x
-                            , checked_ (x == actualRace)
-                            , style_  $ M.singleton "margin" "0.5rem"
+        div_ [ class_ "control has-text-centered" ] [
+            h2_ [class_ "title is-1 has-text-weight-medium"] [ question ]
+            , div_ [ class_ "columns has-text-centered" ] 
+            $ Prelude.map
+                (\x ->
+                    div_ [class_ "column has-text-centered"] [
+                        label_ [ class_ "radio is-size-5"] [
+                            input_ [
+                                type_ "radio", name_ "race", onChecked $ msg x
+                                , checked_ (x == content)
+                                , style_  $ M.singleton "margin" "0.5rem"
+                                ]
+                            , text $ ms $ case x of 
+                                            Just a -> show a
+                                            Nothing -> ""
                             ]
-                        , text $ ms $ case x of 
-                                        Just a -> show a
-                                        Nothing -> ""
                         ]
-                    ]
-            )
-
-makeCheckbox :: [Talent] -> Model -> Int -> [View Msg]
-makeCheckbox t m max = 
-    let 
-        talents = fromMaybe [] $ m ^. character . characterTalent
-    in
-        Prelude.map 
-            ( \x ->
-                div_ [ class_ "column has-text-centered" ] [
-                    label_ [ class_ "checkbox radio is-size-5" ] [
-                        input_ [ 
-                            type_ "checkbox", name_ "talent"
-                            , style_  $ M.singleton "margin" "0.5rem"
-                            , checked_ $ elem x talents
-                            , disabled_ ( Prelude.length talents >= max
-                                        && notElem x talents )
-                            , onChecked $ TalentChecked x 
-                        ]
-                    , text $ ms $ show x
-                    ]
-                ]
-            )
-            t
+                ) valueList
+        ]
 
 atribToBounce :: Model -> Int
 atribToBounce m = m ^. currentAtribBounce
-
 
 navbarElem m =
     let

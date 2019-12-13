@@ -72,10 +72,23 @@ module Update (updateModel) where
                     & (character . characterAttr .~ Just (atr & action .~ value))
                     & currentRoll1 .~ 0 )
                     & currentRoll2 .~ 0 )
-                    
-        
       in
         noEff $ newModel & currentStage .~ (AtribStage newT)
     else
       noEff $ m & currentStage .~ (AtribStage 1)
                 
+  updateModel (FlawChecked f (Checked True)) m =  
+    let 
+      currFlaws = fromMaybe [] $ m ^. character . characterFlaws
+    in
+      noEff ( 
+        if Prelude.length currFlaws < maxFlaws
+        then m & character . characterFlaws .~ Just (currFlaws ++ [ f ])
+        else m 
+        )
+  updateModel (FlawChecked f (Checked False)) m = 
+    let 
+      currFlaws = fromMaybe [] $ m ^. character . characterFlaws
+    in
+      noEff $ m & character . characterFlaws .~
+        (Just $ Prelude.filter (/= f) currFlaws)

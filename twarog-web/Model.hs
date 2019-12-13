@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Model
     ( Model(..)
     , character
@@ -9,8 +10,8 @@ module Model
     , Stage (..)
     , initialModel
     , maxTalents
+    , maxFlaws
     , maxAtrValue
-
     ) where
 
 import           Control.Lens
@@ -45,6 +46,7 @@ data Msg =  Name MisoString
             | Talents [String]
             | RaceChecked (Maybe Race) Checked
             | TalentChecked Talent Checked
+            | FlawChecked Flaw Checked
             | NoOp
             | AskName
             | AskRace
@@ -57,6 +59,9 @@ data Msg =  Name MisoString
 
 maxTalents :: Int
 maxTalents = 3
+
+maxFlaws :: Int
+maxFlaws = 3
 
 maxAtrValue :: Int
 maxAtrValue = 18
