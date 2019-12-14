@@ -92,7 +92,7 @@ data NewCharacter = NewCharacter
   , _characterName      :: Maybe String
   , _characterAttr      :: Maybe Attributes
   , _characterRace      :: Maybe Race
-  , _characterBirth     :: Maybe Month
+  , _characterBirth     :: Maybe Birthday
   , _characterAlignment :: Maybe Archetype
   , _characterGod       :: Maybe (Maybe God)
   , _characterSex       :: Maybe Sex
