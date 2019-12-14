@@ -12,7 +12,8 @@ module Twarog.Backend.Calendar
   , godsBirthday
   ) where
 
-import Control.Lens 
+import Control.Lens
+import Data.Map
 
 import Twarog.Backend.Gods
 import Twarog.Backend.Types
@@ -36,7 +37,7 @@ data Month = Valaskjolf
 data Day where
   CommonDay :: Int -> Day
   NewYearsDay :: Day
-  deriving (Eq, Show) 
+  deriving (Eq, Show)
 
 instance Bounded Day where
   minBound = CommonDay 1
@@ -60,7 +61,7 @@ months = enumFrom (toEnum 0)
 
 -- | Convert Int to @Month@.
 month :: Int -> Month
-month x = if x > 0 
+month x = if x > 0
           then toEnum $ x - 1
           else error "No such month"
 
@@ -80,7 +81,7 @@ monthSeason = \case
   Gladsheimr  -> Autumn
   Thrymheimr  -> Autumn
   Ydalir      -> Autumn
-  Nyarsdagr  -> NewYear
+  Nyarsdagr   -> NewYear
 
 -- | Get list of divine's birthdays for given month.
 monthGod :: Month -> [God]
@@ -108,14 +109,14 @@ seasonAttrMod season = case season of
   Summer  -> wil +~ 1
   Autumn  -> con +~ 1
   NewYear -> cha +~ 1
-                  
+
 -- | Returns god's birthday date.
 godsBirthday :: God -> [Birthday]
 godsBirthday = \case
   Vali      -> [ Birthday (CommonDay 13) Valaskjolf ]
-  Heimdallr -> [ Birthday (CommonDay 13) Himinbjorg 
+  Heimdallr -> [ Birthday (CommonDay 13) Himinbjorg
                , Birthday (NewYearsDay) Nyarsdagr
-               ] 
+               ]
   Vidarr    -> [ Birthday (CommonDay 13) Landvidi ]
   Saga      -> [ Birthday (CommonDay 13) Sokkvabekkr ]
   Thor      -> [ Birthday (CommonDay 13) Thrudheimr ]
@@ -130,4 +131,26 @@ godsBirthday = \case
   Skadi     -> [ Birthday (CommonDay 13) Thrymheimr ]
   Mani      -> [ Birthday (CommonDay 22) Thrymheimr ]
   Hodr      -> [ Birthday (CommonDay 13) Ydalir ]
-  _         -> [] 
+  _         -> []
+
+birthdayGod :: Birthday -> [God]
+birthdayGod = \case
+  Birthday (CommonDay 13) Valaskjolf  -> [ Vali ]
+  Birthday (CommonDay 13) Himinbjorg  -> [ Heimdallr ]
+  Birthday (NewYearsDay) Nyarsdagr    -> [ Heimdallr ]
+  Birthday (CommonDay 13) Landvidi    -> [ Vidarr ] 
+  Birthday (CommonDay 13) Sokkvabekkr -> [ Saga ]   
+  Birthday (CommonDay 13) Thrudheimr  -> [ Thor ]   
+  Birthday (CommonDay 13) Breidablik  -> [ Baldr ]  
+  Birthday (CommonDay 1) Breidablik   -> [ Jord ]   
+  Birthday (CommonDay 13) Noatun      -> [ Njordr ] 
+  Birthday (CommonDay 13) Glitnir     -> [ Forseti ]
+  Birthday (CommonDay 13) Folkvangr   -> [ Freyja
+                                         , Sol ]
+  Birthday (CommonDay 13) Alfheimr    -> [ Freyr ]  
+  Birthday (CommonDay 13) Gladsheimr  -> [ Odinn ]  
+  Birthday (CommonDay 13) Thrymheimr  -> [ Skadi ]  
+  Birthday (CommonDay 22) Thrymheimr  -> [ Mani ]   
+  Birthday (CommonDay 13) Ydalir      -> [ Hodr ]   
+  _ -> []
+  
