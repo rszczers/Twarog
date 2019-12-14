@@ -2,10 +2,14 @@ module Twarog.Backend.Calendar
   ( Month (..)
   , Day (..)
   , Season (..)
+  , Birthday (..)
+  -- ** Utils
   , month
+  , months
   , monthGod
   , monthSeason
   , seasonAttrMod
+  , godsBirthday
   ) where
 
 import Control.Lens 
@@ -26,7 +30,7 @@ data Month = Valaskjolf
            | Gladsheimr
            | Thrymheimr
            | Ydalir
-           | Nayarsdagr
+           | Nyarsdagr
            deriving (Ord, Eq, Show, Enum)
 
 data Day where
@@ -76,7 +80,7 @@ monthSeason = \case
   Gladsheimr  -> Autumn
   Thrymheimr  -> Autumn
   Ydalir      -> Autumn
-  Nayarsdagr  -> NewYear
+  Nyarsdagr  -> NewYear
 
 -- | Get list of divine's birthdays for given month.
 monthGod :: Month -> [God]
@@ -94,7 +98,7 @@ monthGod = \case
   Gladsheimr  -> [Odinn]
   Thrymheimr  -> [Skadi, Mani]
   Ydalir      -> [Hodr]
-  Nayarsdagr  -> [Heimdallr]
+  Nyarsdagr   -> [Heimdallr]
 
 -- | Character attribute modifiers according to season of birth.
 seasonAttrMod :: Season -> Attributes -> Attributes
@@ -110,7 +114,7 @@ godsBirthday :: God -> [Birthday]
 godsBirthday = \case
   Vali      -> [ Birthday (CommonDay 13) Valaskjolf ]
   Heimdallr -> [ Birthday (CommonDay 13) Himinbjorg 
-               , Birthday (NewYearsDay) Nayarsdagr
+               , Birthday (NewYearsDay) Nyarsdagr
                ] 
   Vidarr    -> [ Birthday (CommonDay 13) Landvidi ]
   Saga      -> [ Birthday (CommonDay 13) Sokkvabekkr ]

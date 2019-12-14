@@ -1,6 +1,7 @@
 module Twarog
   ( CharacterSheet (..)
   , NewCharacter (..)
+  , module Twarog.Frontend.DiceGen
   )
     where
 

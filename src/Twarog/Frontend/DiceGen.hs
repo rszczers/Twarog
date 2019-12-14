@@ -13,11 +13,16 @@ module Twarog.Frontend.DiceGen
   -- ** Attribute generator
   , genAttribute
   , genAttributes
+  , genRace
+  , genMonth
+  , genBirthday
   )
   where
 
 import Twarog.Backend.Types
 import Twarog.Backend.Races
+import Twarog.Backend.Calendar
+import Twarog.Backend.Gods
 
 import Hedgehog
 import qualified Hedgehog.Gen as Gen
@@ -80,3 +85,21 @@ genAttributes = do
 -- | Generate random race
 genRace :: Gen Race
 genRace = Gen.choice $ Gen.constant <$> races
+
+-- | Generate random month
+genMonth :: Gen Month
+genMonth = do
+  let months' = Gen.constant <$> months
+      wMonths = (1, Gen.constant Nyarsdagr) :
+        ((27, ) <$> (tail . reverse $ months'))
+  Gen.frequency wMonths
+
+-- | Generate random birthday date
+genBirthday :: Gen Birthday
+genBirthday = do
+  m <- genMonth
+  if m == Nyarsdagr
+  then return $ Birthday NewYearsDay Nyarsdagr
+  else do
+    cd <- Gen.int $ Range.constant 1 28 
+    return $ Birthday (CommonDay cd) m
