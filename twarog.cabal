@@ -61,7 +61,9 @@ executable twarog-web
   import:              common-options
   hs-source-dirs:      twarog-web
   main-is:             Main.hs
---  other-modules:       Model, Update, View
+  other-modules:       Model
+                     , Update
+                     , View
   build-depends:       miso
                      , twarog
   if !impl(ghcjs)
