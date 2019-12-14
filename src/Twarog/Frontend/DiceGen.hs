@@ -65,9 +65,9 @@ roll n dice = Gen.list (Range.singleton n) $
 -- | Generate random valid attribute
 genAttribute :: Gen Int
 genAttribute = do
-  x <- d20
-  y <- d20
-  let r = max x y
+  x <- roll 3 D6
+  y <- roll 3 D6 
+  let r = max (sum x) (sum y)
   if r > 3
   then return r
   else genAttribute
