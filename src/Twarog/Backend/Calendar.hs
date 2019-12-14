@@ -13,7 +13,6 @@ module Twarog.Backend.Calendar
   ) where
 
 import Control.Lens
-import Data.Map
 
 import Twarog.Backend.Gods
 import Twarog.Backend.Types
