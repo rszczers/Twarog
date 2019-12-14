@@ -22,6 +22,7 @@ module Twarog.Frontend.DiceGen
 import Twarog.Backend.Types
 import Twarog.Backend.Races
 import Twarog.Backend.Calendar
+import Twarog.Backend.Archetypes
 import Twarog.Backend.Gods
 
 import Hedgehog
@@ -103,3 +104,7 @@ genBirthday = do
   else do
     cd <- Gen.int $ Range.constant 1 28 
     return $ Birthday (CommonDay cd) m
+
+-- | Generate random archetype
+genArchetype :: Gen Archetype
+genArchetype = Gen.choice $ Gen.constant <$> archetypes

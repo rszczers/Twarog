@@ -6,6 +6,7 @@ module Twarog.Backend.Archetypes
   , Empathy (..)
   , Trait (..)
   , Archetype (..)
+  , archetypes
   ) where
 
 -- import System.Random
@@ -73,6 +74,10 @@ data Archetype = Aphroditic
                | Uranic
                | Zevsean
                deriving (Bounded, Enum, Show, Eq)
+
+-- | Get list of all archetypes
+archetypes :: [Archetype]
+archetypes = enumFrom $ toEnum 0
 
 instance Trait Archetype where
   shadow = archetype . shadow . attitude
