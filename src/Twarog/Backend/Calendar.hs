@@ -26,6 +26,7 @@ data Month = Valaskjolf
            | Gladsheimr
            | Thrymheimr
            | Ydalir
+           | Nayarsdagr
            deriving (Ord, Eq, Show, Enum)
 
 data Day where
@@ -75,6 +76,7 @@ monthSeason = \case
   Gladsheimr  -> Autumn
   Thrymheimr  -> Autumn
   Ydalir      -> Autumn
+  Nayarsdagr  -> NewYear
 
 -- | Get list of divine's birthdays for given month.
 monthGod :: Month -> [God]
@@ -92,13 +94,36 @@ monthGod = \case
   Gladsheimr  -> [Odinn]
   Thrymheimr  -> [Skadi, Mani]
   Ydalir      -> [Hodr]
+  Nayarsdagr  -> [Heimdallr]
 
 -- | Character attribute modifiers according to season of birth.
-seasonAttrMod   :: Season -> Attributes -> Attributes
-seasonAttrMod   season = case season of
+seasonAttrMod :: Season -> Attributes -> Attributes
+seasonAttrMod season = case season of
   Winter  -> int +~ 1
   Spring  -> str +~ 1
   Summer  -> wil +~ 1
   Autumn  -> con +~ 1
   NewYear -> cha +~ 1
                   
+-- | Returns god's birthday date.
+godsBirthday :: God -> [Birthday]
+godsBirthday = \case
+  Vali      -> [ Birthday (CommonDay 13) Valaskjolf ]
+  Heimdallr -> [ Birthday (CommonDay 13) Himinbjorg 
+               , Birthday (NewYearsDay) Nayarsdagr
+               ] 
+  Vidarr    -> [ Birthday (CommonDay 13) Landvidi ]
+  Saga      -> [ Birthday (CommonDay 13) Sokkvabekkr ]
+  Thor      -> [ Birthday (CommonDay 13) Thrudheimr ]
+  Baldr     -> [ Birthday (CommonDay 13) Breidablik ]
+  Jord      -> [ Birthday (CommonDay 1) Breidablik ]
+  Njordr    -> [ Birthday (CommonDay 13) Noatun ]
+  Forseti   -> [ Birthday (CommonDay 13) Glitnir ]
+  Freyja    -> [ Birthday (CommonDay 13) Folkvangr ]
+  Sol       -> [ Birthday (CommonDay 13) Folkvangr ]
+  Freyr     -> [ Birthday (CommonDay 13) Alfheimr ]
+  Odinn     -> [ Birthday (CommonDay 13) Gladsheimr ]
+  Skadi     -> [ Birthday (CommonDay 13) Thrymheimr ]
+  Mani      -> [ Birthday (CommonDay 22) Thrymheimr ]
+  Hodr      -> [ Birthday (CommonDay 13) Ydalir ]
+  _         -> [] 
