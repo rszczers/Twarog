@@ -7,6 +7,7 @@ module Twarog.Backend.Races
   , raceAdultAge
   , raceSizeMod
   , raceAttrMod
+  , raceArchetype
   , isRaceTraditionalOnly
   -- ** Toughness mods
   , raceColdMod
@@ -24,6 +25,7 @@ import Control.Lens
 import Twarog.Backend.Types
 import Twarog.Backend.Units
 import Twarog.Backend.Skills
+import Twarog.Backend.Archetypes
 
 data Race = Dwarf
           | Elf
@@ -275,6 +277,7 @@ raceSkillMod race skill = case race of
     _ -> id
   _ -> id
 
+-- | Checks whether is traditional only
 isRaceTraditionalOnly :: Race -> Bool
 isRaceTraditionalOnly = \case
   Dwarf -> True
@@ -283,4 +286,54 @@ isRaceTraditionalOnly = \case
   Gnome -> True
   _ -> False
 
+-- | Lists archetypes available for given race
+raceArchetype :: Race -> [Archetype]
+raceArchetype = \case 
+  Dwarf ->    [ Artemisian
+              , Dionysian
+              , Plutonic
+              , Poseidonic
+              ]
+  Elf   ->    [ Aphroditic
+              , Apollonian
+              , Artemisian
+              , Athenic
+              , Demeteric
+              , Dionysian
+              , Heliosean
+              , Heraklean
+              , Panic
+              , Poseidonic
+              , Selenic
+              ]
+  Gnome ->    [ Aphroditic
+              , Apollonian
+              , Artemisian
+              , Athenic
+              , Demeteric
+              , Dionysian
+              , Heliosean
+              , Heraklean
+              , Panic
+              , Poseidonic
+              , Selenic
+              ]
+  Halfling -> [ Aphroditic
+              , Apollonian
+              , Artemisian
+              , Athenic
+              , Demeteric
+              , Dionysian
+              , Heliosean
+              , Heraklean
+              , Panic
+              , Poseidonic
+              , Selenic
+              ]
+  HighMan     -> archetypes           
+  CommonMan   -> archetypes           
+  LesserMan   -> archetypes           
+  _        -> [ Plutonic
+              , Poseidonic
+              ]
 

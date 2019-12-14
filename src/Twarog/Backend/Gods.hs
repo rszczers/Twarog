@@ -1,6 +1,7 @@
 module Twarog.Backend.Gods
   ( -- * Gods representation
     God (..)
+  , gods
     -- ** Gods characteristics
   , godArchetype
   , godElement
