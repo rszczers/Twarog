@@ -1,6 +1,6 @@
 # TWAROG [wip]
 
-[![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
+[![Build Status](https://travis-ci.org/rszczers/Twarog.svg?branch=master)](https://travis-ci.org/rszczers/Twarog)
 
 *Tiny* web-based player character creator/manager for [MYFAROG](https://myfarog.org/) tabletop rpg.
 
