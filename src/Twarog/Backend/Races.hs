@@ -289,51 +289,51 @@ isRaceTraditionalOnly = \case
 -- | Lists archetypes available for given race
 raceArchetype :: Race -> [Archetype]
 raceArchetype = \case 
-  Dwarf ->    [ Artemisian
-              , Dionysian
-              , Plutonic
-              , Poseidonic
-              ]
-  Elf   ->    [ Aphroditic
-              , Apollonian
-              , Artemisian
-              , Athenic
-              , Demeteric
-              , Dionysian
-              , Heliosean
-              , Heraklean
-              , Panic
-              , Poseidonic
-              , Selenic
-              ]
-  Gnome ->    [ Aphroditic
-              , Apollonian
-              , Artemisian
-              , Athenic
-              , Demeteric
-              , Dionysian
-              , Heliosean
-              , Heraklean
-              , Panic
-              , Poseidonic
-              , Selenic
-              ]
-  Halfling -> [ Aphroditic
-              , Apollonian
-              , Artemisian
-              , Athenic
-              , Demeteric
-              , Dionysian
-              , Heliosean
-              , Heraklean
-              , Panic
-              , Poseidonic
-              , Selenic
-              ]
-  HighMan     -> archetypes           
-  CommonMan   -> archetypes           
-  LesserMan   -> archetypes           
-  _        -> [ Plutonic
-              , Poseidonic
-              ]
+  Dwarf    ->  [ Artemisian
+               , Dionysian
+               , Plutonic
+               , Poseidonic
+               ]
+  Elf      ->  [ Aphroditic
+               , Apollonian
+               , Artemisian
+               , Athenic
+               , Demeteric
+               , Dionysian
+               , Heliosean
+               , Heraklean
+               , Panic
+               , Poseidonic
+               , Selenic
+               ]
+  Gnome    ->  [ Aphroditic
+               , Apollonian
+               , Artemisian
+               , Athenic
+               , Demeteric
+               , Dionysian
+               , Heliosean
+               , Heraklean
+               , Panic
+               , Poseidonic
+               , Selenic
+               ]
+  Halfling  -> [ Aphroditic
+               , Apollonian
+               , Artemisian
+               , Athenic
+               , Demeteric
+               , Dionysian
+               , Heliosean
+               , Heraklean
+               , Panic
+               , Poseidonic
+               , Selenic
+               ]
+  HighMan   -> archetypes           
+  CommonMan -> archetypes           
+  LesserMan -> archetypes           
+  _         -> [ Plutonic
+               , Poseidonic
+               ]
 
