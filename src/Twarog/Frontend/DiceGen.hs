@@ -22,6 +22,7 @@ module Twarog.Frontend.DiceGen
 import Twarog.Backend.Types
 import Twarog.Backend.Races
 import Twarog.Backend.Calendar
+import Twarog.Backend.Archetypes
 import Twarog.Backend.Gods
 
 import Hedgehog
@@ -64,9 +65,9 @@ roll n dice = Gen.list (Range.singleton n) $
 -- | Generate random valid attribute
 genAttribute :: Gen Int
 genAttribute = do
-  x <- d20
-  y <- d20
-  let r = max x y
+  x <- roll 3 D6
+  y <- roll 3 D6 
+  let r = max (sum x) (sum y)
   if r > 3
   then return r
   else genAttribute
@@ -103,3 +104,7 @@ genBirthday = do
   else do
     cd <- Gen.int $ Range.constant 1 28 
     return $ Birthday (CommonDay cd) m
+
+-- | Generate random archetype
+genArchetype :: Gen Archetype
+genArchetype = Gen.choice $ Gen.constant <$> archetypes

@@ -1,6 +1,7 @@
 module Twarog.Backend.Gods
   ( -- * Gods representation
     God (..)
+  , gods
     -- ** Gods characteristics
   , godArchetype
   , godElement
@@ -53,6 +54,10 @@ data Element = Fire
              | Earth
              | Spirit
              deriving (Show, Eq)
+
+-- | Get list of all gods
+gods :: [God]
+gods = enumFrom (toEnum 0)
 
 isSympathetic :: God -> Bool
 isSympathetic god = god < Austr
