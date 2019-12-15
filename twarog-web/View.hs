@@ -10,6 +10,7 @@ import           Twarog.Backend.Races
 import           Twarog.Backend.Talents
 import           Twarog.Backend.Types
 import           Twarog.Backend.Flaws
+import           Twarog.Frontend.DiceGen
 
 import           Control.Lens
 import qualified Data.Map                 as M
@@ -235,36 +236,84 @@ breadcrumb stages =
 askAtributes :: Model -> Int -> View Msg
 askAtributes m n = 
     let 
+        firstScreen = n == 0
         atr = case n of 
+            0 -> ""
             1 -> "charisma" 
             2 -> "constitution"
             3 -> "dexterity"
             4 -> "inteligence"
             5 -> "strength"
             6 -> "will power"
-    in        
-        div_ [] [
-            p_ [class_ "title is-1 has-text-weight-medium"] [text "Roll your dice!"]
-            , p_ [class_ "subtitle is-3"] [text $ ms $"Determine your " ++ atr ]
-            , p_ [class_ "subtitle"] [text "Three d6 two times" ]
-            , div_ [class_ "columns is-mobile is-centered"
-                    , style_  $ M.singleton "margin" "0.5rem" ] [
-                            input_ [class_ "input is-large column is-one-fifth"
-                                    , style_  $ M.singleton "margin-right" "0.5rem"
-                                    , type_ "number"
-                                    , max_ $ ms $ show $ maxAtrValue
-                                    , value_ (ms (show (m ^. currentRoll1)))
-                                    , onInput SetCurrentRoll1 ]
-                            , input_ [class_ "input is-large column is-one-fifth"
-                                    , type_ "number"
-                                    , max_ $ ms $ show $ maxAtrValue
-                                    , value_ (ms (show $ m ^. currentRoll2)) 
-                                    , onInput SetCurrentRoll2 ] 
+    in  
+        if firstScreen 
+        then attributesFirstScreen
+        else     
+            div_ [] [
+                p_ [class_ "title is-1 has-text-weight-medium"] [text "Roll your dice!"]
+                , p_ [class_ "subtitle is-3"] [text $ ms $"Determine your " ++ atr ]
+                , p_ [class_ "subtitle"] [text "Three d6 two times" ]
+                , div_ [class_ "is-mobile is-centered"
+                        , style_  $ M.singleton "margin" "0.5rem" ] [
+                            div_ [class_ "level is-mobile columns"] [
+                                div_ [class_ "field has-addons column is-two-fifths is-offset-one-third"] [
+                                    p_ [class_ "control"] [
+                                    input_ [class_ "input level-item is-one-fifth is-large "
+                                            --, style_  $ M.singleton "margin-right" "0.5rem"
+                                            , type_ "number"
+                                            , max_ $ ms $ show $ maxAtrValue
+                                            , value_ (ms (show (m ^. currentRoll1)))
+                                            , onInput SetCurrentRoll1 ]
+                                    ]
+                                    ,p_ [class_ "control"] [
+                                    button_ [
+                                        class_ "button level-item is-black is-large"
+                                        -- , onClick  
+                                            ] ["Generate"]
+                                    ]
+                                ]
+                            ]
+                            , div_ [class_ "level is-mobile columns"] [
+                                div_ [class_ "field has-addons column is-two-fifths is-offset-one-third"] [
+                                    p_ [class_ "control"] [
+                                    input_ [class_ "input level-item is-one-fifth is-large "
+                                            --, style_  $ M.singleton "margin-right" "0.5rem"
+                                            , type_ "number"
+                                            , max_ $ ms $ show $ maxAtrValue
+                                            , value_ (ms (show (m ^. currentRoll2)))
+                                            , onInput SetCurrentRoll2 ]
+                                    ]
+                                    ,p_ [class_ "control"] [
+                                    button_ [
+                                        class_ "button level-item is-black is-large"
+                                        -- , onClick  
+                                        ] ["Generate"]
+                                    ]
+                                ]
+                            ]
                         ]
-            , button_ [ class_ "button is-black"
-                        , onClick (SetAttribute (
-                                        max (m ^. currentRoll1) (m ^. currentRoll2))
-                                        n )
-                    ] 
-                        [text "Calculate"]
-            ]
+                , button_ [ class_ "button is-black is-large"
+                            , style_  $ M.singleton "margin-top" "1rem"
+                            , onClick (SetAttribute (
+                                            max (m ^. currentRoll1) (m ^. currentRoll2))
+                                            n )
+                        ] 
+                            [text "Calculate"]
+                ]
+
+attributesFirstScreen :: View Msg
+attributesFirstScreen = div_ [] [
+                            p_ [class_ "title is-1 has-text-weight-medium"] [text "Your attributes"] 
+                            , div_ [class_ "columns "] [
+                                div_ [class_ "level is-mobile column is-three-fifths is-offset-one-fifth"] [
+                                    button_ [class_ "level-item button is-large is-black"
+                                            , onClick $ ChangeStage $ AtribStage 1
+                                            ] ["Use your dices"]   
+                                    , label_ [class_ "level-item label is-medium"] [" or "]
+                                    , button_ [class_ "level-item button is-large is-black"
+                                              -- , onClick SetAllAtributes  $ 
+                                                                        -- Tu bym chciała dać atrybuty            
+                                            ] ["Use one click generator"]
+                                ]  
+                            ]
+                        ] 

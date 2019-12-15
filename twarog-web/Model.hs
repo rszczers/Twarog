@@ -53,6 +53,7 @@ data Msg =  Name MisoString
             | AskTalents
             | ChangeStage Stage
             | SetAttribute Int Int
+            | SetAllAtributes Attributes
             | SetCurrentRoll1 MisoString
             | SetCurrentRoll2 MisoString
             deriving (Show, Eq)
@@ -67,7 +68,7 @@ maxAtrValue :: Int
 maxAtrValue = 18
 
 initialModel :: Model
-initialModel = Model (AtribStage 1) 0 0 0
+initialModel = Model (AtribStage 0) 0 0 0
                 $ NewCharacter Nothing Nothing Nothing
                                 Nothing Nothing Nothing
                                 Nothing Nothing Nothing

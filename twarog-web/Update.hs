@@ -92,3 +92,5 @@ module Update (updateModel) where
     in
       noEff $ m & character . characterFlaws .~
         (Just $ Prelude.filter (/= f) currFlaws)
+
+  updateModel (SetAllAtributes attr) m = noEff m
