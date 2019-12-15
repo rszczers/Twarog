@@ -26,7 +26,7 @@ viewModel m@Model{..} =
             [ navbarElem m
              , div_ [class_ "hero-body"] [
                 div_ [class_ "container has-text-centered"] $
-                    [ breadcrumb [NameStage, RaceStage, TalentStage, (AtribStage 1), FlawStage]]
+                    [ breadcrumb [NameStage, RaceStage, TalentStage, (AtribStage 1), FlawStage, BirthStage]]
                     ++ [getStage m]
                 ]
             ]
@@ -48,8 +48,8 @@ getStage m = case m ^. currentStage of
                 AtribStage n -> askAtributes m n
                 RaceStage -> displayRadioQuestion (Prelude.map Just races) m
                                     characterRace "Your race?" RaceChecked 
-{-               BirthStagez
-                ArchetypeStage
+                BirthStage -> displayBirthday 
+            {-    ArchetypeStage
                 GodStage
                 SexStage
                 HamingjaStage -}
@@ -82,7 +82,20 @@ askName m =
                 ]
       ]
 
-
+displayBirthday =  
+    div_ [] [
+        h2_ [class_ "title is-1 has-text-weight-medium"] [ "Your birthday? "]
+        , div_ [class_ "field has-addons column has-text-centered is-one-fifth-tablet is-one-quarters-mobile"] [ 
+            p_ [class_ "control"] [
+                input_ [ 
+                    type_ "number", name_ "talent"
+                ]
+                ]
+            , p_ [class_ "control"] [ 
+                text "day"
+                ]
+            ]
+    ]
 
 --dispaleyCheckboxQuestion :: [a] -> Model -> (characterField) -> String -> Int -> (a -> Bool -> View Msg)
 displayCheckboxQuestion valueList model characterField question max msg =
