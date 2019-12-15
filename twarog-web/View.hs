@@ -46,7 +46,7 @@ getStage m = case m ^. currentStage of
                 OwnerStage -> askName m
                 NameStage -> askName m
                 AtribStage n -> askAtributes m n
-                RaceStage -> displayRadioQuestion [Just Dwarf, Just Elf, Just Hobgoblin, Just HalfOrc, Just Goblin ] m
+                RaceStage -> displayRadioQuestion (Prelude.map Just races) m
                                     characterRace "Your race?" RaceChecked 
 {-               BirthStagez
                 ArchetypeStage
@@ -99,21 +99,25 @@ displayCheckboxQuestion valueList model characterField question max msg =
                     ++ [ text $ ms (maxFlaws - Prelude.length content)]
                     ++ [" more "]
                     ]
-                , div_ [ class_ "columns has-text-centered"]
+                , div_ [ class_ "columns has-text-centered is-multiline is-mobile"]
                     $ Prelude.map 
                         ( \x ->
-                            div_ [ class_ "column has-text-centered" ] [
-                                label_ [ class_ "checkbox radio is-size-5" ] [
-                                    input_ [ 
-                                        type_ "checkbox", name_ "talent"
-                                        , style_  $ M.singleton "margin" "0.5rem"
-                                        , checked_ $ elem x content
-                                        , disabled_ $ isDisabled x
-                                        , onChecked $ msg x 
+                            label_ [class_ "label has-text-weight-normal"] [
+                                div_ [class_ "field has-addons column has-text-centered is-one-fifth-tablet is-one-quarters-mobile"] [ 
+                                    p_ [class_ "control"] [
+                                        input_ [ 
+                                            type_ "checkbox", name_ "talent"
+                                            , style_  $ M.singleton "margin" "0.5rem"
+                                            , checked_ $ elem x content
+                                            , disabled_ $ isDisabled x
+                                            , onChecked $ msg x 
+                                        ]
+                                        ]
+                                    , p_ [class_ "control"] [ 
+                                        text $ ms $ show x
+                                        ]
                                     ]
-                                , text $ ms $ show x
                                 ]
-                            ]
                         ) valueList
             ]
         ]
@@ -125,19 +129,23 @@ displayRadioQuestion valueList model characterField question msg =
     in
         div_ [ class_ "control has-text-centered" ] [
             h2_ [class_ "title is-1 has-text-weight-medium"] [ question ]
-            , div_ [ class_ "columns has-text-centered" ] 
+            , div_ [ class_ "columns has-text-centered is-multiline is-mobile" ]
             $ Prelude.map
                 (\x ->
-                    div_ [class_ "column has-text-centered"] [
-                        label_ [ class_ "radio is-size-5"] [
-                            input_ [
-                                type_ "radio", name_ "race", onChecked $ msg x
-                                , checked_ (x == content)
-                                , style_  $ M.singleton "margin" "0.5rem"
+                    label_ [class_ "label has-text-weight-normal"] [
+                        div_ [class_ "field has-addons column has-text-centered is-one-fifth-tablet is-one-quarters-mobile"] [
+                                p_ [class_ "control"] [
+                                input_ [
+                                    type_ "radio", name_ "race", onChecked $ msg x
+                                    , checked_ (x == content)
+                                    , style_  $ M.singleton "margin" "0.5rem"
+                                    ]
+                                    ]
+                                ,p_ [class_ "control"] [
+                                    text $ ms $ case x of 
+                                                Just a -> show a
+                                                Nothing -> ""
                                 ]
-                            , text $ ms $ case x of 
-                                            Just a -> show a
-                                            Nothing -> ""
                             ]
                         ]
                 ) valueList
