@@ -1,2 +1,2 @@
 language: nix
-script: nix-build -A release
+script: nix-build -A dev
