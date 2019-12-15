@@ -1,5 +1,3 @@
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE FlexibleInstances #-}
 module View (viewModel) where
 
 import           Miso
@@ -342,6 +340,7 @@ askAtributes m n =
                                 ]
                             ]
                         ]
+
                 , button_ [ class_ "button is-black is-large"
                             , style_  $ M.singleton "margin-top" "1rem"
                             , onClick (SetAttribute (

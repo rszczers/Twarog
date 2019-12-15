@@ -1,0 +1,6 @@
+result
+dist*
+tags
+.*
+!.travis.yml
+!.gitignore

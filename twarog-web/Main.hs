@@ -1,7 +1,4 @@
-{-# LANGUAGE CPP             #-}
-{-# LANGUAGE RecordWildCards #-}
-
-module Main ( main ) where
+module Main where
 
 -- | Miso framework import
 import           Miso

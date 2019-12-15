@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleInstances #-}
 module Model
     ( Model(..)
     , character
