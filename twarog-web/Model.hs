@@ -47,6 +47,7 @@ data Msg =  Name MisoString
             | RaceChecked (Maybe Race) Checked
             | TalentChecked Talent Checked
             | FlawChecked Flaw Checked
+            | SexChecked (Maybe Sex) Checked
             | NoOp
             | AskName
             | AskRace
@@ -68,7 +69,7 @@ maxAtrValue :: Int
 maxAtrValue = 18
 
 initialModel :: Model
-initialModel = Model (AtribStage 0) 0 0 0
+initialModel = Model (BirthStage) 0 0 0
                 $ NewCharacter Nothing Nothing Nothing
                                 Nothing Nothing Nothing
                                 Nothing Nothing Nothing

@@ -94,3 +94,8 @@ module Update (updateModel) where
         (Just $ Prelude.filter (/= f) currFlaws)
 
   updateModel (SetAllAtributes attr) m = noEff m
+
+  updateModel (SexChecked s (Checked True)) m = 
+    noEff $ m & character . characterSex .~ s
+
+  

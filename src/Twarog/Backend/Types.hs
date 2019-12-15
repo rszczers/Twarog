@@ -9,6 +9,7 @@ module Twarog.Backend.Types
   , Note
   -- ** Descriptive part
   , Sex (..)
+  , sexes
   , Height
   , Size (..)
   , LifeStance (..)
@@ -185,7 +186,10 @@ type Lvl = Int
 data Sex = Male
          | Female
          | Non
-         deriving (Eq, Show)
+         deriving (Eq, Show, Enum)
+
+sexes :: [Sex]
+sexes = enumFrom (toEnum 0)
 
 data LifeStance = Religious
                 | Traditional

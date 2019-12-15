@@ -10,6 +10,7 @@ import           Twarog.Backend.Races
 import           Twarog.Backend.Talents
 import           Twarog.Backend.Types
 import           Twarog.Backend.Flaws
+import           Twarog.Backend.Calendar
 import           Twarog.Frontend.DiceGen
 
 import           Control.Lens
@@ -26,7 +27,7 @@ viewModel m@Model{..} =
             [ navbarElem m
              , div_ [class_ "hero-body"] [
                 div_ [class_ "container has-text-centered"] $
-                    [ breadcrumb [NameStage, RaceStage, TalentStage, (AtribStage 1), FlawStage, BirthStage]]
+                    [ breadcrumb [NameStage, RaceStage, TalentStage, (AtribStage 1), FlawStage, BirthStage, SexStage]]
                     ++ [getStage m]
                 ]
             ]
@@ -50,9 +51,10 @@ getStage m = case m ^. currentStage of
                                     characterRace "Your race?" RaceChecked 
                 BirthStage -> displayBirthday 
             {-    ArchetypeStage
-                GodStage
-                SexStage
-                HamingjaStage -}
+                GodStage -}
+                SexStage -> displayRadioQuestion (Prelude.map Just sexes) m 
+                                                characterSex "Your sex?" SexChecked
+            --    HamingjaStage 
                 FlawStage -> displayCheckboxQuestion [ Alcoholic FlawLevel1
                                         , Annoying FlawLevel1
                                         , BadBack FlawLevel1
@@ -85,17 +87,44 @@ askName m =
 displayBirthday =  
     div_ [] [
         h2_ [class_ "title is-1 has-text-weight-medium"] [ "Your birthday? "]
-        , div_ [class_ "field has-addons column has-text-centered is-one-fifth-tablet is-one-quarters-mobile"] [ 
-            p_ [class_ "control"] [
-                input_ [ 
-                    type_ "number", name_ "talent"
+        , div_ [class_ "level columns"] [
+            div_ [class_ "column"] []
+            , div_ [class_ "column"] [
+                div_ [class_ "field has-addons"] [
+                    input_ [class_ "input", type_ "number"]
+                    , p_ [class_ "control"] [
+                        button_ [
+                            class_ "button level-item is-black"
+                            -- , onClick  
+                                ] ["Generate"]
+                        ]
+                ]
+                , div_ [class_ "field has-addons"] [
+                    input_ [class_ "input", type_ "number"]
+                    , p_ [class_ "control"] [
+                        button_ [
+                            class_ "button level-item is-black"
+                            -- , onClick  
+                                ] ["Generate"]
+                        ]
+                ]
+                , div_ [class_ "field has-addons"] [
+                    input_ [class_ "input", type_ "number"]
+                    , p_ [class_ "control"] [
+                        button_ [
+                            class_ "button level-item is-black"
+                            -- , onClick  
+                                ] ["Generate"]
+                        ]
                 ]
                 ]
-            , p_ [class_ "control"] [ 
-                text "day"
-                ]
+                , div_ [class_ "column"] []
             ]
-    ]
+            , div_ [class_ ""] [
+                button_ [class_ "button is-medium is-black"] ["Calculate"]
+            ]
+        ]
+            
 
 --dispaleyCheckboxQuestion :: [a] -> Model -> (characterField) -> String -> Int -> (a -> Bool -> View Msg)
 displayCheckboxQuestion valueList model characterField question max msg =
@@ -279,7 +308,7 @@ askAtributes m n =
                             div_ [class_ "level is-mobile columns"] [
                                 div_ [class_ "field has-addons column is-two-fifths is-offset-one-third"] [
                                     p_ [class_ "control"] [
-                                    input_ [class_ "input level-item is-one-fifth is-large "
+                                    input_ [class_ "input level-item is-one-fifth is-medium "
                                             --, style_  $ M.singleton "margin-right" "0.5rem"
                                             , type_ "number"
                                             , max_ $ ms $ show $ maxAtrValue
@@ -288,7 +317,7 @@ askAtributes m n =
                                     ]
                                     ,p_ [class_ "control"] [
                                     button_ [
-                                        class_ "button level-item is-black is-large"
+                                        class_ "button level-item is-black is-medium"
                                         -- , onClick  
                                             ] ["Generate"]
                                     ]
@@ -297,7 +326,7 @@ askAtributes m n =
                             , div_ [class_ "level is-mobile columns"] [
                                 div_ [class_ "field has-addons column is-two-fifths is-offset-one-third"] [
                                     p_ [class_ "control"] [
-                                    input_ [class_ "input level-item is-one-fifth is-large "
+                                    input_ [class_ "input level-item is-one-fifth is-medium "
                                             --, style_  $ M.singleton "margin-right" "0.5rem"
                                             , type_ "number"
                                             , max_ $ ms $ show $ maxAtrValue
@@ -306,7 +335,7 @@ askAtributes m n =
                                     ]
                                     ,p_ [class_ "control"] [
                                     button_ [
-                                        class_ "button level-item is-black is-large"
+                                        class_ "button level-item is-black is-medium"
                                         -- , onClick  
                                         ] ["Generate"]
                                     ]
