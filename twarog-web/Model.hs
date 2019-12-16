@@ -71,6 +71,8 @@ data Msg =  Name MisoString
             | SetCurrentRoll2 MisoString
             | SetAttrBounce AttribBounce
             | SetRandomAttr
+            | SetBirth Birthday
+            | SetRandomBirth
             deriving (Show, Eq)
 
 maxTalents :: Int

@@ -47,7 +47,7 @@ getStage m = case m ^. currentStage of
                 AttribStage n -> askAttributes m n
                 RaceStage -> displayRadioQuestion (Prelude.map Just races) m
                                     characterRace "Your race?" RaceChecked 
-                BirthStage -> displayBirthday 
+                BirthStage -> displayBirthday m
             {-    ArchetypeStage
                 GodStage -}
                 SexStage -> displayRadioQuestion (Prelude.map Just sexes) m 
@@ -82,45 +82,33 @@ askName m =
                 ]
       ]
 
-displayBirthday =  
-    div_ [] [
-        h2_ [class_ "title is-1 has-text-weight-medium"] [ "Your birthday? "]
-        , div_ [class_ "level columns"] [
-            div_ [class_ "column"] []
-            , div_ [class_ "column"] [
-                div_ [class_ "field has-addons"] [
-                    input_ [class_ "input", type_ "number"]
-                    , p_ [class_ "control"] [
-                        button_ [
-                            class_ "button level-item is-black"
-                            --, onClick
-                                ] ["Generate"]
-                        ]
+displayBirthday m =
+    let
+        birthday = m ^. character . characterBirth
+        day =  case birthday of
+                    Nothing -> ""
+                    Just a -> show $ a ^. birthdayDay
+        month = case birthday of
+                    Nothing -> ""
+                    Just a -> show $ a ^. birthdayMonth
+    in
+        div_ [] [ 
+            h2_ [class_ "title is-1 has-text-weight-medium"] [ "Your birthday? "]
+            , div_ [class_ "columns"] [
+                div_ [ class_ "column field"] [
+                    label_ [class_ "label"] ["Day"]
+                    , p_ [] [text $ ms $ day]
+                    ]
+                , div_ [class_ "column field"] [
+                    label_ [class_ "label"] ["Month"]
+                    , p_ [] [text $ ms $ month]
+                    ]
                 ]
-                , div_ [class_ "field has-addons"] [
-                    input_ [class_ "input", type_ "number"]
-                    , p_ [class_ "control"] [
-                        button_ [
-                            class_ "button level-item is-black"
-                            -- , onClick  
-                                ] ["Generate"]
-                        ]
-                ]
-                , div_ [class_ "field has-addons"] [
-                    input_ [class_ "input", type_ "number"]
-                    , p_ [class_ "control"] [
-                        button_ [
-                            class_ "button level-item is-black"
-                            -- , onClick  
-                                ] ["Generate"]
-                        ]
-                ]
-                ]
-                , div_ [class_ "column"] []
-            ]
             , div_ [class_ ""] [
-                button_ [class_ "button is-medium is-black"] ["Calculate"]
-            ]
+                button_ [class_ "button is-medium is-black"
+                        , onClick SetRandomBirth ] 
+                    ["Generate birthday"]
+                ]
         ]
             
 

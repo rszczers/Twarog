@@ -103,11 +103,16 @@ updateModel (FlawChecked f (Checked False)) m =
 updateModel (SetAllAttributes attr) m = 
   noEff  ((m & character . characterAttr .~ Just attr) 
               & currentAttribBounce .~ Just Every)
-
---updateModel (SetAttrBounce b) m =
---  noEff (m & currentAttribBounce .~ b)
   
 updateModel SetRandomAttr m = do
     m <# do
       attr <- sample $ genAttributes
       return $ SetAllAttributes attr
+
+updateModel SetRandomBirth m = do
+  m <# do
+    birth <- sample $ genBirthday
+    return $ SetBirth birth
+
+updateModel (SetBirth b) m =
+  noEff  (m & character . characterBirth .~ Just b) 

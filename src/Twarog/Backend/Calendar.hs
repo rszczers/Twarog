@@ -3,6 +3,8 @@ module Twarog.Backend.Calendar
   , Day (..)
   , Season (..)
   , Birthday (..)
+  , birthdayDay
+  , birthdayMonth
   -- ** Utils
   , month
   , months
@@ -50,9 +52,10 @@ data Season = NewYear
             deriving (Eq, Show, Enum)
 
 data Birthday =
-  Birthday { birthdayDay :: Day
-           , birthdayMonth :: Month
+  Birthday { _birthdayDay :: Day
+           , _birthdayMonth :: Month
            } deriving (Eq, Show)
+makeLenses ''Birthday
 
 -- | Get list of months.
 months :: [Month]
