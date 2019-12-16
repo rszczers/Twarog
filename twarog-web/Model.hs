@@ -2,20 +2,23 @@ module Model
     ( Model(..)
     , character
     , currentStage
-    , currentAtribBounce
+    , currentAttribBounce
     , currentRoll1
     , currentRoll2
     , Msg (..)
     , Stage (..)
+    , AttribBounce (..)
+    , printBounce
     , initialModel
     , maxTalents
     , maxFlaws
-    , maxAtrValue
+    , maxAttrValue
     ) where
 
 import           Control.Lens
 import           Miso
 import           Miso.String
+import           Data.Char as C
 import           Twarog.Backend.Archetypes
 import           Twarog.Backend.Calendar
 import           Twarog.Backend.Character
@@ -27,14 +30,24 @@ import           Twarog.Backend.Skills
 import           Twarog.Backend.Talents
 import           Twarog.Backend.Types
 
-data Stage = OwnerStage | NameStage | AtribStage Int | RaceStage | BirthStage
+data Stage = OwnerStage | NameStage | AttribStage (Maybe AttribBounce) | RaceStage | BirthStage
             | ArchetypeStage | GodStage | SexStage | HamingjaStage
             | FlawStage | RoleStage | SkilsStage | TalentStage
             deriving (Show, Eq)
 
+data AttribBounce = Every | Charisma | Constitution | Dexterity | Inteligence | Strength | WillPower 
+            deriving (Show, Eq)
+
+printBounce :: Maybe AttribBounce -> String
+printBounce b = 
+    case b of
+        Just a -> Prelude.map C.toLower $ show a
+        Nothing -> "" 
+    
+
 data Model = Model
     { _currentStage :: Stage
-    , _currentAtribBounce :: Int
+    , _currentAttribBounce :: Maybe AttribBounce
     , _currentRoll1 :: Int
     , _currentRoll2 :: Int
     , _character    :: NewCharacter
@@ -52,10 +65,12 @@ data Msg =  Name MisoString
             | AskRace
             | AskTalents
             | ChangeStage Stage
-            | SetAttribute Int Int
-            | SetAllAtributes Attributes
+            | SetAttribute Int (Maybe AttribBounce)
+            | SetAllAttributes Attributes
             | SetCurrentRoll1 MisoString
             | SetCurrentRoll2 MisoString
+            | SetAttrBounce AttribBounce
+            | SetRandomAttr
             deriving (Show, Eq)
 
 maxTalents :: Int
@@ -64,11 +79,11 @@ maxTalents = 3
 maxFlaws :: Int
 maxFlaws = 3
 
-maxAtrValue :: Int
-maxAtrValue = 18
+maxAttrValue :: Int
+maxAttrValue = 18
 
 initialModel :: Model
-initialModel = Model (BirthStage) 0 0 0
+initialModel = Model (AttribStage Nothing) Nothing 0 0
                 $ NewCharacter Nothing Nothing Nothing
                                 Nothing Nothing Nothing
                                 Nothing Nothing Nothing

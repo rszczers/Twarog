@@ -25,7 +25,7 @@ viewModel m@Model{..} =
             [ navbarElem m
              , div_ [class_ "hero-body"] [
                 div_ [class_ "container has-text-centered"] $
-                    [ breadcrumb [NameStage, RaceStage, TalentStage, (AtribStage 1), FlawStage, BirthStage, SexStage]]
+                    [ breadcrumb [NameStage, RaceStage, TalentStage, (AttribStage Nothing), FlawStage, BirthStage, SexStage]]
                     ++ [getStage m]
                 ]
             ]
@@ -44,7 +44,7 @@ getStage :: Model -> View Msg
 getStage m = case m ^. currentStage of
                 OwnerStage -> askName m
                 NameStage -> askName m
-                AtribStage n -> askAtributes m n
+                AttribStage n -> askAttributes m n
                 RaceStage -> displayRadioQuestion (Prelude.map Just races) m
                                     characterRace "Your race?" RaceChecked 
                 BirthStage -> displayBirthday 
@@ -93,7 +93,7 @@ displayBirthday =
                     , p_ [class_ "control"] [
                         button_ [
                             class_ "button level-item is-black"
-                            -- , onClick  
+                            --, onClick
                                 ] ["Generate"]
                         ]
                 ]
@@ -191,84 +191,45 @@ displayRadioQuestion valueList model characterField question msg =
                 ) valueList
         ]
 
-atribToBounce :: Model -> Int
-atribToBounce m = m ^. currentAtribBounce
+attribToBounce :: Model -> Maybe AttribBounce
+attribToBounce m = m ^. currentAttribBounce
 
 navbarElem m =
     let
-        getAtr f = case m ^. character . characterAttr of
+        getAttr f = case m ^. character . characterAttr of
                         Just a -> a ^. f
                         Nothing -> 0
-        charisma = getAtr cha
-        costitution =  getAtr con
-        dexterity = getAtr dex
-        inteligence = getAtr int
-        strength = getAtr str
-        will = getAtr wil
+        charisma = getAttr cha
+        costitution =  getAttr con
+        dexterity = getAttr dex
+        inteligence = getAttr int
+        strength = getAttr str
+        will = getAttr wil
+
+        printAttribute attr bounce = 
+            div_ [class_ "level-item has-text-centered"] [
+                div_ [ class_ 
+                    (if attribToBounce m == bounce
+                    then "animated bounce"
+                    else "")
+                    ] [
+                        p_ [class_ "heading"] [ text $ ms $ printBounce $ bounce]
+                        , p_ [class_ "title"] [ text $ ms $ show attr]
+                    ]
+            ]
     in
-    nav_ [class_ "level is-mobile"][
-        div_ [class_ "level-item has-text-centered"] [
-            div_ [ class_ 
-                (if atribToBounce m == 1 
-                then "animated bounce"
-                else "")
+        nav_ [class_ $ ms $ "level is-mobile " ++ 
+                            (if (attribToBounce m == (Just Every)) 
+                            then "animated bounce"
+                            else "")
             ] [
-                p_ [class_ "heading"] [ "Charisma"]
-                , p_ [class_ "title"] [ text $ ms $ show charisma
-                                        ]
-            ]
+            printAttribute charisma $ Just Charisma
+            ,  printAttribute costitution $ Just Constitution
+            ,  printAttribute dexterity $ Just Dexterity
+            ,  printAttribute inteligence $ Just Inteligence
+            ,  printAttribute strength $ Just Strength
+            ,  printAttribute will $ Just WillPower
         ]
-        , div_ [class_ "level-item has-text-centered"] [
-            div_ [class_ 
-                (if atribToBounce m == 2 
-                then "animated bounce"
-                else "")
-                ] [
-                p_ [class_ "heading"] [ "Constitution"]
-                , p_ [class_ "title"] [ text $ ms $ show costitution ]
-            ]
-        ]
-        , div_ [class_ "level-item has-text-centered"] [
-            div_ [ class_ 
-                (if atribToBounce m == 3 
-                then "animated bounce"
-                else "")
-            ] [
-                p_ [class_ "heading"] [ "Dexterity"]
-                , p_ [class_ "title"] [ text $ ms $ show dexterity ]
-            ]
-        ]
-        , div_ [class_ "level-item has-text-centered"] [
-            div_ [class_ 
-                (if atribToBounce m == 4 
-                then "animated bounce"
-                else "")
-            ] [
-                p_ [class_ "heading"] [ "Inteligence"]
-                , p_ [class_ "title"] [ text $ ms $ show inteligence ]
-            ]
-        ]
-        , div_ [class_ "level-item has-text-centered"] [
-            div_ [ class_ 
-                (if atribToBounce m == 5 
-                then "animated bounce"
-                else "")
-            ] [
-                p_ [class_ "heading"] [ "Strength"]
-                , p_ [class_ "title"] [ text $ ms $ show strength ]
-            ]
-        ]
-        , div_ [class_ "level-item has-text-centered"] [
-            div_ [class_ 
-                (if atribToBounce m == 6 
-                then "animated bounce"
-                else "")
-            ] [
-                p_ [class_ "heading"] [ "Will"]
-                , p_ [class_ "title"] [ text $ ms $ show will ]
-            ]
-        ]
-    ]
 
 breadcrumb :: [Stage] -> View Msg
 breadcrumb stages = 
@@ -281,72 +242,45 @@ breadcrumb stages =
         ]
 
 
-askAtributes :: Model -> Int -> View Msg
-askAtributes m n = 
+askAttributes :: Model -> Maybe AttribBounce -> View Msg
+askAttributes m bounce = 
     let 
-        firstScreen = n == 0
-        atr = case n of 
-            0 -> ""
-            1 -> "charisma" 
-            2 -> "constitution"
-            3 -> "dexterity"
-            4 -> "inteligence"
-            5 -> "strength"
-            6 -> "will power"
+        firstScreen = isNothing bounce
+        attr = printBounce bounce
     in  
         if firstScreen 
         then attributesFirstScreen
         else     
             div_ [] [
                 p_ [class_ "title is-1 has-text-weight-medium"] [text "Roll your dice!"]
-                , p_ [class_ "subtitle is-3"] [text $ ms $"Determine your " ++ atr ]
+                , p_ [class_ "subtitle is-3"] [text $ ms $ "Determine your " ++ attr ]
                 , p_ [class_ "subtitle"] [text "Three d6 two times" ]
-                , div_ [class_ "is-mobile is-centered"
-                        , style_  $ M.singleton "margin" "0.5rem" ] [
-                            div_ [class_ "level is-mobile columns"] [
-                                div_ [class_ "field has-addons column is-two-fifths is-offset-one-third"] [
-                                    p_ [class_ "control"] [
-                                    input_ [class_ "input level-item is-one-fifth is-medium "
-                                            --, style_  $ M.singleton "margin-right" "0.5rem"
-                                            , type_ "number"
-                                            , max_ $ ms $ show $ maxAtrValue
-                                            , value_ (ms (show (m ^. currentRoll1)))
-                                            , onInput SetCurrentRoll1 ]
-                                    ]
-                                    ,p_ [class_ "control"] [
-                                    button_ [
-                                        class_ "button level-item is-black is-medium"
-                                        -- , onClick  
-                                            ] ["Generate"]
-                                    ]
-                                ]
-                            ]
-                            , div_ [class_ "level is-mobile columns"] [
-                                div_ [class_ "field has-addons column is-two-fifths is-offset-one-third"] [
-                                    p_ [class_ "control"] [
-                                    input_ [class_ "input level-item is-one-fifth is-medium "
-                                            --, style_  $ M.singleton "margin-right" "0.5rem"
-                                            , type_ "number"
-                                            , max_ $ ms $ show $ maxAtrValue
-                                            , value_ (ms (show (m ^. currentRoll2)))
-                                            , onInput SetCurrentRoll2 ]
-                                    ]
-                                    ,p_ [class_ "control"] [
-                                    button_ [
-                                        class_ "button level-item is-black is-medium"
-                                        -- , onClick  
-                                        ] ["Generate"]
-                                    ]
-                                ]
-                            ]
+                , div_ [class_ "columns is-centered"
+                        --, style_  $ M.singleton "margin" "0.5rem" 
+                    ] [
+                        div_ [class_ "column is-one-fifth"] [
+                            input_ [class_ "input is-medium "
+                                --, style_  $ M.singleton "margin-right" "0.5rem"
+                                , type_ "number"
+                                , max_ $ ms $ show $ maxAttrValue
+                                , value_ (ms (show (m ^. currentRoll1)))
+                                , onInput SetCurrentRoll1 ]
                         ]
-
+                        , div_ [class_ "column  is-one-fifth"] [
+                            input_ [class_ "input is-medium "
+                                --, style_  $ M.singleton "margin-right" "0.5rem"
+                                , type_ "number"
+                                , max_ $ ms $ show $ maxAttrValue
+                                , value_ (ms (show (m ^. currentRoll2)))
+                                , onInput SetCurrentRoll2 ]
+                        ]
+                ]
                 , button_ [ class_ "button is-black is-large"
                             , style_  $ M.singleton "margin-top" "1rem"
                             , onClick (SetAttribute (
-                                            max (m ^. currentRoll1) (m ^. currentRoll2))
-                                            n )
-                        ] 
+                                        max (m ^. currentRoll1) (m ^. currentRoll2))
+                                        bounce )
+                            ] 
                             [text "Calculate"]
                 ]
 
@@ -356,12 +290,11 @@ attributesFirstScreen = div_ [] [
                             , div_ [class_ "columns "] [
                                 div_ [class_ "level is-mobile column is-three-fifths is-offset-one-fifth"] [
                                     button_ [class_ "level-item button is-large is-black"
-                                            , onClick $ ChangeStage $ AtribStage 1
+                                            , onClick $ ChangeStage $ AttribStage $ Just Charisma
                                             ] ["Use your dices"]   
                                     , label_ [class_ "level-item label is-medium"] [" or "]
                                     , button_ [class_ "level-item button is-large is-black"
-                                              -- , onClick SetAllAtributes  $ 
-                                                                        -- Tu bym chciała dać atrybuty            
+                                               , onClick SetRandomAttr                             -- Tu bym chciała dać atrybuty            
                                             ] ["Use one click generator"]
                                 ]  
                             ]

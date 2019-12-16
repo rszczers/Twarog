@@ -9,6 +9,8 @@ import           Model
 import           Twarog.Backend.Character
 import           Twarog.Backend.Talents
 import           Twarog.Backend.Types
+import Hedgehog.Gen
+import Twarog.Frontend.DiceGen
 
 -- | Updates model, optionally introduces side effects
 updateModel :: Msg -> Model -> Effect Msg Model
@@ -52,32 +54,32 @@ updateModel (SetCurrentRoll2 n) m =
     noEff ( m & currentRoll2 .~  result)
 
 updateModel (SetAttribute n t) m =  
-  if t <= 6
-  then
     let 
       action = case t of
-        1 -> cha
-        2 -> con
-        3 -> dex
-        4 -> int
-        5 -> str
-        6 -> wil
-      newT = case t of
-              6 -> 1
-              _ -> t +1
+        Just Charisma -> cha
+        Just Constitution -> con
+        Just Dexterity -> dex
+        Just Inteligence -> Twarog.Backend.Types.int
+        Just Strength -> str
+        Just WillPower -> wil
+
+      next = case t of 
+        Just Every -> Just Charisma
+        Just Charisma -> Just Constitution
+        Just Constitution -> Just Dexterity
+        Just Dexterity -> Just Inteligence
+        Just Inteligence -> Just Strength
+        Just Strength -> Just WillPower
+        Just WillPower -> Nothing
       value = if n >= 18 then 18 else n
-      atr = fromMaybe (Attributes 0 0 0 0 0 0) 
+      attr = fromMaybe (Attributes 0 0 0 0 0 0) 
                 (m ^. character . characterAttr)
-      newModel = (((m & currentAtribBounce .~ t)
-                  & (character . characterAttr .~ Just (atr & action .~ value))
+      newModel = (((m & currentAttribBounce .~ t)
+                  & (character . characterAttr .~ Just (attr & action .~ value))
                   & currentRoll1 .~ 0 )
                   & currentRoll2 .~ 0 )
     in
-      noEff $ newModel & currentStage .~ (AtribStage newT)
-    else
-      noEff $ m & currentStage .~ (AtribStage 1)
-
-updateModel (SetAllAtributes attr) m = noEff m
+      noEff $ newModel & currentStage .~ (AttribStage next)
 
 updateModel (SexChecked s (Checked True)) m = 
   noEff $ m & character . characterSex .~ s
@@ -97,3 +99,15 @@ updateModel (FlawChecked f (Checked False)) m =
   in
     noEff $ m & character . characterFlaws .~
       (Just $ Prelude.filter (/= f) currFlaws)
+
+updateModel (SetAllAttributes attr) m = 
+  noEff  ((m & character . characterAttr .~ Just attr) 
+              & currentAttribBounce .~ Just Every)
+
+--updateModel (SetAttrBounce b) m =
+--  noEff (m & currentAttribBounce .~ b)
+  
+updateModel SetRandomAttr m = do
+    m <# do
+      attr <- sample $ genAttributes
+      return $ SetAllAttributes attr
