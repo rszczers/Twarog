@@ -123,11 +123,11 @@ maximumAge race con = case race of
 -- | Check if for given parameters given Character Role is
 -- allowed.
 isProperRole :: Attributes -> [Talent]
-             -> LifeStance -> Race -> Sex -> God
+             -> LifeStance -> Race -> Sex
              -> Archetype 
              -> CharacterRole 
              -> Bool
-isProperRole (Attributes cha con dex int str wil) ts ls race sex god arch cr =
+isProperRole (Attributes cha con dex int str wil) ts ls race sex arch cr =
   case cr of
     Civilian -> True
     Warrior   -> con >= 9 
@@ -141,16 +141,15 @@ isProperRole (Attributes cha con dex int str wil) ts ls race sex god arch cr =
               && dex >= 9 
               && int >= 9
     Ranger    -> race == HighMan 
-              && ls == Religious 
+              && ls == (Religious Skadi)
               && arch == Artemisian
-              && god == Skadi
               && cha >= 13
               && con >= 9
               && dex >= 9
               && int >= 9
               && wil >= 9
     Bard      -> race == HighMan
-              && ls == Religious
+              && ls /= Traditional
               && cha >= 16
               && Marked `elem` ts
     Sorcerer  -> race == HighMan
@@ -165,11 +164,11 @@ isProperRole (Attributes cha con dex int str wil) ts ls race sex god arch cr =
     _ -> False
 
 availableRoles :: Attributes -> [Talent]
-               -> LifeStance -> Race -> Sex -> God
+               -> LifeStance -> Race -> Sex
                -> Archetype 
                -> [CharacterRole]
-availableRoles attr ts ls rc sx g arch =
-  filter (isProperRole attr ts ls rc sx g arch) characterRoles 
+availableRoles attr ts ls rc sx arch =
+  filter (isProperRole attr ts ls rc sx arch) characterRoles 
 
 -- | Helper function for @expToLvl@
 maxNormalLvl :: Race -> CharacterRole -> Sex -> Lvl

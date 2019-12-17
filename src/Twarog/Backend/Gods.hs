@@ -2,6 +2,7 @@ module Twarog.Backend.Gods
   ( -- * Gods representation
     God (..)
   , gods
+  , LifeStance (..)
     -- ** Gods characteristics
   , godArchetype
   , godElement
@@ -190,3 +191,7 @@ godArchetype = \case
   Mani      -> Selenic
   Hodr      -> Plutonic
   _         -> error "Unsympathetic deity"
+
+data LifeStance = Religious God
+                | Traditional
+                deriving (Eq, Show)

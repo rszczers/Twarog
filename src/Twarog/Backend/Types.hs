@@ -12,7 +12,6 @@ module Twarog.Backend.Types
   , sexes
   , Height
   , Size (..)
-  , LifeStance (..)
   , Age (..)
   , XP
   , Lvl
@@ -190,10 +189,6 @@ data Sex = Male
 
 sexes :: [Sex]
 sexes = enumFrom (toEnum 0)
-
-data LifeStance = Religious
-                | Traditional
-                deriving (Eq, Show)
 
 data Toughness = Toughness Cold Electricity Heat Physical
   deriving (Show)

@@ -248,7 +248,7 @@ talentMod = \case
   Careful         -> [ PerceptionTalent (+ 1)
                      , StealthTalent (+ 1) 
                      ]
-  Cliopean       ->  [ WorldLoreTalent (+ 1) ]
+  Cliopean        -> [ WorldLoreTalent (+ 1) ]
   Courageous      -> [ MoraleTalent (+ 2) ]
   Craftsman       -> [ CraftsTalent (+ 1) ]
   Curious         -> [ WorldLoreTalent (+ 1) ]
