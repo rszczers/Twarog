@@ -6,11 +6,8 @@ import       Data.Maybe
 import       Miso
 import       Miso.String
 import       Model
-import       Twarog.Backend.Character
-import       Twarog.Backend.Talents
-import       Twarog.Backend.Types
-import       Hedgehog.Gen
-import       Twarog.Frontend.DiceGen
+import       Twarog
+import qualified Twarog as T
 
 -- | Updates model, optionally introduces side effects
 updateModel :: Msg -> Model -> Effect Msg Model
@@ -60,7 +57,7 @@ updateModel (SetAttribute n t) m =
         Just Charisma -> cha
         Just Constitution -> con
         Just Dexterity -> dex
-        Just Inteligence -> Twarog.Backend.Types.int
+        Just Inteligence -> T.int
         Just Strength -> str
         Just WillPower -> wil
         Nothing -> cha

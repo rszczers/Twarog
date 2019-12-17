@@ -118,7 +118,6 @@ module Twarog.Backend.Units
   , Glass
   , Hour
   , Shift
-  , Day
   -- ** Conversions
   , glass
   , hour

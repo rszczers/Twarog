@@ -17,16 +17,7 @@ import       Control.Lens
 import       Miso
 import       Miso.String
 import       Data.Char as C
-import       Twarog.Backend.Archetypes
-import       Twarog.Backend.Calendar
-import       Twarog.Backend.Character
-import       Twarog.Backend.Flaws
-import       Twarog.Backend.Gods
-import       Twarog.Backend.Item
-import       Twarog.Backend.Races
-import       Twarog.Backend.Skills
-import       Twarog.Backend.Talents
-import       Twarog.Backend.Types
+import       Twarog
 
 data Stage = OwnerStage | NameStage | AttribStage (Maybe AttribBounce) | RaceStage | BirthStage
       | ArchetypeStage | GodStage | SexStage | HamingjaStage

@@ -65,7 +65,7 @@ data Talent = Acrobatic
             | HawkEyed
             | Hephaestusean
               -- ^ Requires Craftsman
-            | Heraklean
+            | HerakleanTalent
               -- ^ Requires Fighter
             | Herbalist
             | Humble
@@ -123,7 +123,7 @@ data Talent = Acrobatic
               -- ^ Requires Nimble
             | Uranian
             | WarmHands
-            | Zevsean
+            | ZevseanTalent
               -- ^ Requires Thrower
             | Aegirean
             deriving (Eq, Show, Enum)
@@ -150,7 +150,7 @@ isTalentAvailable ts r t = if t `elem` ts then False
     Fearless        -> Courageous `elem` ts
     FistFighter     -> Fighter `elem` ts
     Hephaestusean   -> Craftsman `elem` ts
-    Heraklean       -> Fighter `elem` ts
+    HerakleanTalent -> Fighter `elem` ts
     Inquisitive     -> Cliopean `elem` ts
     Lancer          -> Fighter `elem` ts
     Mechanic        -> Nimble `elem` ts
@@ -169,7 +169,7 @@ isTalentAvailable ts r t = if t `elem` ts then False
     Terpsichorean   -> Acrobatic `elem` ts
     Tracker         -> Focused `elem` ts
     TricksterTalent -> Nimble `elem` ts
-    Zevsean         -> Thrower `elem` ts
+    ZevseanTalent   -> Thrower `elem` ts
     SlowAgeing      -> r /= Elf
     _               -> True
 
@@ -286,7 +286,7 @@ talentMod = \case
                          "from movement"
                      ]
   Hephaestusean   -> [ CraftsTalent (+ 1) ]
-  Heraklean       -> [ OtherTalent "+1 Melee (when using concussion weapons)" ]
+  HerakleanTalent -> [ OtherTalent "+1 Melee (when using concussion weapons)" ]
   Herbalist       -> [ AlchemyTalent (+ 1)
                      , ForagingTalent (+ 1)
                      ]
@@ -345,6 +345,6 @@ talentMod = \case
   TricksterTalent -> [ TrickeryTalent (+ 1) ]
   Uranian         -> [ NavigationTalent (+ 1) ]
   WarmHands       -> [ HealingTalent (+ 1) ]
-  Zevsean         -> [ MissileTalent (+ 1) ]
+  ZevseanTalent   -> [ MissileTalent (+ 1) ]
   Aegirean        -> [ FrightTalent (\x -> x - 1) ]
 

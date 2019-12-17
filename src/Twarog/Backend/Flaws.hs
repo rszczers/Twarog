@@ -29,7 +29,7 @@ data Flaw = Alcoholic FlawLevel
           | Haemophilic FlawLevel
           | Hypersexual FlawLevel
           | Jealous FlawLevel
-          | Lawful FlawLevel
+          | LawfulFlaw FlawLevel
           | Lazy FlawLevel
           | Limp FlawLevel -- ^ Gives PC Marked Talent for free. 
           | LowSelfEsteem FlawLevel
@@ -363,7 +363,7 @@ flawMod = \case
                             "You strongly dislike it when others are " ++
                             "better than you at something."
                          ]
-  Lawful fl           -> case fl of
+  LawfulFlaw fl       -> case fl of
     FlawLevel1        -> [ OtherFlaw $
                             "You strongly resist breaking the law."
                          ]

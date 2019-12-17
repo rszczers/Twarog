@@ -3,13 +3,7 @@ module View (viewModel) where
 import       Miso
 import       Miso.String
 import       Model
-import       Twarog.Backend.Character
-import       Twarog.Backend.Races
-import       Twarog.Backend.Talents
-import       Twarog.Backend.Types
-import       Twarog.Backend.Flaws
-import       Twarog.Backend.Calendar
-import       Twarog.Frontend.DiceGen
+import       Twarog
 
 import       Control.Lens
 import qualified Data.Map         as M
