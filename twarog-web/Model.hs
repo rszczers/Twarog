@@ -2,15 +2,17 @@ module Model
   ( Model(..)
   , character
   , currentStage
+  , availableStages
   , currentAttribBounce
   , currentRoll1
   , currentRoll2
   , Msg (..)
   , Stage (..)
   , AttribBounce (..)
+  , MaxChcekbox (..)
   , printBounce
   , initialModel
-  , maxTalents
+  , nextStage
   ) where
 
 import       Control.Lens
@@ -20,12 +22,25 @@ import       Data.Char as C
 import       Twarog
 
 data Stage = OwnerStage | NameStage | AttribStage (Maybe AttribBounce) | RaceStage | BirthStage
-      | ArchetypeStage | GodStage | SexStage | HamingjaStage
+      | ArchetypeStage | AttitudeStage | GodStage | SexStage | HamingjaStage
       | FlawStage | RoleStage | SkilsStage | TalentStage
       deriving (Show, Eq)
 
 data AttribBounce = Every | Charisma | Constitution | Dexterity | Inteligence | Strength | WillPower 
       deriving (Show, Eq)
+
+nextStage :: Stage -> Stage
+nextStage s = 
+  case s of 
+    NameStage -> AttribStage Nothing
+    AttribStage _ -> BirthStage
+    BirthStage -> SexStage
+    SexStage -> RaceStage
+    RaceStage -> AttitudeStage
+    AttitudeStage-> ArchetypeStage 
+    ArchetypeStage -> TalentStage
+    TalentStage -> RoleStage
+    RoleStage -> SkilsStage
 
 printBounce :: Maybe AttribBounce -> String
 printBounce b = 
@@ -35,6 +50,7 @@ printBounce b =
   
 data Model = Model
   { _currentStage :: Stage
+  , _availableStages :: [Stage]
   , _currentAttribBounce :: Maybe AttribBounce
   , _currentRoll1 :: Int
   , _currentRoll2 :: Int
@@ -43,31 +59,34 @@ data Model = Model
 makeLenses ''Model
 
 data Msg =  Name MisoString
-      | Talents [String]
-      | RaceChecked (Maybe Race) Checked
-      | TalentChecked Talent Checked
-      | FlawChecked Flaw Checked
+      -- Chcekbox msgs
+      | TalentChecked Talent (Maybe Int) Checked
+      | FlawChecked Flaw (Maybe Int) Checked
+      -- Radiobox msgs
       | SexChecked (Maybe Sex) Checked
-      | NoOp
+      | RaceChecked (Maybe Race) Checked
+      -- Character related msgs
       | AskName
       | AskRace
       | AskTalents
-      | ChangeStage Stage
       | SetAttribute Int (Maybe AttribBounce)
       | SetAllAttributes Attributes
-      | SetCurrentRoll1 MisoString
-      | SetCurrentRoll2 MisoString
-      | SetAttrBounce AttribBounce
       | SetRandomAttr
       | SetBirth Birthday
       | SetRandomBirth
+      -- No character related msgs
+      | NoOp
+      | ChangeStage Stage
+      | AddAvailableStage Stage
+      | SetCurrentRoll1 MisoString
+      | SetCurrentRoll2 MisoString
+      | SetAttrBounce AttribBounce
       deriving (Show, Eq)
 
-maxTalents :: Int
-maxTalents = 3
+data MaxChcekbox = TalentsMax Int | NoLimit
 
 initialModel :: Model
-initialModel = Model (AttribStage Nothing) Nothing 0 0
+initialModel = Model (NameStage) [NameStage] Nothing 0 0
         $ NewCharacter Nothing Nothing Nothing
                 Nothing Nothing Nothing
                 Nothing Nothing Nothing

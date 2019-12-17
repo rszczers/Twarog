@@ -19,7 +19,7 @@ viewModel m@Model{..} =
       [ navbarElem m
        , div_ [class_ "hero-body"] [
         div_ [class_ "container has-text-centered"] $
-          [ breadcrumb [NameStage, RaceStage, TalentStage, (AttribStage Nothing), FlawStage, BirthStage, SexStage] (m ^. currentStage) ]
+          [ breadcrumb (m ^. availableStages) (m ^. currentStage) ]
           ++ [getStage m]
         ]
       ]
@@ -39,44 +39,132 @@ getStage m = case m ^. currentStage of
         OwnerStage -> askName m
         NameStage -> askName m
         AttribStage n -> askAttributes m n
-        RaceStage -> displayRadioQuestion (Prelude.map Just races) m
-                  characterRace "Your race?" RaceChecked 
-        BirthStage -> displayBirthday m
-      {-  ArchetypeStage
-        GodStage -}
-        SexStage -> displayRadioQuestion (Prelude.map Just sexes) m 
-                        characterSex "Your sex?" SexChecked
+        RaceStage -> askRace m
+        BirthStage -> askBirthday m
+        AttitudeStage -> askAttitude m
+        ArchetypeStage -> askArchetype m
+        --GodStage 
+        SexStage -> askSex m
       --  HamingjaStage 
         FlawStage -> displayCheckboxQuestion [ Alcoholic FlawLevel1
                     , Annoying FlawLevel1
                     , BadBack FlawLevel1
                     , BadSight FlawLevel1
                     , BadTempered FlawLevel1
-                    , ChronicPain FlawLevel1] m characterFlaws "What are your flaws?" Nothing FlawChecked
+                    , ChronicPain FlawLevel1] m characterFlaws "What are your flaws?" NoLimit FlawChecked
       {-  RoleStage
         SkilsStage -}
-        TalentStage -> displayCheckboxQuestion [ Acrobatic, Aggresive, AnimalFriend, Arachnean, Argonautic, Ascetic ] m
-                            characterTalent "What are your talents?" (Just maxTalents) TalentChecked
+        TalentStage -> displayCheckboxQuestion talents m
+                            characterTalent "What are your talents?" (TalentsMax 3) TalentChecked
+
+nextButton :: Stage -> String -> View Msg                            
+nextButton stage txt = 
+  div_ [class_ "columns"][
+    div_ [class_ "column is-full level"] [
+      div_ [ class_ "level-right"] [
+        button_ [ class_ "button is-black is-medium"
+                , onClick $ ChangeStage $ nextStage stage  ] 
+                [ text $ ms txt ]
+        ]
+      ]
+    ]
 
 askName :: Model -> View Msg
 askName m =
   div_ []
     [ h2_ [class_ "title is-1 has-text-weight-medium"] [ "Your name? "]
-    , div_ [class_ "columns has-text-centered"] [
-        div_ [ class_ "column is-four-fifths"] [
+    , div_ [class_ "columns is-centered"] [
+        div_ [ class_ "column is-two-fifths"] [
             input_ [ class_ "input is-medium"
               , value_ $ ms
                 $ fromMaybe "" (m^.character.characterName)
-              , onChange Name 
+              , onInput Name 
               ]
           ]
-        , div_ [ class_ "column"] [
-              button_ [ class_ "button is-black is-medium"] [ text "Answer" ]
-          ]
         ]
+        , nextButton NameStage "Go to attributes"
     ]
 
-displayBirthday m =
+askAttributes :: Model -> Maybe AttribBounce -> View Msg
+askAttributes m bounce = 
+  let 
+    firstScreen = isNothing bounce
+    attr = printBounce bounce
+    max3D6 = 18
+    isNotValid = not $ (Prelude.foldr max max3D6 [m ^. currentRoll1, m ^. currentRoll2]) == max3D6
+  in  
+    if firstScreen 
+    then attributesFirstScreen
+    else   
+      div_ [] [
+        p_ [class_ "title is-1 has-text-weight-medium"] [text "Roll your dice!"]
+        , p_ [class_ "subtitle is-3"] [text $ ms $ "Determine your " ++ attr ]
+        , p_ [class_ "subtitle"] [text "Three d6 two times" ]
+        , div_ [class_ "columns is-centered"
+            --, style_  $ M.singleton "margin" "0.5rem" 
+          ] [
+            div_ [class_ "column is-one-fifth"] [
+              input_ [class_ "input is-medium "
+                --, style_  $ M.singleton "margin-right" "0.5rem"
+                , type_ "number"
+                , max_ $ ms $ show $ max3D6
+                , value_ (ms $ show (m ^. currentRoll1))
+                , onInput SetCurrentRoll1 ]
+            ]
+            , div_ [class_ "column  is-one-fifth"] [
+              input_ [class_ "input is-medium "
+                --, style_  $ M.singleton "margin-right" "0.5rem"
+                , type_ "number"
+                , max_ $ ms $ show $ max3D6
+                , value_ (ms $ show $ m ^. currentRoll2)
+                , onInput SetCurrentRoll2 ]
+            ]
+        ]
+        , div_ [class_ "columns is-centered"] 
+            (if isNotValid
+            then 
+              [
+                article_ [class_ "message is-danger animated bounceInDown "] [
+                  div_ [class_ "message-header"] [
+                    p_ [] ["Maximum of 3xD6 roll is 18. "]
+                  ]
+                  , div_ [class_ "message-body"] [
+                      figure_ [] [
+                        img_ [src_ "https://i.kym-cdn.com/entries/icons/original/000/005/540/130221984383.png"]
+                      ]
+                    ]
+                  ]
+                  ]
+              else [])
+        , button_ [ class_ "button is-black is-large"
+              , style_  $ M.singleton "margin-top" "1rem"
+              , disabled_ isNotValid
+              , onClick (SetAttribute (
+                    max (m ^. currentRoll1) (m ^. currentRoll2))
+                    bounce )
+              ] 
+              [text "Calculate"]
+        ]
+
+attributesFirstScreen :: View Msg
+attributesFirstScreen = div_ [] [
+              p_ [class_ "title is-1 has-text-weight-medium"] [text "Your attributes"] 
+              , div_ [class_ "columns "] [
+                div_ [class_ "level is-mobile column is-three-fifths is-offset-one-fifth"] [
+                  button_ [class_ "level-item button is-large is-black"
+                      , onClick $ ChangeStage $ AttribStage $ Just Charisma
+                      ] ["Use your dices"]   
+                  , label_ [class_ "level-item label is-medium"] [" or "]
+                  , button_ [class_ "level-item button is-large is-black"
+                         , onClick SetRandomAttr 
+                      ] ["Use one click generator"]
+                ]  
+              ]
+              , nextButton (AttribStage Nothing) "Go to Birthday"
+            ] 
+
+
+askBirthday m =
   let
     birthday = m ^. character . characterBirth
     day =  case birthday of
@@ -109,35 +197,69 @@ displayBirthday m =
           ]
       ]
       , div_ [class_ "columns is-centered"] [
-          
-            article_ [class_ 
-                    (if god /= [] 
-                      then " message is-success animated fadeInDown" 
-                      else "")
+          article_ 
+            [ class_ 
+                (if god /= [] 
+                then " message is-success animated fadeInDown" 
+                else "")
+            ]
+            (case god of
+              [ a ] -> 
+                [ div_ [class_ "message-header"] [
+                    p_ [] ["You are marked!"]    
                   ]
-                  (case god of
-                    [ a ] -> 
-                      [ div_ [class_ "message-header"] [
-                          p_ [] ["You are marked!"]    
-                        ]
-                      , div_ [class_ "message-body",
-                            style_  $ M.singleton "padding" "0.5rem"] [
-                        text $ ms $ "This is " ++ show a ++ " day. You obtain additional talent: Marked"
-                        ]
-                      ]
-                    _ -> [ text $ ""]  
-                )
+                , div_ [class_ "message-body",
+                      style_  $ M.singleton "padding" "0.5rem"] [
+                  text $ ms $ "This is " ++ show a ++ " day. You obtain additional talent: Marked"
+                  ]
+                ]
+              _ -> [ text $ ""]  
+            )
         ]
+        , nextButton BirthStage "Go to Sex"
     ]
     
+askSex m = 
+  div_ [] [    
+    displayRadioQuestion (Prelude.map Just sexes) m 
+                        characterSex "Your sex?" SexChecked
+    , nextButton SexStage "Go to Race"
+    ]
+
+askRace m =
+  div_ [] [
+    displayRadioQuestion (Prelude.map Just races) m
+                  characterRace "Your race?" RaceChecked 
+    , nextButton RaceStage "Go to Life stance"
+  ]
+
+askAttitude m = 
+  div_ [] [
+    --displayRadioQuestion (Prelude.map Just lifeStances) m
+    nextButton AttitudeStage "Go to Archetype"         
+  ]
+
+askArchetype m = 
+  div_ [] [
+  
+    nextButton ArchetypeStage "Go to Talents and Flaws"             
+  ]
+
+
 --dispaleyCheckboxQuestion :: [a] -> Model -> (characterField) -> String -> Int -> (a -> Bool -> View Msg)
 displayCheckboxQuestion valueList model characterField question max msg =
   let 
     content = fromMaybe [] $ model ^. character . characterField
-    isDisabled x =  case max of 
-              Just a -> Prelude.length content >= a
-                  && notElem x content 
-              Nothing -> False
+    isDisabled x =  
+      case max of 
+        TalentsMax a -> Prelude.length content >= a
+            && notElem x content 
+        NoLimit -> False
+
+    maxCheckbox = 
+      case max of
+        TalentsMax a -> Just a
+        NoLimit -> Nothing
 
   in
     div_ [ class_ "control has-text-centered" ] [
@@ -146,13 +268,13 @@ displayCheckboxQuestion valueList model characterField question max msg =
         , div_ [ class_ ""]
           (
             case max of
-              Just a -> 
+              TalentsMax a -> 
                 [ p_ [class_ "subtitle"] 
                     $ ["You can choose "]
                     ++ [ text $ ms (a - Prelude.length content)]
-                    ++ [" more "]
+                    ++ [" more talents"]
                 ]
-              Nothing -> []
+              NoLimit -> []
           )
         , div_ [ class_ "columns has-text-centered is-multiline is-mobile"]
           $ Prelude.map 
@@ -165,7 +287,7 @@ displayCheckboxQuestion valueList model characterField question max msg =
                       , style_  $ M.singleton "margin" "0.5rem"
                       , checked_ $ elem x content
                       , disabled_ $ isDisabled x
-                      , onChecked $ msg x 
+                      , onChecked $ msg x maxCheckbox
                     ]
                     ]
                   , p_ [class_ "control"] [ 
@@ -258,79 +380,3 @@ breadcrumb stages active =
     ]
 
 
-askAttributes :: Model -> Maybe AttribBounce -> View Msg
-askAttributes m bounce = 
-  let 
-    firstScreen = isNothing bounce
-    attr = printBounce bounce
-    max3D6 = 18
-    isNotValid = not $ (Prelude.foldr max max3D6 [m ^. currentRoll1, m ^. currentRoll2]) == max3D6
-  in  
-    if firstScreen 
-    then attributesFirstScreen
-    else   
-      div_ [] [
-        p_ [class_ "title is-1 has-text-weight-medium"] [text "Roll your dice!"]
-        , p_ [class_ "subtitle is-3"] [text $ ms $ "Determine your " ++ attr ]
-        , p_ [class_ "subtitle"] [text "Three d6 two times" ]
-        , div_ [class_ "columns is-centered"
-            --, style_  $ M.singleton "margin" "0.5rem" 
-          ] [
-            div_ [class_ "column is-one-fifth"] [
-              input_ [class_ "input is-medium "
-                --, style_  $ M.singleton "margin-right" "0.5rem"
-                , type_ "number"
-                , max_ $ ms $ show $ max3D6
-                , value_ (ms $ show (m ^. currentRoll1))
-                , onInput SetCurrentRoll1 ]
-            ]
-            , div_ [class_ "column  is-one-fifth"] [
-              input_ [class_ "input is-medium "
-                --, style_  $ M.singleton "margin-right" "0.5rem"
-                , type_ "number"
-                , max_ $ ms $ show $ max3D6
-                , value_ (ms $ show $ m ^. currentRoll2)
-                , onInput SetCurrentRoll2 ]
-            ]
-        ]
-        , div_ [class_ "columns is-centered"] 
-            (if isNotValid
-            then 
-              [
-                article_ [class_ "message is-danger animated bounceInDown "] [
-                  div_ [class_ "message-header"] [
-                    p_ [] ["Maximum of 3xD6 roll is 18. "]
-                  ]
-                  , div_ [class_ "message-body"] [
-                      figure_ [] [
-                        img_ [src_ "https://i.kym-cdn.com/entries/icons/original/000/005/540/130221984383.png"]
-                      ]
-                    ]
-                  ]
-                  ]
-              else [])
-        , button_ [ class_ "button is-black is-large"
-              , style_  $ M.singleton "margin-top" "1rem"
-              , disabled_ isNotValid
-              , onClick (SetAttribute (
-                    max (m ^. currentRoll1) (m ^. currentRoll2))
-                    bounce )
-              ] 
-              [text "Calculate"]
-        ]
-
-attributesFirstScreen :: View Msg
-attributesFirstScreen = div_ [] [
-              p_ [class_ "title is-1 has-text-weight-medium"] [text "Your attributes"] 
-              , div_ [class_ "columns "] [
-                div_ [class_ "level is-mobile column is-three-fifths is-offset-one-fifth"] [
-                  button_ [class_ "level-item button is-large is-black"
-                      , onClick $ ChangeStage $ AttribStage $ Just Charisma
-                      ] ["Use your dices"]   
-                  , label_ [class_ "level-item label is-medium"] [" or "]
-                  , button_ [class_ "level-item button is-large is-black"
-                         , onClick SetRandomAttr               -- Tu bym chciała dać atrybuty      
-                      ] ["Use one click generator"]
-                ]  
-              ]
-            ] 

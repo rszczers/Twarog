@@ -13,6 +13,7 @@ module Twarog.Backend.Types
   , Height
   , Size (..)
   , LifeStance (..)
+  , lifeStances
   , Age (..)
   , XP
   , Lvl
@@ -193,7 +194,10 @@ sexes = enumFrom (toEnum 0)
 
 data LifeStance = Religious
                 | Traditional
-                deriving (Eq, Show)
+                deriving (Eq, Show, Enum)
+
+lifeStances :: [LifeStance]
+lifeStances = enumFrom (toEnum 0)
 
 data Toughness = Toughness Cold Electricity Heat Physical
   deriving (Show)
