@@ -19,7 +19,7 @@ viewModel m@Model{..} =
       [ navbarElem m
        , div_ [class_ "hero-body"] [
         div_ [class_ "container has-text-centered"] $
-          [ breadcrumb [NameStage, RaceStage, TalentStage, (AttribStage Nothing), FlawStage, BirthStage, SexStage]]
+          [ breadcrumb [NameStage, RaceStage, TalentStage, (AttribStage Nothing), FlawStage, BirthStage, SexStage] (m ^. currentStage) ]
           ++ [getStage m]
         ]
       ]
@@ -85,27 +85,51 @@ displayBirthday m =
     month = case birthday of
           Nothing -> ""
           Just a -> show $ a ^. birthdayMonth
+    god = case birthday of
+          Just b -> birthdayGod b
+          Nothing -> []
   in
-    div_ [] [ 
-      h2_ [class_ "title is-1 has-text-weight-medium"] [ "Your birthday? "]
-      , div_ [class_ "columns"] [
-        div_ [ class_ "column field"] [
-          label_ [class_ "label"] ["Day"]
-          , p_ [] [text $ ms $ day]
+    div_ [] [
+      h2_ [class_ "title has-text-weight-medium"] [ "Your birthday? "]
+    , div_ [class_ "columns is-mobile is-multiline is-centered"] [ 
+            div_ [ class_ "column is-one-fifth field"] [
+              label_ [class_ "label"] ["Day"]
+              , p_ [] [text $ ms $ day]
+              ]
+            , div_ [class_ "column is-one-fifth field"] [
+              label_ [class_ "label"] ["Month"]
+              , p_ [] [text $ ms $ month]
+              ]
           ]
-        , div_ [class_ "column field"] [
-          label_ [class_ "label"] ["Month"]
-          , p_ [] [text $ ms $ month]
+      , div_ [class_ "columns is-centered"] [
+          div_ [class_ "column is-half"] [
+          button_ [class_ "button is-medium is-black"
+              , onClick SetRandomBirth ] 
+            ["Generate birthday"]
           ]
-        ]
-      , div_ [class_ ""] [
-        button_ [class_ "button is-medium is-black"
-            , onClick SetRandomBirth ] 
-          ["Generate birthday"]
+      ]
+      , div_ [class_ "columns is-centered"] [
+          
+            article_ [class_ 
+                    (if god /= [] 
+                      then " message is-success animated fadeInDown" 
+                      else "")
+                  ]
+                  (case god of
+                    [ a ] -> 
+                      [ div_ [class_ "message-header"] [
+                          p_ [] ["You are marked!"]    
+                        ]
+                      , div_ [class_ "message-body",
+                            style_  $ M.singleton "padding" "0.5rem"] [
+                        text $ ms $ "This is " ++ show a ++ " day. You obtain additional talent: Marked"
+                        ]
+                      ]
+                    _ -> [ text $ ""]  
+                )
         ]
     ]
-      
-
+    
 --dispaleyCheckboxQuestion :: [a] -> Model -> (characterField) -> String -> Int -> (a -> Bool -> View Msg)
 displayCheckboxQuestion valueList model characterField question max msg =
   let 
@@ -222,11 +246,12 @@ navbarElem m =
       ,  printAttribute will $ Just WillPower
     ]
 
-breadcrumb :: [Stage] -> View Msg
-breadcrumb stages = 
+breadcrumb :: [Stage] -> Stage -> View Msg
+breadcrumb stages active = 
   nav_ [class_ "breadcrumb is-centered"] [
     ul_ [] $ Prelude.map
-        ( \x -> li_ [] [
+        ( \x -> li_ [class_ 
+                    (if (active == x) then "is-active" else "") ] [
           a_ [ onClick (ChangeStage x) ] [ text $ ms $ show x ]
         ])
         stages
@@ -268,17 +293,21 @@ askAttributes m bounce =
                 , onInput SetCurrentRoll2 ]
             ]
         ]
-        , div_ [] 
+        , div_ [class_ "columns is-centered"] 
             (if isNotValid
             then 
               [
-                article_ [class_ "message is-danger"] [
-                  div_ [class_ "messege-body"] [
-                    text $ ms $ "Wait a sec are u trying to cheat me. "
-                    ++ "Maximum of 3xD6 roll is 18. "
+                article_ [class_ "message is-danger animated bounceInDown "] [
+                  div_ [class_ "message-header"] [
+                    p_ [] ["Maximum of 3xD6 roll is 18. "]
                   ]
-                ]
-              ]
+                  , div_ [class_ "message-body"] [
+                      figure_ [] [
+                        img_ [src_ "https://i.kym-cdn.com/entries/icons/original/000/005/540/130221984383.png"]
+                      ]
+                    ]
+                  ]
+                  ]
               else [])
         , button_ [ class_ "button is-black is-large"
               , style_  $ M.singleton "margin-top" "1rem"

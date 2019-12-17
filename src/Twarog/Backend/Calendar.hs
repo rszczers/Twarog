@@ -12,6 +12,7 @@ module Twarog.Backend.Calendar
   , monthSeason
   , seasonAttrMod
   , godsBirthday
+  , birthdayGod
   ) where
 
 import Control.Lens
