@@ -55,7 +55,7 @@ roll :: Int -> Dice -> Gen [Int]
 roll n dice = Gen.list (Range.singleton n) $
   case dice of
     D4   -> d4
-    D6   -> d4
+    D6   -> d6
     D8   -> d8
     D10  -> d10
     D12  -> d12
