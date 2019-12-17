@@ -1,14 +1,16 @@
 module Update (updateModel) where
 
-import           Control.Lens
-import           Control.Monad.IO.Class
-import           Data.Maybe
-import           Miso
-import           Miso.String
-import           Model
-import           Twarog.Backend.Character
-import           Twarog.Backend.Talents
-import           Twarog.Backend.Types
+import       Control.Lens
+import       Control.Monad.IO.Class
+import       Data.Maybe
+import       Miso
+import       Miso.String
+import       Model
+import       Twarog.Backend.Character
+import       Twarog.Backend.Talents
+import       Twarog.Backend.Types
+import       Hedgehog.Gen
+import       Twarog.Frontend.DiceGen
 
 -- | Updates model, optionally introduces side effects
 updateModel :: Msg -> Model -> Effect Msg Model
@@ -19,76 +21,101 @@ updateModel (RaceChecked r (Checked True)) m =
   noEff $ m & character . characterRace .~ r
 updateModel (TalentChecked t (Checked True)) m =  
   let 
-    currTalents = fromMaybe [] $ m ^. character . characterTalent
+  currTalents = fromMaybe [] $ m ^. character . characterTalent
   in
-    noEff ( 
-      if Prelude.length currTalents < maxTalents
-      then m & character . characterTalent .~ Just (currTalents ++ [ t ])
-      else m 
-      )
+  noEff ( 
+    if Prelude.length currTalents < maxTalents
+    then m & character . characterTalent .~ Just (currTalents ++ [ t ])
+    else m 
+    )
 updateModel (TalentChecked r (Checked False)) m = 
   let 
-    currTalents = fromMaybe [] $ m ^. character . characterTalent
+  currTalents = fromMaybe [] $ m ^. character . characterTalent
   in
-    noEff $ m & character . characterTalent .~
-      (Just $ Prelude.filter (/= r) currTalents)
+  noEff $ m & character . characterTalent .~
+    (Just $ Prelude.filter (/= r) currTalents)
 updateModel (ChangeStage s) m = noEff $ m & currentStage .~ s
 updateModel (SetCurrentRoll1 n) m = 
   let
-    toString = fromMisoString n 
-    result = case toString of
-                "" -> 0
-                _ -> read toString
+  toString = fromMisoString n 
+  result = case toString of
+        "" -> 0
+        _ -> read toString
   in
-    noEff ( m & currentRoll1 .~  result)
-                                                                                                        
+  noEff ( m & currentRoll1 .~ result)
+                                                    
 updateModel (SetCurrentRoll2 n) m = 
   let
-    toString = fromMisoString n 
-    result = case toString of
-                "" -> 0
-                _ -> read toString
+  toString = fromMisoString n 
+  result = case toString of
+        "" -> 0
+        _ -> read toString
   in
-    noEff ( m & currentRoll2 .~  result)
+  noEff ( m & currentRoll2 .~  result)
 
 updateModel (SetAttribute n t) m =  
-  if t <= 6
-  then
-    let 
-      action = case t of
-        1 -> cha
-        2 -> con
-        3 -> dex
-        4 -> int
-        5 -> str
-        6 -> wil
-      newT = case t of
-              6 -> 1
-              _ -> t +1
-      value = if n >= 18 then 18 else n
-      atr = fromMaybe (Attributes 0 0 0 0 0 0) 
-                (m ^. character . characterAttr)
-      newModel = (((m & currentAtribBounce .~ t)
-                  & (character . characterAttr .~ Just (atr & action .~ value))
-                  & currentRoll1 .~ 0 )
-                  & currentRoll2 .~ 0 )
-    in
-      noEff $ newModel & currentStage .~ (AtribStage newT)
-  else
-    noEff $ m & currentStage .~ (AtribStage 1)
-              
+  let 
+    action = 
+      case t of
+        Just Charisma -> cha
+        Just Constitution -> con
+        Just Dexterity -> dex
+        Just Inteligence -> Twarog.Backend.Types.int
+        Just Strength -> str
+        Just WillPower -> wil
+        Nothing -> cha
+
+    next = 
+      case t of 
+        Just Every -> Just Charisma
+        Just Charisma -> Just Constitution
+        Just Constitution -> Just Dexterity
+        Just Dexterity -> Just Inteligence
+        Just Inteligence -> Just Strength
+        Just Strength -> Just WillPower
+        Just WillPower -> Nothing
+        Nothing -> Nothing
+
+    value = if n >= 18 then 18 else n
+    attr = fromMaybe (Attributes 0 0 0 0 0 0) 
+        (m ^. character . characterAttr)
+    newModel = (((m & currentAttribBounce .~ t)
+          & (character . characterAttr .~ Just (attr & action .~ value))
+          & currentRoll1 .~ 0 )
+          & currentRoll2 .~ 0 )
+  in
+    noEff $ newModel & currentStage .~ (AttribStage next)
+
+updateModel (SexChecked s (Checked True)) m = 
+  noEff $ m & character . characterSex .~ s
+     
 updateModel (FlawChecked f (Checked True)) m =  
   let 
-    currFlaws = fromMaybe [] $ m ^. character . characterFlaws
+  currFlaws = fromMaybe [] $ m ^. character . characterFlaws
   in
-    noEff ( 
-      if Prelude.length currFlaws < maxFlaws
-      then m & character . characterFlaws .~ Just (currFlaws ++ [ f ])
-      else m 
-      )
+  noEff 
+    $ m & character . characterFlaws .~ Just (currFlaws ++ [ f ])
+
 updateModel (FlawChecked f (Checked False)) m = 
   let 
-    currFlaws = fromMaybe [] $ m ^. character . characterFlaws
+  currFlaws = fromMaybe [] $ m ^. character . characterFlaws
   in
-    noEff $ m & character . characterFlaws .~
-      (Just $ Prelude.filter (/= f) currFlaws)
+  noEff $ m & character . characterFlaws .~
+    (Just $ Prelude.filter (/= f) currFlaws)
+
+updateModel (SetAllAttributes attr) m = 
+  noEff  ((m & character . characterAttr .~ Just attr) 
+        & currentAttribBounce .~ Just Every)
+  
+updateModel SetRandomAttr m = do
+  m <# do
+    attr <- sample $ genAttributes
+    return $ SetAllAttributes attr
+
+updateModel SetRandomBirth m = do
+  m <# do
+    birth <- sample $ genBirthday
+    return $ SetBirth birth
+
+updateModel (SetBirth b) m =
+  noEff  (m & character . characterBirth .~ Just b) 
