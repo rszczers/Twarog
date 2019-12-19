@@ -32,6 +32,7 @@ viewModel m@Model{..} =
     [ rel_ "stylesheet"
     , href_ "https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css"
     ]
+    , script_ [defer_ "True", src_ "https://use.fontawesome.com/releases/v5.3.1/js/all.js"] []
   ]
 
 getStage :: Model -> View Msg
@@ -46,33 +47,31 @@ getStage m = case m ^. currentStage of
         --GodStage 
         SexStage -> askSex m
       --  HamingjaStage 
-        FlawStage -> displayCheckboxQuestion [ Alcoholic FlawLevel1
-                    , Annoying FlawLevel1
-                    , BadBack FlawLevel1
-                    , BadSight FlawLevel1
-                    , BadTempered FlawLevel1
-                    , ChronicPain FlawLevel1] m characterFlaws "What are your flaws?" NoLimit FlawChecked
+        FlawsAndTalentsStage -> askFlawsAndTalents m
       {-  RoleStage
         SkilsStage -}
-        TalentStage -> displayCheckboxQuestion talents m
-                            characterTalent "What are your talents?" (TalentsMax 3) TalentChecked
 
 nextButton :: Stage -> String -> View Msg                            
 nextButton stage txt = 
   div_ [class_ "columns"][
     div_ [class_ "column is-full level"] [
       div_ [ class_ "level-right"] [
-        button_ [ class_ "button is-black is-medium"
+        button_ [ class_ "button is-outlined is-medium"
                 , onClick $ ChangeStage $ nextStage stage  ] 
-                [ text $ ms txt ]
+                [ 
+                  text $ ms $ txt
+                  , span_ [class_ "icon", style_ $ M.singleton "padding-left" "1.5rem"] [
+                      i_ [class_ "fas fa-chevron-right"] []
+                    ]
+                 ]
         ]
       ]
     ]
 
 askName :: Model -> View Msg
 askName m =
-  div_ []
-    [ h2_ [class_ "title is-1 has-text-weight-medium"] [ "Your name? "]
+  div_ [class_ "animated fadeIn"]
+    [ h2_ [class_ "title is-2 has-text-weight-medium"] [ "Your name? "]
     , div_ [class_ "columns is-centered"] [
         div_ [ class_ "column is-two-fifths"] [
             input_ [ class_ "input is-medium"
@@ -96,8 +95,8 @@ askAttributes m bounce =
     if firstScreen 
     then attributesFirstScreen
     else   
-      div_ [] [
-        p_ [class_ "title is-1 has-text-weight-medium"] [text "Roll your dice!"]
+      div_ [class_ "animated fadeIn"] [
+        p_ [class_ "title is-2 has-text-weight-medium"] [text "Roll your dice!"]
         , p_ [class_ "subtitle is-3"] [text $ ms $ "Determine your " ++ attr ]
         , p_ [class_ "subtitle"] [text "Three d6 two times" ]
         , div_ [class_ "columns is-centered"
@@ -136,7 +135,7 @@ askAttributes m bounce =
                   ]
                   ]
               else [])
-        , button_ [ class_ "button is-black is-large"
+        , button_ [ class_ "button is-black is-medium"
               , style_  $ M.singleton "margin-top" "1rem"
               , disabled_ isNotValid
               , onClick (SetAttribute (
@@ -147,15 +146,15 @@ askAttributes m bounce =
         ]
 
 attributesFirstScreen :: View Msg
-attributesFirstScreen = div_ [] [
-              p_ [class_ "title is-1 has-text-weight-medium"] [text "Your attributes"] 
+attributesFirstScreen = div_ [class_ "animated fadeIn"] [
+              p_ [class_ "title is-2 has-text-weight-medium"] [text "Your attributes"] 
               , div_ [class_ "columns "] [
                 div_ [class_ "level is-mobile column is-three-fifths is-offset-one-fifth"] [
-                  button_ [class_ "level-item button is-large is-black"
+                  button_ [class_ "level-item button is-medium is-black"
                       , onClick $ ChangeStage $ AttribStage $ Just Charisma
                       ] ["Use your dices"]   
                   , label_ [class_ "level-item label is-medium"] [" or "]
-                  , button_ [class_ "level-item button is-large is-black"
+                  , button_ [class_ "level-item button is-medium is-black"
                          , onClick SetRandomAttr 
                       ] ["Use one click generator"]
                 ]  
@@ -177,8 +176,8 @@ askBirthday m =
           Just b -> birthdayGod b
           Nothing -> []
   in
-    div_ [] [
-      h2_ [class_ "title has-text-weight-medium"] [ "Your birthday? "]
+    div_ [class_ "animated fadeIn"] [
+      h2_ [class_ "title is-2 has-text-weight-medium"] [ "Your birthday? "]
     , div_ [class_ "columns is-mobile is-multiline is-centered"] [ 
             div_ [ class_ "column is-one-fifth field"] [
               label_ [class_ "label"] ["Day"]
@@ -220,62 +219,123 @@ askBirthday m =
     ]
     
 askSex m = 
-  div_ [] [    
+  div_ [class_ "animated fadeIn"] [    
     displayRadioQuestion (Prelude.map Just sexes) m 
                         characterSex "Your sex?" SexChecked
     , nextButton SexStage "Go to Race"
     ]
 
 askRace m =
-  div_ [] [
+  div_ [class_ "animated fadeIn"] [
     displayRadioQuestion (Prelude.map Just races) m
                   characterRace "Your race?" RaceChecked 
     , nextButton RaceStage "Go to Life stance"
   ]
 
 askAttitude m = 
-  div_ [] [
+  div_ [class_ "animated fadeIn"] [
     --displayRadioQuestion (Prelude.map Just lifeStances) m
     nextButton AttitudeStage "Go to Archetype"         
   ]
 
 askArchetype m = 
-  div_ [] [
+  div_ [class_ "animated fadeIn"] [
   
     nextButton ArchetypeStage "Go to Talents and Flaws"             
   ]
+
+askFlawsAndTalents m = 
+  div_ [class_ "animated fadeIn"] [
+    h2_ [class_ "title is-2 has-text-weight-medium"] [ "Talents and flaws "]
+    , maxTalentsInfo m $ TalentsMax 3
+    , p_ [class_ "subtitle"] ["If you choose two flaws, you'll gain one additional talent."]
+    , div_ [class_ "columns"] [
+        div_ [class_ "column"] [
+          displayCheckboxQuestion talents m
+                            characterTalent "What are your talents?" (TalentsMax 3) TalentChecked
+        ]
+        , div_ [class_ "column"] [
+            displayCheckboxQuestion [ Alcoholic FlawLevel1
+                        , Annoying FlawLevel1
+                        , BadBack FlawLevel1
+                        , BadSight FlawLevel1
+                        , BadTempered FlawLevel1
+                        , ChronicPain FlawLevel1,  Alcoholic FlawLevel1
+                        , Annoying FlawLevel1
+                        , BadBack FlawLevel1
+                        , BadSight FlawLevel1
+                        , BadTempered FlawLevel1
+                        , ChronicPain FlawLevel1,  Alcoholic FlawLevel1
+                        , Annoying FlawLevel1
+                        , BadBack FlawLevel1
+                        , BadSight FlawLevel1
+                        , BadTempered FlawLevel1
+                        , ChronicPain FlawLevel1, Alcoholic FlawLevel1
+                        , Annoying FlawLevel1
+                        , BadBack FlawLevel1
+                        , BadSight FlawLevel1
+                        , BadTempered FlawLevel1
+                        , ChronicPain FlawLevel1] m characterFlaws "What are your flaws?" NoLimit FlawChecked
+        ]
+    ]
+  ]
+
+maxTalentsInfo :: Model -> MaxCheckbox -> View Msg
+maxTalentsInfo m max = 
+    div_ [ class_ ""]
+    (
+      case max of
+        TalentsMax a -> 
+          let 
+            additionalTalents = 
+              quot ( 
+                Prelude.length (
+                  fromMaybe [] $ m ^. character . characterFlaws
+                  ) 
+              ) 2
+            toChoose = a + additionalTalents
+            choosed = Prelude.length $ fromMaybe [] $ m ^. character . characterTalent
+
+          in 
+            [ p_ [class_ "subtitle"] 
+                $ ["You can choose "]
+                ++ [ text $ ms $ toChoose - choosed]
+                ++ [" more talents."]
+            ]
+        NoLimit -> []
+    )
 
 
 --dispaleyCheckboxQuestion :: [a] -> Model -> (characterField) -> String -> Int -> (a -> Bool -> View Msg)
 displayCheckboxQuestion valueList model characterField question max msg =
   let 
     content = fromMaybe [] $ model ^. character . characterField
+
+    additionalTalents = 
+      case max of 
+        TalentsMax _ -> 
+          quot ( 
+            Prelude.length (
+              fromMaybe [] $ model ^. character . characterFlaws
+              ) 
+            ) 2
+        otherwise -> 0
+
     isDisabled x =  
       case max of 
-        TalentsMax a -> Prelude.length content >= a
+        TalentsMax a -> Prelude.length content >= ( a + additionalTalents )
             && notElem x content 
         NoLimit -> False
 
     maxCheckbox = 
       case max of
-        TalentsMax a -> Just a
+        TalentsMax a -> Just (a + additionalTalents)
         NoLimit -> Nothing
 
   in
     div_ [ class_ "control has-text-centered" ] [
       div_ [] [
-        p_ [class_ "title is-1 is-full has-text-weight-medium"] [ question ]
-        , div_ [ class_ ""]
-          (
-            case max of
-              TalentsMax a -> 
-                [ p_ [class_ "subtitle"] 
-                    $ ["You can choose "]
-                    ++ [ text $ ms (a - Prelude.length content)]
-                    ++ [" more talents"]
-                ]
-              NoLimit -> []
-          )
+        p_ [class_ "title is-3 is-full has-text-weight-medium"] [ question ]
         , div_ [ class_ "columns has-text-centered is-multiline is-mobile"]
           $ Prelude.map 
             ( \x ->
@@ -298,14 +358,14 @@ displayCheckboxQuestion valueList model characterField question max msg =
             ) valueList
       ]
     ]
-   
+
 --dispaleyRadioQuestion :: [a] -> Model -> (characterField) -> String ->  (a -> Bool -> View Msg)
 displayRadioQuestion valueList model characterField question msg =
   let 
     content = model ^. character . characterField 
   in
     div_ [ class_ "control has-text-centered" ] [
-      h2_ [class_ "title is-1 has-text-weight-medium"] [ question ]
+      h2_ [class_ "title is-2 has-text-weight-medium"] [ question ]
       , div_ [ class_ "columns has-text-centered is-multiline is-mobile" ]
       $ Prelude.map
         (\x ->

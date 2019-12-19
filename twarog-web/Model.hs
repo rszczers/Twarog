@@ -9,7 +9,7 @@ module Model
   , Msg (..)
   , Stage (..)
   , AttribBounce (..)
-  , MaxChcekbox (..)
+  , MaxCheckbox (..)
   , printBounce
   , initialModel
   , nextStage
@@ -22,8 +22,8 @@ import       Data.Char as C
 import       Twarog
 
 data Stage = OwnerStage | NameStage | AttribStage (Maybe AttribBounce) | RaceStage | BirthStage
-      | ArchetypeStage | AttitudeStage | GodStage | SexStage | HamingjaStage
-      | FlawStage | RoleStage | SkilsStage | TalentStage
+      | ArchetypeStage | AttitudeStage | GodStage | SexStage | HamingjaStage | FlawsAndTalentsStage
+      | RoleStage | SkilsStage 
       deriving (Show, Eq)
 
 data AttribBounce = Every | Charisma | Constitution | Dexterity | Inteligence | Strength | WillPower 
@@ -38,8 +38,8 @@ nextStage s =
     SexStage -> RaceStage
     RaceStage -> AttitudeStage
     AttitudeStage-> ArchetypeStage 
-    ArchetypeStage -> TalentStage
-    TalentStage -> RoleStage
+    ArchetypeStage -> FlawsAndTalentsStage
+    FlawsAndTalentsStage -> RoleStage
     RoleStage -> SkilsStage
 
 printBounce :: Maybe AttribBounce -> String
@@ -59,7 +59,7 @@ data Model = Model
 makeLenses ''Model
 
 data Msg =  Name MisoString
-      -- Chcekbox msgs
+      -- Checkbox msgs
       | TalentChecked Talent (Maybe Int) Checked
       | FlawChecked Flaw (Maybe Int) Checked
       -- Radiobox msgs
@@ -83,7 +83,7 @@ data Msg =  Name MisoString
       | SetAttrBounce AttribBounce
       deriving (Show, Eq)
 
-data MaxChcekbox = TalentsMax Int | NoLimit
+data MaxCheckbox = TalentsMax Int | NoLimit
 
 initialModel :: Model
 initialModel = Model (NameStage) [NameStage] Nothing 0 0
