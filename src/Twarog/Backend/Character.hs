@@ -2,6 +2,7 @@ module Twarog.Backend.Character
   ( -- * Character
     CharacterRole (..)
   , NewCharacter (..)
+  , emptyNewCharacter
   -- ** Character Role Utils
   , characterRoles 
   , availableRoles 
@@ -104,6 +105,22 @@ data NewCharacter = NewCharacter
   } deriving (Show, Eq)
 makeLenses ''NewCharacter
  
+emptyNewCharacter = 
+  let _characterOwner     = Nothing
+      _characterName      = Nothing
+      _characterAttr      = Nothing
+      _characterRace      = Nothing
+      _characterBirth     = Nothing
+      _characterAlignment = Nothing
+      _characterGod       = Nothing
+      _characterSex       = Nothing
+      _characterHamingja  = Nothing
+      _characterFlaws     = Nothing
+      _characterRole      = Nothing
+      _characterSkills    = Nothing
+      _characterTalent    = Nothing
+   in NewCharacter{..}
+
 -- | Maximal age that PC can live up to
 maximumAge :: Race -> CON -> Age
 maximumAge race con = case race of
@@ -464,4 +481,3 @@ hp :: CON -> Str -> Size -> CharacterRole -> Lvl -> HP
 hp c str size cr lvl =
   let bonus = lvl * crHPBonus cr 0
    in size . str $ c + bonus
-

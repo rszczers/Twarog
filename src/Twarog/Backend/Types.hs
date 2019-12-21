@@ -13,6 +13,8 @@ module Twarog.Backend.Types
   , Height
   , Size (..)
   , Age (..)
+  , _Immortal
+  , _Mortal
   , XP
   , Lvl
   , Hamingja
@@ -57,12 +59,18 @@ module Twarog.Backend.Types
   , MsPenality
   , ShieldDvMe
   , ShieldBlock
+  , Fright
   -- ** Toughness
   , Cold
   , Electricity
   , Heat
   , Physical
   , Toughness (..)
+  -- ** Toughness lenses 
+  , toughnessCold
+  , toughnessElectricity
+  , toughnessHeat
+  , toughnessPhysical
   -- ** Condition
   , Condition
   -- ** Vitality
@@ -123,7 +131,9 @@ type MsPenality = Int
 type ShieldDvMe = Int  
 type ShieldBlock = Float -> Float
 
-type Mod = Int -> Int
+type Fright = Int
+
+type Mod = Int
 
 type Hamingja = Int
 type BaseRange = Int
@@ -154,8 +164,11 @@ type Physical = Int
 type XP = Int
 type HP = Int
 type SP = Int
+
 data Age = Immortal | Mortal Int
   deriving (Show)
+makePrisms ''Age  
+
 type Height = Distance Inch
 
 type Size = Int -> Int
@@ -190,8 +203,13 @@ data Sex = Male
 sexes :: [Sex]
 sexes = enumFrom (toEnum 0)
 
-data Toughness = Toughness Cold Electricity Heat Physical
-  deriving (Show)
+data Toughness = Toughness 
+  { _toughnessCold :: Cold
+  , _toughnessElectricity :: Electricity
+  , _toughnessHeat :: Heat
+  , _toughnessPhysical :: Physical
+  } deriving (Show)
+makeLenses ''Toughness
 
 data Condition = Tired
                | Weary

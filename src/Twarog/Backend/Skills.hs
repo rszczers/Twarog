@@ -1,13 +1,16 @@
 module Twarog.Backend.Skills
   ( CharacterSkill (..)
+  , characterSkill
+  , skillMod
+  , proficiency
   , Skill (..)
   , SkillType (..)
-  , SkillMod (..)
   , Proficiency (..)
   , skillType
   )
   where
 
+import Control.Lens
 import Twarog.Backend.Types
 
 data Skill = Acrobatics
@@ -58,9 +61,11 @@ data SkillType = MovementSkill
                deriving (Eq, Ord, Show)
 
 data CharacterSkill = CharacterSkill
-  { characterSkill :: Skill
-  , proficiency    :: Proficiency
+  { _characterSkill :: Skill
+  , _skillMod       :: Int
+  , _proficiency    :: Proficiency
   } deriving (Eq, Ord, Show)
+makeLenses ''CharacterSkill
 
 -- | Assigns aprioprate category to given skill.
 skillType :: Skill -> SkillType
@@ -97,36 +102,4 @@ skillType = \case
   Trickery           -> SpecialSkill
   WorldLore          -> SpecialSkill
 
-data SkillMod = AcrobaticsMod Mod
-              | ActingMod Mod
-              | AlchemyMod Mod
-              | ClimbingMod Mod
-              | CraftsMod Mod
-              | DancingMod Mod
-              | DodgingMod Mod
-              | FlutePlayingMod Mod
-              | ForagingMod Mod
-              | FortitudeMod Mod
-              | HealingMod Mod
-              | LyrePlayingMod Mod
-              | MechanicsMod Mod
-              | MeleeMod Mod
-              | MissileMod Mod
-              | NavigationMod Mod
-              | PerceptionMod Mod
-              | PoetryMod Mod
-              | ReligiousTraditionMod Mod
-              | RidingMod Mod
-              | RuneLoreMod Mod
-              | SeamanshipMod Mod
-              | SingingMod Mod
-              | SocialSkillsMod Mod
-              | StaminaMod Mod
-              | StealthMod Mod
-              | SwimmingMod Mod
-              | TempoMod Mod
-              | TrackingMod Mod
-              | TrickeryMod Mod
-              | WorldLoreMod Mod
-              deriving (Show)
 

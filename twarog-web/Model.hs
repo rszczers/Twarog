@@ -67,8 +67,10 @@ maxTalents :: Int
 maxTalents = 3
 
 initialModel :: Model
-initialModel = Model (AttribStage Nothing) Nothing 0 0
-        $ NewCharacter Nothing Nothing Nothing
-                Nothing Nothing Nothing
-                Nothing Nothing Nothing
-                Nothing Nothing Nothing Nothing
+initialModel =
+  let _currentStage = AttribStage Nothing 
+      _currentAttribBounce = Nothing 
+      _currentRoll1 = 0
+      _currentRoll2 = 0
+      _character = emptyNewCharacter
+   in Model{..}

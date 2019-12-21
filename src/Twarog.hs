@@ -13,6 +13,7 @@ module Twarog
   , module Twarog.Backend.Item
   , module Twarog.Backend.Units
   , module Twarog.Backend.Types
+  , module Twarog.Backend.Modifier
   , module Twarog.Frontend.DiceGen
   , module Twarog.Frontend.HamingjaStore
   , sample
@@ -32,6 +33,7 @@ import Twarog.Backend.Talents
 import Twarog.Backend.Item
 import Twarog.Backend.Units
 import Twarog.Backend.Types
+import Twarog.Backend.Modifier
 import Twarog.Frontend.DiceGen
 import Twarog.Frontend.HamingjaStore
 
