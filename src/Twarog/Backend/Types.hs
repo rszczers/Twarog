@@ -171,13 +171,7 @@ makePrisms ''Age
 
 type Height = Distance Inch
 
-type Size = Int -> Int
-instance Show Size where
-  show f = show $ f 0
-
--- newtype Size = Size { unSize :: Int -> Int }
--- instance Show Size where
---   show (Size f) = show $ f 0
+type Size = Int
 
 type Cha = Int -> Int
 type Con = Int -> Int

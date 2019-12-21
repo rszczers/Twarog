@@ -13,6 +13,7 @@ module Twarog.Backend.CharacterSheet
   , sheetHeight
   , sheetSize
   , sheetLifeStance
+  , sheetCombatStats
   , sheetAlignment
   , sheetStamina
   , sheetHealth
@@ -122,7 +123,7 @@ emptySheet =
       _sheetMaxAge      = raceAdultAge HighMan
       _sheetRace        = HighMan
       _sheetHeight      = raceHeight HighMan Male
-      _sheetSize        = raceSizeMod HighMan Male
+      _sheetSize        = raceSizeMod HighMan Male 0
       _sheetLifeStance  = Traditional
       _sheetFavGod      = Nothing
       _sheetAlignment   = Kronic

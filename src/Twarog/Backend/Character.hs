@@ -477,7 +477,7 @@ crHPBonus = \case
   HalfOrcRole   -> (+ 2)
   OgreRole      -> (+ 3)
 
-hp :: CON -> Str -> Size -> CharacterRole -> Lvl -> HP
+hp :: CON -> Str -> (Size -> Size) -> CharacterRole -> Lvl -> HP
 hp c str size cr lvl =
   let bonus = lvl * crHPBonus cr 0
    in size . str $ c + bonus

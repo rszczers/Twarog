@@ -1,6 +1,5 @@
 module Twarog.Backend.Flaws
   ( Flaw (..)
-  , FlawMod (..)
   , FlawLevel (..)
   )
   where
@@ -29,7 +28,7 @@ data Flaw = Alcoholic FlawLevel
           | Hypersexual FlawLevel
           | Jealous FlawLevel
           | LawfulFlaw FlawLevel
-          | Lazy FlawLevel
+          | LazyFlaw FlawLevel
           | Limp FlawLevel -- ^ Gives PC Marked Talent for free. 
           | LowSelfEsteem FlawLevel
           | Seasickness FlawLevel
@@ -61,30 +60,3 @@ data FlawLevel = FlawLevel1
                | FlawLevel2
                | FlawLevel3
                deriving (Eq, Show, Enum)
-
-data FlawMod = HPFlaw Mod
-             | MoraleFlaw Mod
-             | PerceptionFlaw Mod
-             | MeleeFlaw Mod
-             | MissileFlaw Mod
-             | ChaFlaw Mod
-             | CHAFlaw Mod
-             | WILFlaw Mod
-             | CONFlaw Mod
-             | StrFlaw Mod
-             | EncumbranceFlaw (Float -> Float)
-             | ConFlaw Mod
-             | SizeFlaw Mod
-             | DEXFlaw Mod
-             | ToughnessFlaw Mod
-             | INTFlaw Mod
-             | DVMEFlaw Mod
-             | RuneLoreFlaw Mod
-             | FortitudeFlaw Mod
-             | OtherFlaw Note
-             | MaximalAgeFlaw Float
-             | ActingFlaw Mod
-             | LyrePlayingFlaw Mod
-             | FlutePlayingFlaw Mod
-             | SingingFlaw Mod
-             | SocialSkillsFlaw Mod
