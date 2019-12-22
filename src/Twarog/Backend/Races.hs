@@ -45,7 +45,7 @@ data Race = Dwarf
 races :: [Race]
 races = enumFrom (toEnum 0)
 
-raceSizeMod :: Race -> Sex -> Size
+raceSizeMod :: Race -> Sex -> Size -> Size
 raceSizeMod race sex = case race of
   Dwarf     -> (\x -> x - 1)
   Elf       -> (\x -> x - 1)

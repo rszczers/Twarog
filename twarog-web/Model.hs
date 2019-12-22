@@ -86,8 +86,12 @@ data Msg =  Name MisoString
 data MaxCheckbox = TalentsMax Int | NoLimit
 
 initialModel :: Model
-initialModel = Model (NameStage) [NameStage] Nothing 0 0
-        $ NewCharacter Nothing Nothing Nothing
-                Nothing Nothing Nothing
-                Nothing Nothing Nothing
-                Nothing Nothing Nothing Nothing
+initialModel =
+  let _currentStage = NameStage 
+      _currentAttribBounce = Nothing 
+      _availableStages = []
+      _currentRoll1 = 0
+      _currentRoll2 = 0
+      _character = emptyNewCharacter
+   in Model{..}
+

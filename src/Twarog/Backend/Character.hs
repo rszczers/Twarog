@@ -2,6 +2,7 @@ module Twarog.Backend.Character
   ( -- * Character
     CharacterRole (..)
   , NewCharacter (..)
+  , emptyNewCharacter
   -- ** Character Role Utils
   , characterRoles 
   , availableRoles 
@@ -104,6 +105,22 @@ data NewCharacter = NewCharacter
   } deriving (Show, Eq)
 makeLenses ''NewCharacter
  
+emptyNewCharacter = 
+  let _characterOwner     = Nothing
+      _characterName      = Nothing
+      _characterAttr      = Nothing
+      _characterRace      = Nothing
+      _characterBirth     = Nothing
+      _characterAlignment = Nothing
+      _characterGod       = Nothing
+      _characterSex       = Nothing
+      _characterHamingja  = Nothing
+      _characterFlaws     = Nothing
+      _characterRole      = Nothing
+      _characterSkills    = Nothing
+      _characterTalent    = Nothing
+   in NewCharacter{..}
+
 -- | Maximal age that PC can live up to
 maximumAge :: Race -> CON -> Age
 maximumAge race con = case race of
@@ -123,11 +140,11 @@ maximumAge race con = case race of
 -- | Check if for given parameters given Character Role is
 -- allowed.
 isProperRole :: Attributes -> [Talent]
-             -> LifeStance -> Race -> Sex -> God
+             -> LifeStance -> Race -> Sex
              -> Archetype 
              -> CharacterRole 
              -> Bool
-isProperRole (Attributes cha con dex int str wil) ts ls race sex god arch cr =
+isProperRole (Attributes cha con dex int str wil) ts ls race sex arch cr =
   case cr of
     Civilian -> True
     Warrior   -> con >= 9 
@@ -141,16 +158,15 @@ isProperRole (Attributes cha con dex int str wil) ts ls race sex god arch cr =
               && dex >= 9 
               && int >= 9
     Ranger    -> race == HighMan 
-              && ls == Religious 
+              && ls == (Religious Skadi)
               && arch == Artemisian
-              && god == Skadi
               && cha >= 13
               && con >= 9
               && dex >= 9
               && int >= 9
               && wil >= 9
     Bard      -> race == HighMan
-              && ls == Religious
+              && ls /= Traditional
               && cha >= 16
               && Marked `elem` ts
     Sorcerer  -> race == HighMan
@@ -165,11 +181,11 @@ isProperRole (Attributes cha con dex int str wil) ts ls race sex god arch cr =
     _ -> False
 
 availableRoles :: Attributes -> [Talent]
-               -> LifeStance -> Race -> Sex -> God
+               -> LifeStance -> Race -> Sex
                -> Archetype 
                -> [CharacterRole]
-availableRoles attr ts ls rc sx g arch =
-  filter (isProperRole attr ts ls rc sx g arch) characterRoles 
+availableRoles attr ts ls rc sx arch =
+  filter (isProperRole attr ts ls rc sx arch) characterRoles 
 
 -- | Helper function for @expToLvl@
 maxNormalLvl :: Race -> CharacterRole -> Sex -> Lvl
@@ -442,6 +458,7 @@ crSkills = \case
                    , Tracking
                    ]
 
+-- | Get health bonus points for gaining a level
 crHPBonus :: CharacterRole -> Int -> Int
 crHPBonus = \case
   Civilian      -> (+ 1)
@@ -461,8 +478,8 @@ crHPBonus = \case
   HalfOrcRole   -> (+ 2)
   OgreRole      -> (+ 3)
 
-hp :: CON -> Str -> Size -> CharacterRole -> Lvl -> HP
+-- | Compute maximal health points
+hp :: CON -> Str -> (Size -> Size) -> CharacterRole -> Lvl -> HP
 hp c str size cr lvl =
   let bonus = lvl * crHPBonus cr 0
    in size . str $ c + bonus
-

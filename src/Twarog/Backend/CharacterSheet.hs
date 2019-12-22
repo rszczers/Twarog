@@ -1,24 +1,29 @@
 module Twarog.Backend.CharacterSheet
   (
   -- * Character sheet
-    CharacterSheet
+    CharacterSheet (..)
   -- ** Character lenses
   , sheetPlayerName
   , sheetCharName
   , sheetLevel
   , sheetRole
+  , sheetMaxAge
   , sheetAge
   , sheetRace
   , sheetHeight
   , sheetSize
   , sheetLifeStance
+  , sheetCombatStats
   , sheetAlignment
   , sheetStamina
+  , sheetSex
   , sheetHealth
   , sheetToughness
   , sheetExperience
+  , sheetEncumbrance
   , sheetResistance
   , sheetFlaws
+  , sheetFright
   , sheetTalents
   , sheetSkills
   , sheetEquipment
@@ -44,6 +49,7 @@ module Twarog.Backend.CharacterSheet
   ) where
 
 import Control.Lens
+import qualified Data.Map as M
 import qualified Data.Set as S
 
 import Twarog.Backend.Archetypes
@@ -96,12 +102,14 @@ data CharacterSheet = Player
   , _sheetCombatStats :: CombatStats
   , _sheetToughness   :: Toughness
   , _sheetExperience  :: XP
+  , _sheetEncumbrance :: Float
   , _sheetResistance  :: Resistance
-  , _sheetFlaws       :: [Flaw]
-  , _sheetTalents     :: [Talent]
-  , _sheetSkills      :: S.Set (CharacterSkill, SkillMod)
+  , _sheetFlaws       :: S.Set Flaw
+  , _sheetTalents     :: S.Set Talent
+  , _sheetSkills      :: M.Map Skill CharacterSkill
   , _sheetEquipment   :: Equipment
   , _sheetAttributes  :: Attributes
+  , _sheetFright      :: Fright
   , _sheetOther       :: [Note]
   } deriving (Show)
 makeLenses ''CharacterSheet
@@ -109,21 +117,22 @@ makeLenses ''CharacterSheet
 -- | Default character sheet
 emptySheet :: CharacterSheet
 emptySheet =
-  let _sheetPlayerName = ""
-      _sheetCharName   = ""
-      _sheetLevel      = 0
-      _sheetRole       = Civilian
-      _sheetAge        = raceAdultAge HighMan
-      _sheetMaxAge     = raceAdultAge HighMan
-      _sheetRace       = HighMan
-      _sheetHeight     = raceHeight HighMan Male
-      _sheetSize       = raceSizeMod HighMan Male
-      _sheetLifeStance = Traditional
-      _sheetFavGod     = Nothing
-      _sheetAlignment  = Kronic
-      _sheetStamina    = 0
-      _sheetHealth     = 0
-      _sheetSex        = Male
+  let _sheetPlayerName  = ""
+      _sheetCharName    = ""
+      _sheetLevel       = 0
+      _sheetRole        = Civilian
+      _sheetAge         = raceAdultAge HighMan
+      _sheetMaxAge      = raceAdultAge HighMan
+      _sheetRace        = HighMan
+      _sheetHeight      = raceHeight HighMan Male
+      _sheetSize        = raceSizeMod HighMan Male 0
+      _sheetLifeStance  = Traditional
+      _sheetFavGod      = Nothing
+      _sheetAlignment   = Kronic
+      _sheetStamina     = 0
+      _sheetHealth      = 0
+      _sheetSex         = Male
+      _sheetEncumbrance = 0
       _sheetCombatStats = let _ovMe        = 0
                               _ovMi        = 0
                               _dvMe        = 0
@@ -132,28 +141,29 @@ emptySheet =
                               _totalAv     = 0
                               _msPenality  = 0
                               _shieldDvMe  = 0
-                              _shieldBlock = \_ -> 0
+                              _shieldBlock = 0
                            in CombatStats {..}
-      _sheetToughness = (Toughness 0 0 0 0)
-      _sheetExperience = 0
-      _sheetResistance = Resistance 0 0
-      _sheetFlaws = []
-      _sheetTalents = []
-      _sheetSkills = S.empty
-      _sheetEquipment = let _belt          = Nothing
-                            _pouch         = Nothing
-                            _quiver        = Nothing
-                            _leftShoulder  = Nothing
-                            _rightShoulder = Nothing
-                            _sack          = Nothing
-                            _backpack      = Nothing
-                            _armour        = Nothing
-                            _helmet        = Nothing
-                            _shield        = Nothing
-                            _meleeWeapon   = Nothing
-                            _missileWeapon = Nothing
-                            _clothes       = Nothing
-                         in Equipment{..}
-      _sheetAttributes = Attributes 0 0 0 0 0 0
-      _sheetOther = []
+      _sheetToughness   = Toughness 0 0 0 0
+      _sheetExperience  = 0
+      _sheetResistance  = Resistance 0 0
+      _sheetFlaws       = S.empty
+      _sheetTalents     = S.empty 
+      _sheetSkills      = M.empty
+      _sheetEquipment   = let _belt          = Nothing
+                              _pouch         = Nothing
+                              _quiver        = Nothing
+                              _leftShoulder  = Nothing
+                              _rightShoulder = Nothing
+                              _sack          = Nothing
+                              _backpack      = Nothing
+                              _armour        = Nothing
+                              _helmet        = Nothing
+                              _shield        = Nothing
+                              _meleeWeapon   = Nothing
+                              _missileWeapon = Nothing
+                              _clothes       = Nothing
+                           in Equipment{..}
+      _sheetAttributes  = Attributes 0 0 0 0 0 0
+      _sheetFright      = 0
+      _sheetOther       = []
     in Player {..}

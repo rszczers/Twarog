@@ -87,6 +87,7 @@ library
                      , Twarog.Backend.Encumbrance
                      , Twarog.Backend.Types
                      , Twarog.Backend.Units
+                     , Twarog.Backend.Modifier
                      , Twarog.Frontend.HamingjaStore
                      , Twarog.Frontend.DiceGen
   hs-source-dirs:      src
