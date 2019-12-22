@@ -123,7 +123,7 @@ data Talent = Acrobatic
             | ZevseanTalent
               -- ^ Requires Thrower
             | Aegirean
-            deriving (Eq, Show, Enum)
+            deriving (Eq, Show, Enum, Ord)
 
 -- | Check if PC has prerequisited talents
 isTalentAvailable :: [Talent] -> Race -> Talent -> Bool

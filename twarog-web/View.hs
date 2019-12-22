@@ -9,6 +9,7 @@ import       Control.Lens
 import qualified Data.Map         as M
 import       Data.Maybe
 import       Data.Typeable
+import qualified Data.Set         as S
 
 viewModel :: Model -> View Msg
 viewModel m@Model{..} =
@@ -68,6 +69,7 @@ nextButton stage txt =
       ]
     ]
 
+    
 askName :: Model -> View Msg
 askName m =
   div_ [class_ "animated fadeIn"]
@@ -247,7 +249,7 @@ askArchetype m =
 askFlawsAndTalents m = 
   div_ [class_ "animated fadeIn"] [
     h2_ [class_ "title is-2 has-text-weight-medium"] [ "Talents and flaws "]
-    , maxTalentsInfo m $ TalentsMax 3
+    , maxTalentsInfo m $ TalentsMax 3 -- This is temporary
     , p_ [class_ "subtitle"] ["If you choose two flaws, you'll gain one additional talent."]
     , div_ [class_ "columns"] [
         div_ [class_ "column"] [
@@ -289,12 +291,12 @@ maxTalentsInfo m max =
           let 
             additionalTalents = 
               quot ( 
-                Prelude.length (
-                  fromMaybe [] $ m ^. character . characterFlaws
+                S.size (
+                  fromMaybe S.empty $ m ^. character . characterFlaws
                   ) 
               ) 2
             toChoose = a + additionalTalents
-            choosed = Prelude.length $ fromMaybe [] $ m ^. character . characterTalent
+            choosed = S.size $ fromMaybe S.empty $ m ^. character . characterTalent
 
           in 
             [ p_ [class_ "subtitle"] 
@@ -309,14 +311,14 @@ maxTalentsInfo m max =
 --dispaleyCheckboxQuestion :: [a] -> Model -> (characterField) -> String -> Int -> (a -> Bool -> View Msg)
 displayCheckboxQuestion valueList model characterField question max msg =
   let 
-    content = fromMaybe [] $ model ^. character . characterField
+    content = fromMaybe S.empty $ model ^. character . characterField
 
     additionalTalents = 
       case max of 
         TalentsMax _ -> 
           quot ( 
-            Prelude.length (
-              fromMaybe [] $ model ^. character . characterFlaws
+            S.size (
+              fromMaybe S.empty $ model ^. character . characterFlaws
               ) 
             ) 2
         otherwise -> 0

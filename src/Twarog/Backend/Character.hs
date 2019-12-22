@@ -13,12 +13,12 @@ module Twarog.Backend.Character
   , characterRace
   , characterBirth
   , characterAlignment
-  , characterGod
+  , characterLifeStance
   , characterSex  
   , characterHamingja
   , characterFlaws     
-  , characterRole    
-  , characterSkills
+  , characterRole
+  , characterSkills  
   , characterTalent
   -- * Combat Statistics
   , CombatStats (..)
@@ -40,6 +40,7 @@ module Twarog.Backend.Character
   where
 
 import qualified Data.Set as S
+import qualified Data.Map as M
 import Control.Lens
 
 import Twarog.Backend.Archetypes
@@ -96,32 +97,30 @@ data NewCharacter = NewCharacter
   , _characterBirth      :: Maybe Birthday
   , _characterAlignment  :: Maybe Archetype
   , _characterLifeStance :: Maybe LifeStance
- -- ^
   , _characterSex        :: Maybe Sex
   , _characterHamingja   :: Maybe Hamingja
   , _characterFlaws      :: Maybe (S.Set Flaw)
-                         -- ^
   , _characterRole       :: Maybe CharacterRole
-  , _sheetSkills         :: Maybe (M.Map Skill CharacterSkill)
-                         -- ^
+  , _characterSkills     :: Maybe (M.Map Skill CharacterSkill)
   , _characterTalent     :: Maybe (S.Set Talent)
-                         -- ^
-  }
+  } deriving (Show, Eq)
+makeLenses ''NewCharacter
  
 emptyNewCharacter = 
-  let _characterOwner     = Nothing
-      _characterName      = Nothing
-      _characterAttr      = Nothing
-      _characterRace      = Nothing
-      _characterBirth     = Nothing
-      _characterAlignment = Nothing
-      _characterGod       = Nothing
-      _characterSex       = Nothing
-      _characterHamingja  = Nothing
-      _characterFlaws     = Nothing
-      _characterRole      = Nothing
-      _characterSkills    = Nothing
-      _characterTalent    = Nothing
+  let _characterOwner       = Nothing
+      _characterName        = Nothing
+      _characterAttr        = Nothing
+      _characterRace        = Nothing
+      _characterBirth       = Nothing
+      _characterAlignment   = Nothing
+      _characterLifeStance  = Nothing
+      _characterGod         = Nothing
+      _characterSex         = Nothing
+      _characterHamingja    = Nothing
+      _characterFlaws       = Nothing
+      _characterRole        = Nothing
+      _characterSkills      = Nothing
+      _characterTalent      = Nothing
    in NewCharacter{..}
 
 -- | Maximal age that PC can live up to

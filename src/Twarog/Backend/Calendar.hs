@@ -43,7 +43,7 @@ data Day where
 
 instance Show Day where
   show (CommonDay a) = show a
-  show NewYearsDay = "New Year Day"
+  show NewYearsDay = "New Year's Day"
 
 instance Bounded Day where
   minBound = CommonDay 1

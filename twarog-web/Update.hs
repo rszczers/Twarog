@@ -3,6 +3,7 @@ module Update (updateModel) where
 import       Control.Lens
 import       Control.Monad.IO.Class
 import       Data.Maybe
+import qualified Data.Set as S
 import       Miso
 import       Miso.String
 import       Model
@@ -21,20 +22,20 @@ updateModel (RaceChecked r (Checked True)) m =
 
 updateModel (TalentChecked t max (Checked True)) m =  
   let 
-    currTalents = fromMaybe [] $ m ^. character . characterTalent
+    currTalents = fromMaybe S.empty $ m ^. character . characterTalent
     maxTalents = fromMaybe 0 max
   in
     noEff ( 
         if Prelude.length currTalents < maxTalents
-        then m & character . characterTalent .~ Just (currTalents ++ [ t ])
+        then m & character . characterTalent .~ Just (S.insert t currTalents)
         else m 
         )
 updateModel (TalentChecked r _ (Checked False)) m = 
   let 
-    currTalents = fromMaybe [] $ m ^. character . characterTalent
+    currTalents = fromMaybe S.empty $ m ^. character . characterTalent
   in
     noEff $ m & character . characterTalent .~
-      (Just $ Prelude.filter (/= r) currTalents)
+      (Just $ S.delete r currTalents)
 
 updateModel (ChangeStage s) m = 
   let 
@@ -102,17 +103,17 @@ updateModel (SexChecked s (Checked True)) m =
      
 updateModel (FlawChecked f _ (Checked True)) m =  
   let 
-  currFlaws = fromMaybe [] $ m ^. character . characterFlaws
+    currFlaws = fromMaybe S.empty $ m ^. character . characterFlaws
   in
-  noEff 
-    $ m & character . characterFlaws .~ Just (currFlaws ++ [ f ])
+    noEff 
+      $ m & character . characterFlaws .~ (Just $ S.insert f currFlaws)
 
 updateModel (FlawChecked f _ (Checked False)) m = 
   let 
-  currFlaws = fromMaybe [] $ m ^. character . characterFlaws
+    currFlaws = fromMaybe S.empty $ m ^. character . characterFlaws
   in
-  noEff $ m & character . characterFlaws .~
-    (Just $ Prelude.filter (/= f) currFlaws)
+    noEff $ m & character . characterFlaws .~
+      (Just $ S.delete f currFlaws)
 
 updateModel (SetAllAttributes attr) m = 
   noEff  ((m & character . characterAttr .~ Just attr) 
@@ -130,10 +131,10 @@ updateModel SetRandomBirth m = do
 
 updateModel (SetBirth b) m =
   let
-    talents = fromMaybe [] (m ^. character . characterTalent)  
+    talents = fromMaybe S.empty $ (m ^. character . characterTalent)  
     ch =  if birthdayGod b /= []
-          then m & character . characterTalent .~ (Just $ talents ++ [Marked])
-          else m & character . characterTalent .~ (Just $ [ x  | x <- talents, x /= Marked])
+          then m & character . characterTalent .~ (Just $ S.insert Marked talents)
+          else m & character . characterTalent .~ (Just $ S.delete Marked talents)
   in
     noEff  (ch & character . characterBirth .~ Just b) 
 
