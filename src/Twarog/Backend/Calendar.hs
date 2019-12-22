@@ -12,6 +12,7 @@ module Twarog.Backend.Calendar
   , monthSeason
   , seasonAttrMod
   , godsBirthday
+  , birthdayGod
   ) where
 
 import Control.Lens
@@ -38,7 +39,11 @@ data Month = Valaskjolf
 data Day where
   CommonDay :: Int -> Day
   NewYearsDay :: Day
-  deriving (Eq, Show)
+  deriving (Eq)
+
+instance Show Day where
+  show (CommonDay a) = show a
+  show NewYearsDay = "New Year's Day"
 
 instance Bounded Day where
   minBound = CommonDay 1

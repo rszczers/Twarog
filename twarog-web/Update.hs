@@ -3,6 +3,7 @@ module Update (updateModel) where
 import       Control.Lens
 import       Control.Monad.IO.Class
 import       Data.Maybe
+import qualified Data.Set as S
 import       Miso
 import       Miso.String
 import       Model
@@ -13,31 +14,45 @@ import qualified Twarog as T
 updateModel :: Msg -> Model -> Effect Msg Model
 updateModel (Name n) m = 
   noEff $ m & character . characterName .~ (Just $ fromMisoString n)
+
 updateModel NoOp m = noEff m
+
 updateModel (RaceChecked r (Checked True)) m = 
   noEff $ m & character . characterRace .~ r
-updateModel (TalentChecked t (Checked True)) m =  
+
+updateModel (TalentChecked t max (Checked True)) m =  
   let 
-  currTalents = fromMaybe [] $ m ^. character . characterTalent
+    currTalents = fromMaybe S.empty $ m ^. character . characterTalent
+    maxTalents = fromMaybe 0 max
   in
-  noEff ( 
-    if Prelude.length currTalents < maxTalents
-    then m & character . characterTalent .~ Just (currTalents ++ [ t ])
-    else m 
-    )
-updateModel (TalentChecked r (Checked False)) m = 
+    noEff ( 
+        if Prelude.length currTalents < maxTalents
+        then m & character . characterTalent .~ Just (S.insert t currTalents)
+        else m 
+        )
+updateModel (TalentChecked r _ (Checked False)) m = 
   let 
-  currTalents = fromMaybe [] $ m ^. character . characterTalent
+    currTalents = fromMaybe S.empty $ m ^. character . characterTalent
   in
-  noEff $ m & character . characterTalent .~
-    (Just $ Prelude.filter (/= r) currTalents)
-updateModel (ChangeStage s) m = noEff $ m & currentStage .~ s
+    noEff $ m & character . characterTalent .~
+      (Just $ S.delete r currTalents)
+
+updateModel (ChangeStage s) m = 
+  let 
+    availableS = m ^. availableStages
+    isNewStage = not $ elem s availableS
+    current = m & currentStage .~ s
+  in
+    (if isNewStage 
+            then noEff (current & availableStages .~ ( availableS ++ [s] ))
+            else noEff current)
+
 updateModel (SetCurrentRoll1 n) m = 
   let
-  toString = fromMisoString n 
-  result = case toString of
-        "" -> 0
-        _ -> read toString
+    toString = fromMisoString n 
+    result = case toString of
+          "" -> 0
+          _ -> read toString
   in
   noEff ( m & currentRoll1 .~ result)
                                                     
@@ -86,19 +101,19 @@ updateModel (SetAttribute n t) m =
 updateModel (SexChecked s (Checked True)) m = 
   noEff $ m & character . characterSex .~ s
      
-updateModel (FlawChecked f (Checked True)) m =  
+updateModel (FlawChecked f _ (Checked True)) m =  
   let 
-  currFlaws = fromMaybe [] $ m ^. character . characterFlaws
+    currFlaws = fromMaybe S.empty $ m ^. character . characterFlaws
   in
-  noEff 
-    $ m & character . characterFlaws .~ Just (currFlaws ++ [ f ])
+    noEff 
+      $ m & character . characterFlaws .~ (Just $ S.insert f currFlaws)
 
-updateModel (FlawChecked f (Checked False)) m = 
+updateModel (FlawChecked f _ (Checked False)) m = 
   let 
-  currFlaws = fromMaybe [] $ m ^. character . characterFlaws
+    currFlaws = fromMaybe S.empty $ m ^. character . characterFlaws
   in
-  noEff $ m & character . characterFlaws .~
-    (Just $ Prelude.filter (/= f) currFlaws)
+    noEff $ m & character . characterFlaws .~
+      (Just $ S.delete f currFlaws)
 
 updateModel (SetAllAttributes attr) m = 
   noEff  ((m & character . characterAttr .~ Just attr) 
@@ -115,4 +130,16 @@ updateModel SetRandomBirth m = do
     return $ SetBirth birth
 
 updateModel (SetBirth b) m =
-  noEff  (m & character . characterBirth .~ Just b) 
+  let
+    talents = fromMaybe S.empty $ (m ^. character . characterTalent)  
+    ch =  if birthdayGod b /= []
+          then m & character . characterTalent .~ (Just $ S.insert Marked talents)
+          else m & character . characterTalent .~ (Just $ S.delete Marked talents)
+  in
+    noEff  (ch & character . characterBirth .~ Just b) 
+
+updateModel (AddAvailableStage s) m =
+  let 
+    stages =  m ^. availableStages
+  in
+    noEff $ (m & availableStages .~ s : stages)
