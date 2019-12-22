@@ -89,21 +89,24 @@ makeLenses ''CombatStats
 -- | Minimal character model; fields are written
 -- in order of how forms should be completed
 data NewCharacter = NewCharacter
-  { _characterOwner     :: Maybe Owner
-  , _characterName      :: Maybe String
-  , _characterAttr      :: Maybe Attributes
-  , _characterRace      :: Maybe Race
-  , _characterBirth     :: Maybe Birthday
-  , _characterAlignment :: Maybe Archetype
-  , _characterGod       :: Maybe (Maybe God)
-  , _characterSex       :: Maybe Sex
-  , _characterHamingja  :: Maybe Hamingja
-  , _characterFlaws     :: Maybe [Flaw]
-  , _characterRole      :: Maybe CharacterRole
-  , _characterSkills    :: Maybe (S.Set CharacterSkill)
-  , _characterTalent    :: Maybe [Talent]
-  } deriving (Show, Eq)
-makeLenses ''NewCharacter
+  { _characterOwner      :: Maybe Owner
+  , _characterName       :: Maybe String
+  , _characterAttr       :: Maybe Attributes
+  , _characterRace       :: Maybe Race
+  , _characterBirth      :: Maybe Birthday
+  , _characterAlignment  :: Maybe Archetype
+  , _characterLifeStance :: Maybe LifeStance
+ -- ^
+  , _characterSex        :: Maybe Sex
+  , _characterHamingja   :: Maybe Hamingja
+  , _characterFlaws      :: Maybe (S.Set Flaw)
+                         -- ^
+  , _characterRole       :: Maybe CharacterRole
+  , _sheetSkills         :: Maybe (M.Map Skill CharacterSkill)
+                         -- ^
+  , _characterTalent     :: Maybe (S.Set Talent)
+                         -- ^
+  }
  
 emptyNewCharacter = 
   let _characterOwner     = Nothing
