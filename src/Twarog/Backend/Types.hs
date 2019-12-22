@@ -129,7 +129,7 @@ type Dodging = Int
 type TotalAv = Int     
 type MsPenality = Int  
 type ShieldDvMe = Int  
-type ShieldBlock = Float -> Float
+type ShieldBlock = Float
 
 type Fright = Int
 

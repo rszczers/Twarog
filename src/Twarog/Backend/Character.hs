@@ -458,6 +458,7 @@ crSkills = \case
                    , Tracking
                    ]
 
+-- | Get health bonus points for gaining a level
 crHPBonus :: CharacterRole -> Int -> Int
 crHPBonus = \case
   Civilian      -> (+ 1)
@@ -477,6 +478,7 @@ crHPBonus = \case
   HalfOrcRole   -> (+ 2)
   OgreRole      -> (+ 3)
 
+-- | Compute maximal health points
 hp :: CON -> Str -> (Size -> Size) -> CharacterRole -> Lvl -> HP
 hp c str size cr lvl =
   let bonus = lvl * crHPBonus cr 0

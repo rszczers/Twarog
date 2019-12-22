@@ -8,6 +8,7 @@ import Control.Lens
 import Twarog.Backend.Talents
 import Twarog.Backend.Types
 import Twarog.Backend.Flaws
+import Twarog.Backend.Encumbrance
 import Twarog.Backend.Skills
 import Twarog.Backend.CharacterSheet
 import Twarog.Backend.Character
@@ -587,3 +588,15 @@ instance Modifier Flaw where
         cr & (sheetOther %~ cons "Whenever you face a problem/danger you must test Wil against DD10 or you will be unable to do anything about it. Instead you will just whine and complain if the others don't solve your problems.")
       FlawLevel3 ->
         cr & (sheetOther %~ cons "Whenever you face a problem/danger you must test Wil against DD12 or you will be unable to do anything about it. Instead you will just whine and complain if the others don't solve your problems.")
+
+instance Modifier Encumbrance where
+  mod cr = 
+    let ms = typeSkill MovementSkill
+        decr x = 
+          foldr (\s -> sheetSkills . at s . _Just . skillMod -~ x) cr ms 
+        -- ^ decrease all movements skill by x
+    in \case 
+      LightLoad  -> cr 
+      MediumLoad -> decr 1
+      HeavyLoad  -> decr 2
+      AbsurdLoad -> decr 3

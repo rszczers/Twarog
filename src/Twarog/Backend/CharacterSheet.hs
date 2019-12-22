@@ -139,7 +139,7 @@ emptySheet =
                               _totalAv     = 0
                               _msPenality  = 0
                               _shieldDvMe  = 0
-                              _shieldBlock = \_ -> 0
+                              _shieldBlock = 0
                            in CombatStats {..}
       _sheetToughness   = (Toughness 0 0 0 0)
       _sheetExperience  = 0

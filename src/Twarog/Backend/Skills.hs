@@ -4,9 +4,11 @@ module Twarog.Backend.Skills
   , skillMod
   , proficiency
   , Skill (..)
+  , skills
   , SkillType (..)
   , Proficiency (..)
   , skillType
+  , typeSkill
   )
   where
 
@@ -44,7 +46,10 @@ data Skill = Acrobatics
            | Tracking
            | Trickery
            | WorldLore
-           deriving (Eq, Ord, Show)
+           deriving (Eq, Ord, Enum, Show)
+
+skills :: [Skill]
+skills = enumFrom $ toEnum 0
 
 data Proficiency = Trained
                  | Untrained
@@ -102,4 +107,6 @@ skillType = \case
   Trickery           -> SpecialSkill
   WorldLore          -> SpecialSkill
 
-
+-- | List all skills of given type
+typeSkill :: SkillType -> [Skill]
+typeSkill t = filter (\x -> skillType x == t) skills 
