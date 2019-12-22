@@ -54,9 +54,9 @@ data Flaw = Alcoholic FlawLevel
           | Vulnerable FlawLevel
           | WeakMinded FlawLevel
           | Whiny FlawLevel
-          deriving (Eq, Show)
+          deriving (Ord, Eq, Show)
 
 data FlawLevel = FlawLevel1
                | FlawLevel2
                | FlawLevel3
-               deriving (Eq, Show, Enum)
+               deriving (Ord, Eq, Show, Enum)

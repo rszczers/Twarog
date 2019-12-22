@@ -4,14 +4,16 @@ module Twarog.Backend.Modifier
   where
 
 import Control.Lens
+import qualified Data.Set as S
 
 import Twarog.Backend.Talents
 import Twarog.Backend.Types
+import Twarog.Backend.Races
 import Twarog.Backend.Flaws
 import Twarog.Backend.Encumbrance
 import Twarog.Backend.Skills
-import Twarog.Backend.CharacterSheet
 import Twarog.Backend.Character
+import Twarog.Backend.CharacterSheet
 
 class Modifier m where
   mod :: CharacterSheet -> m -> CharacterSheet
@@ -21,7 +23,7 @@ instance Modifier Talent where
     Acrobatic ->
       cr & (sheetSkills . at Acrobatics . _Just . skillMod +~ 1)
          . (sheetSkills . at Dancing . _Just . skillMod +~ 1)
-    Aggresive -> 
+    Aggresive ->
       cr & sheetOther %~ cons "+1 Initiative"
     AnimalFriend ->
       cr & (sheetSkills . at Riding . _Just . skillMod +~ 1)
@@ -108,9 +110,9 @@ instance Modifier Talent where
     LightFooted ->
       cr & (sheetSkills . at Stealth . _Just . skillMod +~ 1)
     LynxEyes ->
-      cr & (sheetOther %~ cons 
+      cr & (sheetOther %~ cons
         "Night vision 30' (+100' in total darkness, if has Night vision)")
-    Mariner -> 
+    Mariner ->
       cr & (sheetSkills . at Seamanship . _Just . skillMod +~ 1)
     Marked ->
       cr & (sheetSkills . at Fortitude . _Just . skillMod +~ 1)
@@ -120,14 +122,14 @@ instance Modifier Talent where
       cr & (sheetSkills . at Acting . _Just . skillMod +~ 1)
     Mermaid ->
       cr & (sheetSkills . at Swimming . _Just . skillMod +~ 1)
-    Mule -> 
+    Mule ->
       cr & sheetEncumbrance -~ (0.25 :: Float)
     Nimble ->
       cr & (sheetSkills . at Mechanics . _Just . skillMod +~ 1)
          . (sheetSkills . at Trickery . _Just . skillMod +~ 1)
     Perseusean ->
       cr & sheetOther %~ cons "+5% MI Block when using shields"
-    Pietistic -> 
+    Pietistic ->
       cr & (sheetSkills . at ReligiousTradition . _Just . skillMod +~ 1)
     Polyhymnian ->
       cr & (sheetSkills . at FlutePlaying . _Just . skillMod +~ 1)
@@ -148,7 +150,7 @@ instance Modifier Talent where
       cr & sheetOther %~ cons "+1 Missile (when using slings)"
     SlowAgeing -> case cr ^. sheetMaxAge of
       Immortal -> cr
-      Mortal age -> 
+      Mortal age ->
         cr & sheetMaxAge . _Mortal %~ (floor . (* 1.2) . fromIntegral)
     SpearThrower ->
       cr & sheetOther %~ cons "+1 Missile (when throwing spears)"
@@ -192,9 +194,9 @@ instance Modifier Talent where
       cr & sheetFright -~ 1
 
 instance Modifier Flaw where
-  mod cr = \case 
+  mod cr = \case
     Alcoholic l  -> case l of
-      FlawLevel1 -> 
+      FlawLevel1 ->
         cr & (sheetOther %~ cons "You need to dring at least 1 justa of alcoholic beverage every day")
            . (sheetMaxAge . _Mortal %~ (floor . (* 0.9) . fromIntegral))
       FlawLevel2 ->
@@ -204,7 +206,7 @@ instance Modifier Flaw where
         cr & (sheetOther %~ cons "You need to dring at least 3 justa of alcoholic beverage every day")
            . (sheetMaxAge . _Mortal %~ (floor . (* 0.6) . fromIntegral))
     Annoying l -> case l of
-      FlawLevel1 -> 
+      FlawLevel1 ->
          cr & (sheetOther %~ cons "Your look, voice, the way you dress or talk, or something else is annoying to others")
            . (sheetAttributes . cha -~ 1)
       FlawLevel2 ->
@@ -224,7 +226,7 @@ instance Modifier Flaw where
          cr & (sheetOther %~ cons "When Fumbling on any movement or combat skill you lose D8 HP and suffer a -1 mod to Str and Dex for D6 weeks.")
             . (sheetEncumbrance +~ (0.75 :: Float))
     BadSight l -> case l of
-      FlawLevel1 -> 
+      FlawLevel1 ->
         cr & (sheetSkills . at Perception . _Just . skillMod -~ 1)
            . (sheetSkills . at Melee . _Just . skillMod -~ 1)
            . (sheetSkills . at Missile . _Just . skillMod -~ 1)
@@ -305,7 +307,7 @@ instance Modifier Flaw where
          cr & (sheetOther %~ cons "You cannot read maps or runes")
             . (sheetSkills . at RuneLore . _Just . skillMod -~ 3)
     Enemy l -> case l of
-      _ -> 
+      _ ->
         cr & (sheetOther %~ cons "You have a powerful enemy looking to hurt you")
     Fearful l -> case l of
       FlawLevel1 ->
@@ -473,7 +475,7 @@ instance Modifier Flaw where
             . (sheetSkills . at Dancing . _Just . skillMod -~ 3)
             . (sheetSkills . at SocialSkills . _Just . skillMod -~ 3)
     Secret l -> case l of
-      _ -> 
+      _ ->
         cr & (sheetOther %~ cons "You have a secret that you really don't want others to know. If they find out, it will seriously influence their relationship to you - for the worse.")
     SelfHating l -> case l of
       _ ->
@@ -569,10 +571,10 @@ instance Modifier Flaw where
       FlawLevel3 ->
         cr & (sheetOther %~ cons "If something bad happens to a randomly picked character in the player party, you are likely (1-5 in D6), to automatically be the one affected by this.")
     Vulnerable l -> case l of
-      _ -> 
+      _ ->
         cr & (sheetOther %~ cons "You suffer a -1 to any one Toughness attribute. Effects are cumulative.")
     WeakMinded l -> case l of
-      FlawLevel1 -> 
+      FlawLevel1 ->
         cr & (sheetOther %~ cons "You suffer -1 mod to Fortitude.")
            . (sheetSkills . at Fortitude . _Just . skillMod -~ 1)
       FlawLevel2 ->
@@ -590,13 +592,80 @@ instance Modifier Flaw where
         cr & (sheetOther %~ cons "Whenever you face a problem/danger you must test Wil against DD12 or you will be unable to do anything about it. Instead you will just whine and complain if the others don't solve your problems.")
 
 instance Modifier Encumbrance where
-  mod cr = 
+  mod cr =
     let ms = typeSkill MovementSkill
-        decr x = 
-          foldr (\s -> sheetSkills . at s . _Just . skillMod -~ x) cr ms 
+        decr x =
+          foldr (\s -> sheetSkills . at s . _Just . skillMod -~ x) cr ms
         -- ^ decrease all movements skill by x
-    in \case 
-      LightLoad  -> cr 
-      MediumLoad -> decr 1
-      HeavyLoad  -> decr 2
-      AbsurdLoad -> decr 3
+     in \case
+       LightLoad  -> cr
+       MediumLoad -> decr 1
+       HeavyLoad  -> decr 2
+       AbsurdLoad -> decr 3
+
+instance Modifier Race where
+  mod cr@Player{..} r =
+    let cr' = cr & (sheetAttributes %~ raceAttrMod r _sheetSex)
+                 . (sheetResistance . disease %~ raceDiseaseMod r)
+                 . (sheetResistance . poison %~ racePoisonMod r)
+                 . (sheetToughness . toughnessCold %~ raceColdMod r)
+                 . (sheetToughness . toughnessHeat %~ raceHeatMod r)
+        cr'' = foldr (\s -> sheetSkills
+                          . at s . _Just
+                          . skillMod %~ raceSkillMod r s) cr' skills
+     in case r of
+       Dwarf ->
+         cr'' & (sheetOther %~ cons "Night Vision (can see 100' even in total darkness as if he had Ettin eyes)")
+              . (sheetOther %~ cons "Can learn Dwarf Spells")
+              . (sheetOther %~ cons "Can sense mechanical devices within 60' on 1-3 (D6)")
+              . (sheetOther %~ cons "Knows True North when Underground")
+              . (sheetFlaws %~ S.insert (Phobia FlawLevel1))
+              . (sheetOther %~ cons "Fear of Open Water")
+              . (sheetFlaws %~ S.insert (Greedy FlawLevel1))
+              . (sheetOther %~ cons "You are greedy")
+              . (sheetFlaws %~ S.insert (Dislike FlawLevel1))
+              . (sheetOther %~ cons "You dislike elves")
+              . (sheetFlaws %~ S.insert (Dislike FlawLevel2))
+              . (sheetOther %~ cons "You dislike orcs")
+              . (let s = toModifier (_sheetAttributes ^. str) 0
+                     t' = 30 + (5 * s)
+                  in sheetSkills . at Tempo . _Just . skillMod .~ t')
+              . (sheetOther %~ cons "Base Tempo is only 30'")
+       Elf -> 
+         cr'' & (sheetOther %~ cons "Night Vision")
+              . (sheetFlaws %~ S.insert (Dislike FlawLevel1))
+              . (sheetOther %~ cons "You dislike dwarfs")
+              . (sheetFlaws %~ S.insert (Dislike FlawLevel2))
+              . (sheetOther %~ cons "You dislike orcs")
+              . (sheetOther %~ cons "Can learn Elf Spells and see Incorporeal Trolls, Nymphs and other spirits")
+       Gnome ->               
+         cr'' & (sheetOther %~ cons "Night Vision")
+              . (sheetOther %~ cons "Can learn Gnome Spells")
+              . (sheetFlaws %~ S.insert (Phobia FlawLevel1))
+              . (sheetOther %~ cons "Fear of Open Water")
+              . (let s = toModifier (_sheetAttributes ^. str) 0
+                     t' = 30 + (5 * s)
+                  in sheetSkills . at Tempo . _Just . skillMod .~ t')
+              . (sheetOther %~ cons "Base Tempo is only 30'")
+       HighMan -> cr''
+       CommonMan -> cr''
+       LesserMan -> cr''
+       Halfling -> 
+         cr'' & (sheetOther %~ cons "Night Vision")
+              . (sheetFlaws %~ S.insert (Phobia FlawLevel1))
+              . (sheetOther %~ cons "Fear of Open Water")
+              . (let s = toModifier (_sheetAttributes ^. str) 0
+                     t' = 30 + (5 * s)
+                  in sheetSkills . at Tempo . _Just . skillMod .~ t')
+              . (sheetOther %~ cons "Base Tempo is only 30'")
+       _ ->
+         cr'' & (sheetOther %~ cons "Night Vision (can see 100' even in total darkness as if he had Ettin eyes)")
+              . (sheetFlaws %~ S.insert (Phobia FlawLevel1))
+              . (sheetOther %~ cons "Fear of the Sun")
+              . (sheetFlaws %~ S.insert (Phobia FlawLevel1))
+              . (sheetOther %~ cons "Fear of Open Water")
+              . (sheetOther %~ cons "Can learn Orc Spells")
+              . (sheetFlaws %~ S.insert (Dislike FlawLevel2))
+              . (sheetOther %~ cons "You dislike elves")
+              . (sheetFlaws %~ S.insert (Dislike FlawLevel2))
+              . (sheetOther %~ cons "You dislike dwarfs")

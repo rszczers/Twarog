@@ -1,7 +1,7 @@
 module Twarog.Backend.CharacterSheet
   (
   -- * Character sheet
-    CharacterSheet
+    CharacterSheet (..)
   -- ** Character lenses
   , sheetPlayerName
   , sheetCharName
@@ -16,6 +16,7 @@ module Twarog.Backend.CharacterSheet
   , sheetCombatStats
   , sheetAlignment
   , sheetStamina
+  , sheetSex
   , sheetHealth
   , sheetToughness
   , sheetExperience
@@ -49,6 +50,7 @@ module Twarog.Backend.CharacterSheet
 
 import Control.Lens
 import qualified Data.Map as M
+import qualified Data.Set as S
 
 import Twarog.Backend.Archetypes
 import Twarog.Backend.Gods
@@ -102,8 +104,8 @@ data CharacterSheet = Player
   , _sheetExperience  :: XP
   , _sheetEncumbrance :: Float
   , _sheetResistance  :: Resistance
-  , _sheetFlaws       :: [Flaw]
-  , _sheetTalents     :: [Talent]
+  , _sheetFlaws       :: S.Set Flaw
+  , _sheetTalents     :: S.Set Talent
   , _sheetSkills      :: M.Map Skill CharacterSkill
   , _sheetEquipment   :: Equipment
   , _sheetAttributes  :: Attributes
@@ -141,11 +143,11 @@ emptySheet =
                               _shieldDvMe  = 0
                               _shieldBlock = 0
                            in CombatStats {..}
-      _sheetToughness   = (Toughness 0 0 0 0)
+      _sheetToughness   = Toughness 0 0 0 0
       _sheetExperience  = 0
       _sheetResistance  = Resistance 0 0
-      _sheetFlaws       = []
-      _sheetTalents     = []
+      _sheetFlaws       = S.empty
+      _sheetTalents     = S.empty 
       _sheetSkills      = M.empty
       _sheetEquipment   = let _belt          = Nothing
                               _pouch         = Nothing
