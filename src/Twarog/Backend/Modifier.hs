@@ -16,10 +16,10 @@ import Twarog.Backend.Character
 import Twarog.Backend.CharacterSheet
 
 class Modifier m where
-  mod :: CharacterSheet -> m -> CharacterSheet
+  addMod :: CharacterSheet -> m -> CharacterSheet
 
 instance Modifier Talent where
-  mod cr = \case
+  addMod cr = \case
     Acrobatic ->
       cr & (sheetSkills . at Acrobatics . _Just . skillMod +~ 1)
          . (sheetSkills . at Dancing . _Just . skillMod +~ 1)
@@ -193,8 +193,11 @@ instance Modifier Talent where
     Aegirean ->
       cr & sheetFright -~ 1
 
+instance Modifier a => Modifier (S.Set a) where
+  addMod cr s = S.foldr (\t -> (flip addMod) t) cr s
+
 instance Modifier Flaw where
-  mod cr = \case
+  addMod cr = \case
     Alcoholic l  -> case l of
       FlawLevel1 ->
         cr & (sheetOther %~ cons "You need to dring at least 1 justa of alcoholic beverage every day")
@@ -592,7 +595,7 @@ instance Modifier Flaw where
         cr & (sheetOther %~ cons "Whenever you face a problem/danger you must test Wil against DD12 or you will be unable to do anything about it. Instead you will just whine and complain if the others don't solve your problems.")
 
 instance Modifier Encumbrance where
-  mod cr =
+  addMod cr =
     let ms = typeSkill MovementSkill
         decr x =
           foldr (\s -> sheetSkills . at s . _Just . skillMod -~ x) cr ms
@@ -604,7 +607,7 @@ instance Modifier Encumbrance where
        AbsurdLoad -> decr 3
 
 instance Modifier Race where
-  mod cr@Player{..} r =
+  addMod cr@Player{..} r =
     let cr' = cr & (sheetAttributes %~ raceAttrMod r _sheetSex)
                  . (sheetResistance . disease %~ raceDiseaseMod r)
                  . (sheetResistance . poison %~ racePoisonMod r)
@@ -669,3 +672,48 @@ instance Modifier Race where
               . (sheetOther %~ cons "You dislike elves")
               . (sheetFlaws %~ S.insert (Dislike FlawLevel2))
               . (sheetOther %~ cons "You dislike dwarfs")
+
+-- | Generates character sheet once all necessary data is given
+mkCharacterSheet :: NewCharacter -> Maybe CharacterSheet
+mkCharacterSheet nc@NewCharacter{..} = do
+  owner <- _characterOwner
+  name <- _characterName
+  attr <- _characterAttr
+  race <- _characterRace
+  birth <- _characterBirth
+  alignment <- _characterAlignment
+  lifeStance <- _characterLifeStance
+  sex <- _characterSex
+  hamingja <- _characterHamingja
+  flaws <- _characterFlaws
+  role <- _characterRole
+  skills <- _characterSkills
+  talent <- _characterTalent
+  let _sheetPlayerName = owner
+      _sheetCharName = name
+      _sheetLevel = 1
+      _sheetRole = role      
+      _sheetAge = Mortal 1
+      _sheetMaxAge = maximumAge race (attr ^. con) 
+      _sheetRace = race
+      _sheetHeight = raceHeight race sex
+      _sheetSize = raceSizeMod race sex 0
+      _sheetLifeStance = lifeStance
+      _sheetAlignment = alignment
+      _sheetHealth = 
+        hp (attr ^. con) (toModifier $ attr ^. str) _sheetSize role _sheetLevel
+      _sheetSex = sex
+      _sheetCombatStats = emptyCombatStats
+      _sheetToughness = emptyToughness
+      _sheetExperience = expToLvl race role sex 0
+      _sheetEncumbrance = 0.0
+      _sheetResistance = emptyResistance
+      _sheetFlaws = flaws
+      _sheetTalents = talent   
+      _sheetSkills = skills
+      _sheetEquipment = emptyEquipment
+      _sheetAttributes = attr
+      _sheetFright = 0
+      _sheetOther = []
+      initialSheet = Player{..}
+  return $ initialSheet `addMod` race `addMod` talent `addMod` flaws

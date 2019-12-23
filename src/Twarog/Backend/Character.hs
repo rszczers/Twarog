@@ -22,6 +22,7 @@ module Twarog.Backend.Character
   , characterTalent
   -- * Combat Statistics
   , CombatStats (..)
+  , emptyCombatStats
   -- ** CombatStats lenses
   , ovMe       
   , ovMi       
@@ -33,6 +34,7 @@ module Twarog.Backend.Character
   , shieldDvMe 
   , shieldBlock
   -- * Utilities
+  , hp
   , expToLvl
   , maximumAge
   , crHPBonus
@@ -86,6 +88,19 @@ data CombatStats = CombatStats
   , _shieldBlock :: ShieldBlock
   } deriving (Show)
 makeLenses ''CombatStats
+
+emptyCombatStats :: CombatStats
+emptyCombatStats =
+  let _ovMe = 0
+      _ovMi = 0
+      _dvMe = 0
+      _dvMi = 0
+      _dodging = 0
+      _totalAv = 0
+      _msPenality = 0
+      _shieldDvMe = 0
+      _shieldBlock = 0
+   in CombatStats {..}
 
 -- | Minimal character model; fields are written
 -- in order of how forms should be completed
@@ -481,7 +496,7 @@ crHPBonus = \case
   OgreRole      -> (+ 3)
 
 -- | Compute maximal health points
-hp :: CON -> Str -> (Size -> Size) -> CharacterRole -> Lvl -> HP
+hp :: CON -> Str -> Size -> CharacterRole -> Lvl -> HP
 hp c str size cr lvl =
   let bonus = lvl * crHPBonus cr 0
-   in size . str $ c + bonus
+   in str $ c + bonus + size

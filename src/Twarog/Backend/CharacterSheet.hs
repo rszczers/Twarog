@@ -15,7 +15,6 @@ module Twarog.Backend.CharacterSheet
   , sheetLifeStance
   , sheetCombatStats
   , sheetAlignment
-  , sheetStamina
   , sheetSex
   , sheetHealth
   , sheetToughness
@@ -31,6 +30,7 @@ module Twarog.Backend.CharacterSheet
   , sheetOther
   -- * Equipment
   , Equipment (..)
+  , emptyEquipment
   -- ** Equipment lenses
   , belt
   , pouch
@@ -80,6 +80,23 @@ data Equipment = Equipment
   } deriving (Show)
 makeLenses ''Equipment
 
+emptyEquipment :: Equipment
+emptyEquipment = 
+  let _belt = Nothing
+      _pouch = Nothing
+      _quiver = Nothing
+      _leftShoulder = Nothing
+      _rightShoulder = Nothing
+      _sack = Nothing
+      _backpack = Nothing
+      _armour = Nothing
+      _helmet = Nothing
+      _shield = Nothing
+      _meleeWeapon = Nothing
+      _missileWeapon = Nothing
+      _clothes = Nothing
+   in Equipment{..}
+  
 {- | Character sheet, non-specific to combat mode, i.e. we
 don't consider e.g. Morale.
 -}
@@ -94,9 +111,7 @@ data CharacterSheet = Player
   , _sheetHeight      :: Height
   , _sheetSize        :: Size
   , _sheetLifeStance  :: LifeStance
-  , _sheetFavGod      :: Maybe God
   , _sheetAlignment   :: Archetype
-  , _sheetStamina     :: SP
   , _sheetHealth      :: HP
   , _sheetSex         :: Sex
   , _sheetCombatStats :: CombatStats
@@ -133,36 +148,14 @@ emptySheet =
       _sheetHealth      = 0
       _sheetSex         = Male
       _sheetEncumbrance = 0
-      _sheetCombatStats = let _ovMe        = 0
-                              _ovMi        = 0
-                              _dvMe        = 0
-                              _dvMi        = 0
-                              _dodging     = 0
-                              _totalAv     = 0
-                              _msPenality  = 0
-                              _shieldDvMe  = 0
-                              _shieldBlock = 0
-                           in CombatStats {..}
+      _sheetCombatStats = emptyCombatStats
       _sheetToughness   = Toughness 0 0 0 0
       _sheetExperience  = 0
       _sheetResistance  = Resistance 0 0
       _sheetFlaws       = S.empty
       _sheetTalents     = S.empty 
       _sheetSkills      = M.empty
-      _sheetEquipment   = let _belt          = Nothing
-                              _pouch         = Nothing
-                              _quiver        = Nothing
-                              _leftShoulder  = Nothing
-                              _rightShoulder = Nothing
-                              _sack          = Nothing
-                              _backpack      = Nothing
-                              _armour        = Nothing
-                              _helmet        = Nothing
-                              _shield        = Nothing
-                              _meleeWeapon   = Nothing
-                              _missileWeapon = Nothing
-                              _clothes       = Nothing
-                           in Equipment{..}
+      _sheetEquipment   = emptyEquipment
       _sheetAttributes  = Attributes 0 0 0 0 0 0
       _sheetFright      = 0
       _sheetOther       = []

@@ -1,5 +1,5 @@
 module Twarog.Backend.Types
-  ( 
+  (
   -- * Dices
     Dice (..)
   -- * Character sheet
@@ -41,7 +41,7 @@ module Twarog.Backend.Types
   , Str
   , Wil
   , Modifiers (..)
-  , toModifier 
+  , toModifier
   -- *** Modifiers lenses
   , chaMod
   , conMod
@@ -66,7 +66,8 @@ module Twarog.Backend.Types
   , Heat
   , Physical
   , Toughness (..)
-  -- ** Toughness lenses 
+  , emptyToughness
+  -- ** Toughness lenses
   , toughnessCold
   , toughnessElectricity
   , toughnessHeat
@@ -78,16 +79,17 @@ module Twarog.Backend.Types
   , SP
   -- ** Resistance
   , Resistance (..)
+  , emptyResistance
   , Disease
   , Poison
   -- *** Resistance lenses
   , disease
-  , poison 
+  , poison
   -- ** Morale
   , Morale
   -- * Item statistics
   -- ** Armour statistics
-  , AV 
+  , AV
   , ArmourMs
   , StealthMod
   , SwimmingMod
@@ -121,14 +123,14 @@ type Note = String
 
 type AV = Int
 type Damage = Int
-type OvMe = Int        
-type OvMi = Int        
-type DvMe = Int        
-type DvMi = Int        
-type Dodging = Int     
-type TotalAv = Int     
-type MsPenality = Int  
-type ShieldDvMe = Int  
+type OvMe = Int
+type OvMi = Int
+type DvMe = Int
+type DvMi = Int
+type Dodging = Int
+type TotalAv = Int
+type MsPenality = Int
+type ShieldDvMe = Int
 type ShieldBlock = Float
 
 type Fright = Int
@@ -140,7 +142,7 @@ type BaseRange = Int
 
 type ArmourMs = Int
 type StealthMod = Int
-type SwimmingMod = Int   
+type SwimmingMod = Int
 
 type PerceptionMod = Int
 
@@ -157,8 +159,8 @@ type Poison = Int
 
 -- | Toughness
 type Cold = Int
-type Electricity = Int  
-type Heat = Int 
+type Electricity = Int
+type Heat = Int
 type Physical = Int
 
 type XP = Int
@@ -167,7 +169,7 @@ type SP = Int
 
 data Age = Immortal | Mortal Int
   deriving (Show)
-makePrisms ''Age  
+makePrisms ''Age
 
 type Height = Distance Inch
 
@@ -197,13 +199,21 @@ data Sex = Male
 sexes :: [Sex]
 sexes = enumFrom (toEnum 0)
 
-data Toughness = Toughness 
+data Toughness = Toughness
   { _toughnessCold :: Cold
   , _toughnessElectricity :: Electricity
   , _toughnessHeat :: Heat
   , _toughnessPhysical :: Physical
   } deriving (Show)
 makeLenses ''Toughness
+
+emptyToughness :: Toughness
+emptyToughness =
+  let _toughnessCold = 0
+      _toughnessElectricity = 0
+      _toughnessHeat = 0
+      _toughnessPhysical = 0
+   in Toughness{..}
 
 data Condition = Tired
                | Weary
@@ -225,6 +235,12 @@ data Resistance = Resistance
   } deriving (Show)
 makeLenses ''Resistance
 
+emptyResistance :: Resistance
+emptyResistance =
+  let _disease = 0
+      _poison = 0
+   in Resistance{..}
+
 data Attributes = Attributes
   { _cha :: CHA
   , _con :: CON
@@ -233,8 +249,8 @@ data Attributes = Attributes
   , _str :: STR
   , _wil :: WIL
   } deriving (Eq, Show)
-makeLenses ''Attributes  
-              
+makeLenses ''Attributes
+
 data Modifiers = Modifiers
   { _chaMod :: Cha
   , _conMod :: Con
@@ -242,7 +258,7 @@ data Modifiers = Modifiers
   , _intMod :: Int -> Int
   , _strMod :: Str
   , _wilMod :: Wil
-  } 
+  }
 makeLenses ''Modifiers
 
 instance Show Modifiers where
@@ -256,7 +272,7 @@ toModifier x  | x <= 1             = \x -> x - 5
               | x == 3             = \x -> x - 3
               | x == 4 || x == 5   = \x -> x - 2
               | 6 <= x && x <= 8   = \x -> x - 1
-              | 9 <= x && x <= 12  = id 
+              | 9 <= x && x <= 12  = id
               | 13 <= x && x <= 15 = (+ 1)
               | 16 <= x && x <= 17 = (+ 2)
               | 18 <= x && x <= 19 = (+ 3)
@@ -265,8 +281,8 @@ toModifier x  | x <= 1             = \x -> x - 5
               | x >= 22            = (+ 6)
 
 -- | Convert Attributes to Modifiers
-modifiers :: Attributes -> Modifiers 
+modifiers :: Attributes -> Modifiers
 modifiers (Attributes cha con dex int str wil) =
   let f = toModifier
-   in Modifiers (f cha) (f con) (f dex) (f int) (f str) (f wil)      
+   in Modifiers (f cha) (f con) (f dex) (f int) (f str) (f wil)
 
