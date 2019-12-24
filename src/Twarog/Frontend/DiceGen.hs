@@ -10,14 +10,7 @@ module Twarog.Frontend.DiceGen
   , d20
   , d100
   , roll
-  -- ** Attribute generator
-  , genAttribute
-  , genAttributes
-  , genRace
-  , genMonth
-  , genBirthday
-  )
-  where
+  ) where
 
 import Twarog.Backend.Types
 import Twarog.Backend.Races
@@ -61,50 +54,3 @@ roll n dice = Gen.list (Range.singleton n) $
     D12  -> d12
     D20  -> d20
     D100 -> d100
-
--- | Generate random valid attribute
-genAttribute :: Gen Int
-genAttribute = do
-  x <- roll 3 D6
-  y <- roll 3 D6 
-  let r = max (sum x) (sum y)
-  if r > 3
-  then return r
-  else genAttribute
-
--- | Generate random attributes
-genAttributes :: Gen Attributes
-genAttributes = do
-  cha <- genAttribute
-  con <- genAttribute
-  dex <- genAttribute
-  int <- genAttribute
-  str <- genAttribute
-  wil <- genAttribute
-  return $ Attributes cha con dex int str wil
-
--- | Generate random race
-genRace :: Gen Race
-genRace = Gen.choice $ Gen.constant <$> races
-
--- | Generate random month
-genMonth :: Gen Month
-genMonth = do
-  let months' = Gen.constant <$> months
-      wMonths = (1, Gen.constant Nyarsdagr) :
-        ((27, ) <$> (tail . reverse $ months'))
-  Gen.frequency wMonths
-
--- | Generate random birthday date
-genBirthday :: Gen Birthday
-genBirthday = do
-  m <- genMonth
-  if m == Nyarsdagr
-  then return $ Birthday NewYearsDay Nyarsdagr
-  else do
-    cd <- Gen.int $ Range.constant 1 28 
-    return $ Birthday (CommonDay cd) m
-
--- | Generate random archetype
-genArchetype :: Gen Archetype
-genArchetype = Gen.choice $ Gen.constant <$> archetypes

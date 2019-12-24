@@ -15,6 +15,7 @@ module Twarog
   , module Twarog.Backend.Types
   , module Twarog.Backend.Modifier
   , module Twarog.Frontend.DiceGen
+  , module Twarog.Frontend.CharGen
   , module Twarog.Frontend.HamingjaStore
   , sample
   ) where
@@ -35,6 +36,7 @@ import Twarog.Backend.Units
 import Twarog.Backend.Types
 import Twarog.Backend.Modifier
 import Twarog.Frontend.DiceGen
+import Twarog.Frontend.CharGen
 import Twarog.Frontend.HamingjaStore
 
 import Hedgehog.Gen (sample)

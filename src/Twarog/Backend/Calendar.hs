@@ -13,6 +13,7 @@ module Twarog.Backend.Calendar
   , seasonAttrMod
   , godsBirthday
   , birthdayGod
+  , isMarked
   ) where
 
 import Control.Lens
@@ -161,3 +162,5 @@ birthdayGod = \case
   Birthday (CommonDay 13) Ydalir      -> [ Hodr ]   
   _ -> []
   
+isMarked :: Birthday -> Bool
+isMarked = not . null . birthdayGod

@@ -36,8 +36,11 @@ module Twarog.Backend.Character
   -- * Utilities
   , hp
   , expToLvl
+  , lvlToExp
   , maximumAge
   , crHPBonus
+  , defaultCrSkillChoices 
+  , crSkills 
   )
   where
 
@@ -131,7 +134,7 @@ emptyNewCharacter =
       _characterLifeStance  = Nothing
       _characterGod         = Nothing
       _characterSex         = Nothing
-      _characterHamingja    = Nothing
+      _characterHamingja    = Just 3
       _characterFlaws       = Nothing
       _characterRole        = Nothing
       _characterSkills      = Nothing
@@ -250,6 +253,15 @@ expToLvl r cr s xp =
    in fromInteger $ if p 
       then lvl
       else lvl'
+
+-- | Gives back least XP boundary for given level
+lvlToExp :: Race -> CharacterRole -> Sex
+         -> Lvl -> XP
+lvlToExp r cr s lvl =
+  let nLvl = maxNormalLvl r cr s
+   in if lvl <= nLvl
+      then 250 * lvl * lvl
+      else 500 * lvl * lvl 
 
 -- | Default number of Character Skills from @crSkills@
 -- that can be choosen.

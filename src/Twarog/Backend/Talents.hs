@@ -8,8 +8,11 @@ module Twarog.Backend.Talents
   )
   where
 
+import qualified Data.Set as S
+
 import Twarog.Backend.Types
 import Twarog.Backend.Races
+import Twarog.Backend.Calendar
 import Twarog.Backend.Encumbrance
 
 data Talent = Acrobatic

@@ -56,9 +56,9 @@ data Element = Fire
              | Spirit
              deriving (Show, Eq)
 
--- | Get list of all gods
+-- | Get list of all sympathetic gods
 gods :: [God]
-gods = enumFrom (toEnum 0)
+gods = filter isSympathetic $ enumFrom (toEnum 0)
 
 isSympathetic :: God -> Bool
 isSympathetic god = god < Austr

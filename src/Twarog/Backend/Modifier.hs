@@ -1,5 +1,6 @@
 module Twarog.Backend.Modifier
   ( Modifier (..)
+  , mkCharacterSheet
   )
   where
 
@@ -15,10 +16,22 @@ import Twarog.Backend.Skills
 import Twarog.Backend.Character
 import Twarog.Backend.CharacterSheet
 
-class Modifier m where
-  addMod :: CharacterSheet -> m -> CharacterSheet
+class Modifier c m where
+  addMod :: c -> m -> c
 
-instance Modifier Talent where
+instance Modifier Attributes Race where
+  addMod cr = undefined
+
+instance Modifier NewCharacter Race where
+  addMod cr = undefined
+
+instance Modifier NewCharacter Talent where
+  addMod cr = undefined
+
+instance Modifier NewCharacter Flaw where
+  addMod cr = undefined
+
+instance Modifier CharacterSheet Talent where
   addMod cr = \case
     Acrobatic ->
       cr & (sheetSkills . at Acrobatics . _Just . skillMod +~ 1)
@@ -193,10 +206,10 @@ instance Modifier Talent where
     Aegirean ->
       cr & sheetFright -~ 1
 
-instance Modifier a => Modifier (S.Set a) where
+instance Modifier CharacterSheet a => Modifier CharacterSheet (S.Set a) where
   addMod cr s = S.foldr (\t -> (flip addMod) t) cr s
 
-instance Modifier Flaw where
+instance Modifier CharacterSheet Flaw where
   addMod cr = \case
     Alcoholic l  -> case l of
       FlawLevel1 ->
@@ -594,7 +607,7 @@ instance Modifier Flaw where
       FlawLevel3 ->
         cr & (sheetOther %~ cons "Whenever you face a problem/danger you must test Wil against DD12 or you will be unable to do anything about it. Instead you will just whine and complain if the others don't solve your problems.")
 
-instance Modifier Encumbrance where
+instance Modifier CharacterSheet Encumbrance where
   addMod cr =
     let ms = typeSkill MovementSkill
         decr x =
@@ -606,7 +619,7 @@ instance Modifier Encumbrance where
        HeavyLoad  -> decr 2
        AbsurdLoad -> decr 3
 
-instance Modifier Race where
+instance Modifier CharacterSheet Race where
   addMod cr@Player{..} r =
     let cr' = cr & (sheetAttributes %~ raceAttrMod r _sheetSex)
                  . (sheetResistance . disease %~ raceDiseaseMod r)
@@ -700,6 +713,7 @@ mkCharacterSheet nc@NewCharacter{..} = do
       _sheetSize = raceSizeMod race sex 0
       _sheetLifeStance = lifeStance
       _sheetAlignment = alignment
+      _sheetHamingja = hamingja
       _sheetHealth = 
         hp (attr ^. con) (toModifier $ attr ^. str) _sheetSize role _sheetLevel
       _sheetSex = sex
@@ -716,4 +730,8 @@ mkCharacterSheet nc@NewCharacter{..} = do
       _sheetFright = 0
       _sheetOther = []
       initialSheet = Player{..}
-  return $ initialSheet `addMod` race `addMod` talent `addMod` flaws
+  return $ initialSheet
+         `addMod` race 
+         `addMod` talent 
+         `addMod` flaws
+         `addMod` (encumbrance $ _sheetEncumbrance)

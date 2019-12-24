@@ -1,6 +1,5 @@
 module Twarog.Backend.Skills
   ( CharacterSkill (..)
-  , characterSkill
   , skillMod
   , proficiency
   , Skill (..)
@@ -66,8 +65,7 @@ data SkillType = MovementSkill
                deriving (Eq, Ord, Show)
 
 data CharacterSkill = CharacterSkill
-  { _characterSkill :: Skill
-  , _skillMod       :: Int
+  { _skillMod       :: Int
   , _proficiency    :: Proficiency
   } deriving (Eq, Ord, Show)
 makeLenses ''CharacterSkill

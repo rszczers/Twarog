@@ -114,6 +114,7 @@ data CharacterSheet = Player
   , _sheetAlignment   :: Archetype
   , _sheetHealth      :: HP
   , _sheetSex         :: Sex
+  , _sheetHamingja    :: Hamingja
   , _sheetCombatStats :: CombatStats
   , _sheetToughness   :: Toughness
   , _sheetExperience  :: XP
@@ -147,6 +148,7 @@ emptySheet =
       _sheetStamina     = 0
       _sheetHealth      = 0
       _sheetSex         = Male
+      _sheetHamingja    = 3
       _sheetEncumbrance = 0
       _sheetCombatStats = emptyCombatStats
       _sheetToughness   = Toughness 0 0 0 0
