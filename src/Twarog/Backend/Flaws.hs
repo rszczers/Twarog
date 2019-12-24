@@ -132,9 +132,9 @@ instance Enum Flaw where
     64 -> LazyFlaw FlawLevel1
     65 -> LazyFlaw FlawLevel2
     66 -> LazyFlaw FlawLevel3
-    67 -> Limp FlawLevel1 -- ^ Gives PC Marked Talent for free.
-    68 -> Limp FlawLevel2 -- ^ Gives PC Marked Talent for free.
-    69 -> Limp FlawLevel3 -- ^ Gives PC Marked Talent for free.
+    67 -> Limp FlawLevel1
+    68 -> Limp FlawLevel2
+    69 -> Limp FlawLevel3
     70 -> LowSelfEsteem FlawLevel1
     71 -> LowSelfEsteem FlawLevel2
     72 -> LowSelfEsteem FlawLevel3
