@@ -6,6 +6,7 @@ module Twarog.Backend.Modifier
 
 import Control.Lens
 import qualified Data.Set as S
+import qualified Data.Map.Strict as M
 
 import Twarog.Backend.Talents
 import Twarog.Backend.Types
@@ -18,9 +19,6 @@ import Twarog.Backend.CharacterSheet
 
 class Modifier c m where
   addMod :: c -> m -> c
-
-instance Modifier Attributes Race where
-  addMod cr = undefined
 
 instance Modifier NewCharacter Race where
   addMod nc@NewCharacter{..} r =

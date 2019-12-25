@@ -28,6 +28,7 @@ import Twarog.Backend.Talents
 import Twarog.Backend.Calendar
 import Twarog.Backend.Modifier
 import Twarog.Backend.Skills
+import Twarog.Backend.SkillMods
 import Twarog.Backend.Character
 import Twarog.Backend.Archetypes
 import Twarog.Backend.Gods
@@ -185,11 +186,10 @@ genTalents race fs ts =
        genTalents race fs (S.insert t ts)
      else return ts
 
-genInitCharacterSkills :: CharacterRole -> Sex
+genInitCharacterSkills :: CharacterRole -> Sex -> Modifiers
                        -> Gen (M.Map Skill CharacterSkill)
-genInitCharacterSkills cr sex = do
-  let keys = skills
-      crs = crSkills cr
+genInitCharacterSkills cr sex mods@Modifiers{..} = do
+  let crs = crSkills cr
       chs = Gen.choice $ Gen.constant <$> crs
   cr <- Gen.list (Range.singleton $ defaultCrSkillChoices cr) chs
   let trs = crs \\ cr
@@ -199,7 +199,10 @@ genInitCharacterSkills cr sex = do
       utr' = zip utr $ repeat Untrained
       allSkills = crs' ++ trs' ++ utr'
       mChars = (\(s, p) -> (s, CharacterSkill 0 p)) <$> allSkills
-  return $ M.fromList mChars
+      initSkills = setPenalitySkill 
+                 . (setBaseSkill mods)
+                 $ M.fromList mChars
+  return initSkills
 
 genNewCharacter :: Gen NewCharacter
 genNewCharacter = do
@@ -216,7 +219,7 @@ genNewCharacter = do
   arch       <- genArchetype
   role       <- genCharacterRole 
                   attr (S.toList talents) lifestance race sex arch
-  skills     <- genInitCharacterSkills role sex
+  skills     <- genInitCharacterSkills role sex (modifiers attr)
   let _characterOwner      = Nothing
       _characterName       = Nothing
       _characterRace       = Just race
