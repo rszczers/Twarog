@@ -23,7 +23,70 @@ instance Modifier Attributes Race where
   addMod cr = undefined
 
 instance Modifier NewCharacter Race where
-  addMod cr = undefined
+  addMod nc@NewCharacter{..} r =
+    let nc' = nc & (characterAttr %~ \a -> (do
+                      sex <- _characterSex
+                      fmap (raceAttrMod r sex) a)
+                   )
+        nc'' = foldr (\s -> characterSkills . _Just
+                          . at s . _Just
+                          . skillMod %~ raceSkillMod r s) nc' skills
+     in case r of
+       Dwarf ->
+         nc'' & (characterOther . _Just %~ cons "Night Vision (can see 100' even in total darkness as if he had Ettin eyes)")
+              . (characterOther . _Just %~ cons "Can learn Dwarf Spells")
+              . (characterOther . _Just %~ cons "Can sense mechanical devices within 60' on 1-3 (D6)")
+              . (characterOther . _Just %~ cons "Knows True North when Underground")
+              . (characterFlaws . _Just %~ S.insert (Phobia FlawLevel1))
+              . (characterOther . _Just %~ cons "Fear of Open Water")
+              . (characterFlaws . _Just %~ S.insert (Greedy FlawLevel1))
+              . (characterOther . _Just %~ cons "You are greedy")
+              . (characterFlaws . _Just %~ S.insert (Dislike FlawLevel1))
+              . (characterOther . _Just %~ cons "You dislike elves")
+              . (characterFlaws . _Just %~ S.insert (Dislike FlawLevel2))
+              . (characterOther . _Just %~ cons "You dislike orcs")
+              . (let s = _characterAttr ^?! _Just . str
+                     t' = 30 + (5 * (toModifier s 0))
+                  in characterSkills . _Just . at Tempo . _Just . skillMod .~ t')
+              . (characterOther . _Just %~ cons "Base Tempo is only 30'")
+       Elf -> 
+         nc'' & (characterOther . _Just %~ cons "Night Vision")
+              . (characterFlaws . _Just %~ S.insert (Dislike FlawLevel1))
+              . (characterOther . _Just %~ cons "You dislike dwarfs")
+              . (characterFlaws . _Just %~ S.insert (Dislike FlawLevel2))
+              . (characterOther . _Just %~ cons "You dislike orcs")
+              . (characterOther . _Just %~ cons "Can learn Elf Spells and see Incorporeal Trolls, Nymphs and other spirits")
+       Gnome ->               
+         nc'' & (characterOther . _Just %~ cons "Night Vision")
+              . (characterOther . _Just %~ cons "Can learn Gnome Spells")
+              . (characterFlaws . _Just %~ S.insert (Phobia FlawLevel1))
+              . (characterOther . _Just %~ cons "Fear of Open Water")
+              . (let s = _characterAttr ^?! _Just . str
+                     t' = 30 + (5 * (toModifier s 0))
+                  in characterSkills . _Just . at Tempo . _Just . skillMod .~ t')
+              . (characterOther . _Just %~ cons "Base Tempo is only 30'")
+       HighMan -> nc''
+       CommonMan -> nc''
+       LesserMan -> nc''
+       Halfling -> 
+         nc'' & (characterOther . _Just %~ cons "Night Vision")
+              . (characterFlaws . _Just %~ S.insert (Phobia FlawLevel1))
+              . (characterOther . _Just %~ cons "Fear of Open Water")
+              . (let s = _characterAttr ^?! _Just . str
+                     t' = 30 + (5 * (toModifier s 0))
+                  in characterSkills . _Just . at Tempo . _Just . skillMod .~ t')
+              . (characterOther . _Just %~ cons "Base Tempo is only 30'")
+       _ ->
+         nc'' & (characterOther . _Just %~ cons "Night Vision (can see 100' even in total darkness as if he had Ettin eyes)")
+              . (characterFlaws . _Just %~ S.insert (Phobia FlawLevel1))
+              . (characterOther . _Just %~ cons "Fear of the Sun")
+              . (characterFlaws . _Just %~ S.insert (Phobia FlawLevel1))
+              . (characterOther . _Just %~ cons "Fear of Open Water")
+              . (characterOther . _Just %~ cons "Can learn Orc Spells")
+              . (characterFlaws . _Just %~ S.insert (Dislike FlawLevel2))
+              . (characterOther . _Just %~ cons "You dislike elves")
+              . (characterFlaws . _Just %~ S.insert (Dislike FlawLevel2))
+              . (characterOther . _Just %~ cons "You dislike dwarfs")
 
 instance Modifier NewCharacter Talent where
   addMod cr = undefined

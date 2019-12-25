@@ -26,6 +26,7 @@ import Twarog.Backend.Races
 import Twarog.Backend.Flaws
 import Twarog.Backend.Talents
 import Twarog.Backend.Calendar
+import Twarog.Backend.Modifier
 import Twarog.Backend.Skills
 import Twarog.Backend.Character
 import Twarog.Backend.Archetypes
@@ -229,4 +230,6 @@ genNewCharacter = do
       _characterRole       = Just role
       _characterSkills     = Just skills
       _characterTalent     = Just talents
-  return NewCharacter{..}
+      _characterOther      = Just []
+      initChar             = NewCharacter{..}
+  return $ initChar `addMod` race

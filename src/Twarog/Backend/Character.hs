@@ -20,6 +20,7 @@ module Twarog.Backend.Character
   , characterRole
   , characterSkills  
   , characterTalent
+  , characterOther
   -- * Combat Statistics
   , CombatStats (..)
   , emptyCombatStats
@@ -121,24 +122,26 @@ data NewCharacter = NewCharacter
   , _characterRole       :: Maybe CharacterRole
   , _characterSkills     :: Maybe (M.Map Skill CharacterSkill)
   , _characterTalent     :: Maybe (S.Set Talent)
+  , _characterOther      :: Maybe [Note]
   } deriving (Show, Eq)
 makeLenses ''NewCharacter
  
 emptyNewCharacter = 
-  let _characterOwner       = Nothing
-      _characterName        = Nothing
-      _characterAttr        = Nothing
-      _characterRace        = Nothing
-      _characterBirth       = Nothing
-      _characterAlignment   = Nothing
-      _characterLifeStance  = Nothing
-      _characterGod         = Nothing
-      _characterSex         = Nothing
-      _characterHamingja    = Just 3
-      _characterFlaws       = Nothing
-      _characterRole        = Nothing
-      _characterSkills      = Nothing
-      _characterTalent      = Nothing
+  let _characterOwner      = Nothing
+      _characterName       = Nothing
+      _characterAttr       = Nothing
+      _characterRace       = Nothing
+      _characterBirth      = Nothing
+      _characterAlignment  = Nothing
+      _characterLifeStance = Nothing
+      _characterGod        = Nothing
+      _characterSex        = Nothing
+      _characterHamingja   = Just 3
+      _characterFlaws      = Nothing
+      _characterRole       = Nothing
+      _characterSkills     = Nothing
+      _characterTalent     = Nothing
+      _characterOther      = Nothing
    in NewCharacter{..}
 
 -- | Maximal age that PC can live up to

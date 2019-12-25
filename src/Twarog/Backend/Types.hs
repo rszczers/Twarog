@@ -42,6 +42,7 @@ module Twarog.Backend.Types
   , Wil
   , Modifiers (..)
   , toModifier
+  , modifiers
   -- *** Modifiers lenses
   , chaMod
   , conMod
