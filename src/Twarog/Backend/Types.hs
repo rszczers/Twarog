@@ -8,6 +8,7 @@ module Twarog.Backend.Types
   , CharacterName
   , Note
   -- ** Descriptive part
+  , Name
   , Sex (..)
   , sexes
   , Height
@@ -106,6 +107,7 @@ module Twarog.Backend.Types
   , BaseRange -- Bows and crossbows only
   ) where
 
+import Data.Text
 import Control.Lens
 import Twarog.Backend.Units
 
@@ -118,9 +120,10 @@ data Dice = D4
           | D100
           deriving (Show, Eq)
 
-type Owner = String
-type CharacterName = String
-type Note = String
+type Name = Text
+type Owner = Text
+type CharacterName = Text
+type Note = Text
 
 type AV = Int
 type Damage = Int

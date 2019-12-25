@@ -26,14 +26,28 @@ data Stage = OwnerStage
            | AttribStage (Maybe AttribBounce) 
            | RaceStage 
            | BirthStage
-           | ArchetypeStage 
            | AttitudeStage 
            | GodStage 
            | SexStage 
            | HamingjaStage 
            | FlawsAndTalentsStage
-           | RoleStage | SkilsStage 
-           deriving (Show, Eq)
+           | RoleStage
+           | SkilsStage 
+           deriving (Eq)
+
+instance Show Stage where
+  show OwnerStage = "Your name"
+  show NameStage = "Character name"
+  show (AttribStage _) = "Attributes"
+  show RaceStage = "Race"
+  show BirthStage = "Birthday"
+  show AttitudeStage = "Attitude"
+  show GodStage = "Life stance"
+  show SexStage = "Sex" 
+  show HamingjaStage = "Hamingja"
+  show FlawsAndTalentsStage = "Talents & Flaws"
+  show RoleStage = "Character's role"
+  show SkilsStage = "Skills"
 
 data AttribBounce = Every 
                   | Charisma 
@@ -51,8 +65,7 @@ nextStage s = case s of
   BirthStage           -> SexStage
   SexStage             -> RaceStage
   RaceStage            -> AttitudeStage
-  AttitudeStage        -> ArchetypeStage 
-  ArchetypeStage       -> FlawsAndTalentsStage
+  AttitudeStage        -> FlawsAndTalentsStage
   RoleStage            -> SkilsStage
   FlawsAndTalentsStage -> RoleStage
 

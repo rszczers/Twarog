@@ -110,7 +110,7 @@ emptyCombatStats =
 -- in order of how forms should be completed
 data NewCharacter = NewCharacter
   { _characterOwner      :: Maybe Owner
-  , _characterName       :: Maybe String
+  , _characterName       :: Maybe Name
   , _characterAttr       :: Maybe Attributes
   , _characterRace       :: Maybe Race
   , _characterBirth      :: Maybe Birthday

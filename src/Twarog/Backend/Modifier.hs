@@ -4,6 +4,7 @@ module Twarog.Backend.Modifier
   )
   where
 
+import qualified Data.Text as T
 import Control.Lens
 import qualified Data.Set as S
 import qualified Data.Map.Strict as M

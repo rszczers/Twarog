@@ -44,7 +44,6 @@ getStage m = case m ^. currentStage of
         RaceStage -> askRace m
         BirthStage -> askBirthday m
         AttitudeStage -> askAttitude m
-        ArchetypeStage -> askArchetype m
         --GodStage 
         SexStage -> askSex m
       --  HamingjaStage 
@@ -238,12 +237,6 @@ askAttitude m =
   div_ [class_ "animated fadeIn"] [
     --displayRadioQuestion (Prelude.map Just lifeStances) m
     nextButton AttitudeStage "Go to Archetype"         
-  ]
-
-askArchetype m = 
-  div_ [class_ "animated fadeIn"] [
-  
-    nextButton ArchetypeStage "Go to Talents and Flaws"             
   ]
 
 askFlawsAndTalents m = 
