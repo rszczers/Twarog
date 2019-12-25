@@ -26,65 +26,65 @@ instance Modifier NewCharacter Race where
                       sex <- _characterSex
                       fmap (raceAttrMod r sex) a)
                    )
-        nc'' = foldr (\s -> characterSkills . _Just
+        nc'' = foldr (\s -> characterSkills
                           . at s . _Just
                           . skillMod %~ raceSkillMod r s) nc' skills
      in case r of
        Dwarf ->
-         nc'' & (characterOther . _Just %~ cons "Night Vision (can see 100' even in total darkness as if he had Ettin eyes)")
-              . (characterOther . _Just %~ cons "Can learn Dwarf Spells")
-              . (characterOther . _Just %~ cons "Can sense mechanical devices within 60' on 1-3 (D6)")
-              . (characterOther . _Just %~ cons "Knows True North when Underground")
-              . (characterFlaws . _Just %~ S.insert (Phobia FlawLevel1))
-              . (characterOther . _Just %~ cons "Fear of Open Water")
-              . (characterFlaws . _Just %~ S.insert (Greedy FlawLevel1))
-              . (characterOther . _Just %~ cons "You are greedy")
-              . (characterFlaws . _Just %~ S.insert (Dislike FlawLevel1))
-              . (characterOther . _Just %~ cons "You dislike elves")
-              . (characterFlaws . _Just %~ S.insert (Dislike FlawLevel2))
-              . (characterOther . _Just %~ cons "You dislike orcs")
+         nc'' & (characterOther %~ cons "Night Vision (can see 100' even in total darkness as if he had Ettin eyes)")
+              . (characterOther %~ cons "Can learn Dwarf Spells")
+              . (characterOther %~ cons "Can sense mechanical devices within 60' on 1-3 (D6)")
+              . (characterOther %~ cons "Knows True North when Underground")
+              . (characterFlaws %~ S.insert (Phobia FlawLevel1))
+              . (characterOther %~ cons "Fear of Open Water")
+              . (characterFlaws %~ S.insert (Greedy FlawLevel1))
+              . (characterOther %~ cons "You are greedy")
+              . (characterFlaws %~ S.insert (Dislike FlawLevel1))
+              . (characterOther %~ cons "You dislike elves")
+              . (characterFlaws %~ S.insert (Dislike FlawLevel2))
+              . (characterOther %~ cons "You dislike orcs")
               . (let s = _characterAttr ^?! _Just . str
                      t' = 30 + (5 * (toModifier s 0))
-                  in characterSkills . _Just . at Tempo . _Just . skillMod .~ t')
-              . (characterOther . _Just %~ cons "Base Tempo is only 30'")
+                  in characterSkills . at Tempo . _Just . skillMod .~ t')
+              . (characterOther %~ cons "Base Tempo is only 30'")
        Elf -> 
-         nc'' & (characterOther . _Just %~ cons "Night Vision")
-              . (characterFlaws . _Just %~ S.insert (Dislike FlawLevel1))
-              . (characterOther . _Just %~ cons "You dislike dwarfs")
-              . (characterFlaws . _Just %~ S.insert (Dislike FlawLevel2))
-              . (characterOther . _Just %~ cons "You dislike orcs")
-              . (characterOther . _Just %~ cons "Can learn Elf Spells and see Incorporeal Trolls, Nymphs and other spirits")
+         nc'' & (characterOther %~ cons "Night Vision")
+              . (characterFlaws %~ S.insert (Dislike FlawLevel1))
+              . (characterOther %~ cons "You dislike dwarfs")
+              . (characterFlaws %~ S.insert (Dislike FlawLevel2))
+              . (characterOther %~ cons "You dislike orcs")
+              . (characterOther %~ cons "Can learn Elf Spells and see Incorporeal Trolls, Nymphs and other spirits")
        Gnome ->               
-         nc'' & (characterOther . _Just %~ cons "Night Vision")
-              . (characterOther . _Just %~ cons "Can learn Gnome Spells")
-              . (characterFlaws . _Just %~ S.insert (Phobia FlawLevel1))
-              . (characterOther . _Just %~ cons "Fear of Open Water")
+         nc'' & (characterOther %~ cons "Night Vision")
+              . (characterOther %~ cons "Can learn Gnome Spells")
+              . (characterFlaws %~ S.insert (Phobia FlawLevel1))
+              . (characterOther %~ cons "Fear of Open Water")
               . (let s = _characterAttr ^?! _Just . str
                      t' = 30 + (5 * (toModifier s 0))
-                  in characterSkills . _Just . at Tempo . _Just . skillMod .~ t')
-              . (characterOther . _Just %~ cons "Base Tempo is only 30'")
+                  in characterSkills . at Tempo . _Just . skillMod .~ t')
+              . (characterOther %~ cons "Base Tempo is only 30'")
        HighMan -> nc''
        CommonMan -> nc''
        LesserMan -> nc''
        Halfling -> 
-         nc'' & (characterOther . _Just %~ cons "Night Vision")
-              . (characterFlaws . _Just %~ S.insert (Phobia FlawLevel1))
-              . (characterOther . _Just %~ cons "Fear of Open Water")
+         nc'' & (characterOther %~ cons "Night Vision")
+              . (characterFlaws %~ S.insert (Phobia FlawLevel1))
+              . (characterOther %~ cons "Fear of Open Water")
               . (let s = _characterAttr ^?! _Just . str
                      t' = 30 + (5 * (toModifier s 0))
-                  in characterSkills . _Just . at Tempo . _Just . skillMod .~ t')
-              . (characterOther . _Just %~ cons "Base Tempo is only 30'")
+                  in characterSkills . at Tempo . _Just . skillMod .~ t')
+              . (characterOther %~ cons "Base Tempo is only 30'")
        _ ->
-         nc'' & (characterOther . _Just %~ cons "Night Vision (can see 100' even in total darkness as if he had Ettin eyes)")
-              . (characterFlaws . _Just %~ S.insert (Phobia FlawLevel1))
-              . (characterOther . _Just %~ cons "Fear of the Sun")
-              . (characterFlaws . _Just %~ S.insert (Phobia FlawLevel1))
-              . (characterOther . _Just %~ cons "Fear of Open Water")
-              . (characterOther . _Just %~ cons "Can learn Orc Spells")
-              . (characterFlaws . _Just %~ S.insert (Dislike FlawLevel2))
-              . (characterOther . _Just %~ cons "You dislike elves")
-              . (characterFlaws . _Just %~ S.insert (Dislike FlawLevel2))
-              . (characterOther . _Just %~ cons "You dislike dwarfs")
+         nc'' & (characterOther %~ cons "Night Vision (can see 100' even in total darkness as if he had Ettin eyes)")
+              . (characterFlaws %~ S.insert (Phobia FlawLevel1))
+              . (characterOther %~ cons "Fear of the Sun")
+              . (characterFlaws %~ S.insert (Phobia FlawLevel1))
+              . (characterOther %~ cons "Fear of Open Water")
+              . (characterOther %~ cons "Can learn Orc Spells")
+              . (characterFlaws %~ S.insert (Dislike FlawLevel2))
+              . (characterOther %~ cons "You dislike elves")
+              . (characterFlaws %~ S.insert (Dislike FlawLevel2))
+              . (characterOther %~ cons "You dislike dwarfs")
 
 instance Modifier NewCharacter Talent where
   addMod cr = undefined
@@ -759,10 +759,10 @@ mkCharacterSheet nc@NewCharacter{..} = do
   lifeStance <- _characterLifeStance
   sex <- _characterSex
   hamingja <- _characterHamingja
-  flaws <- _characterFlaws
+  let flaws = _characterFlaws
   role <- _characterRole
-  skills <- _characterSkills
-  talent <- _characterTalent
+  let skills = _characterSkills
+  let talent = _characterTalent
   let _sheetPlayerName = owner
       _sheetCharName = name
       _sheetLevel = 1
@@ -792,7 +792,7 @@ mkCharacterSheet nc@NewCharacter{..} = do
       _sheetOther = []
       initialSheet = Player{..}
   return $ initialSheet
-         `addMod` race 
+--         `addMod` race -- it's taking for consideration at cration stage
          `addMod` talent 
          `addMod` flaws
          `addMod` (encumbrance $ _sheetEncumbrance)

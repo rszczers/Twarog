@@ -22,30 +22,24 @@ updateModel (RaceChecked r (Checked True)) m =
 
 updateModel (TalentChecked t max (Checked True)) m =  
   let 
-    currTalents = fromMaybe S.empty $ m ^. character . characterTalent
+    currTalents = m ^. character . characterTalent
     maxTalents = fromMaybe 0 max
   in
     noEff ( 
         if Prelude.length currTalents < maxTalents
-        then m & character . characterTalent .~ Just (S.insert t currTalents)
+        then m & character . characterTalent %~ S.insert t 
         else m 
         )
 updateModel (TalentChecked r _ (Checked False)) m = 
-  let 
-    currTalents = fromMaybe S.empty $ m ^. character . characterTalent
-  in
-    noEff $ m & character . characterTalent .~
-      (Just $ S.delete r currTalents)
+  noEff $ m & character . characterTalent %~ S.delete r
 
 updateModel (ChangeStage s) m = 
-  let 
-    availableS = m ^. availableStages
-    isNewStage = not $ elem s availableS
-    current = m & currentStage .~ s
-  in
-    (if isNewStage 
-            then noEff (current & availableStages .~ ( availableS ++ [s] ))
-            else noEff current)
+  let availableS = m ^. availableStages
+      isNewStage = not $ elem s availableS
+      current = m & currentStage .~ s
+  in if isNewStage 
+     then noEff $ current & availableStages .~ ( availableS ++ [s] )
+     else noEff current
 
 updateModel (SetCurrentRoll1 n) m = 
   let
@@ -57,13 +51,11 @@ updateModel (SetCurrentRoll1 n) m =
   noEff ( m & currentRoll1 .~ result)
                                                     
 updateModel (SetCurrentRoll2 n) m = 
-  let
-  toString = fromMisoString n 
-  result = case toString of
+  let toString = fromMisoString n 
+      result = case toString of
         "" -> 0
-        _ -> read toString
-  in
-  noEff ( m & currentRoll2 .~  result)
+        _  -> read toString
+  in noEff $ m & currentRoll2 .~  result
 
 updateModel (SetAttribute n t) m =  
   let 
@@ -102,18 +94,11 @@ updateModel (SexChecked s (Checked True)) m =
   noEff $ m & character . characterSex .~ s
      
 updateModel (FlawChecked f _ (Checked True)) m =  
-  let 
-    currFlaws = fromMaybe S.empty $ m ^. character . characterFlaws
-  in
-    noEff 
-      $ m & character . characterFlaws .~ (Just $ S.insert f currFlaws)
+  noEff 
+    $ m & character . characterFlaws %~ S.insert f
 
 updateModel (FlawChecked f _ (Checked False)) m = 
-  let 
-    currFlaws = fromMaybe S.empty $ m ^. character . characterFlaws
-  in
-    noEff $ m & character . characterFlaws .~
-      (Just $ S.delete f currFlaws)
+  noEff $ m & character . characterFlaws %~ S.delete f
 
 updateModel (SetAllAttributes attr) m = 
   noEff  ((m & character . characterAttr .~ Just attr) 
@@ -130,13 +115,10 @@ updateModel SetRandomBirth m = do
     return $ SetBirth birth
 
 updateModel (SetBirth b) m =
-  let
-    talents = fromMaybe S.empty $ (m ^. character . characterTalent)  
-    ch =  if birthdayGod b /= []
-          then m & character . characterTalent .~ (Just $ S.insert Marked talents)
-          else m & character . characterTalent .~ (Just $ S.delete Marked talents)
-  in
-    noEff  (ch & character . characterBirth .~ Just b) 
+  noEff $ m & (character . characterBirth .~ Just b)
+            . (character . characterTalent %~ if isMarked b
+                                              then S.insert Marked
+                                              else S.delete Marked)
 
 updateModel (AddAvailableStage s) m =
   let 

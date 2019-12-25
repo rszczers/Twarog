@@ -21,32 +21,45 @@ import       Miso.String
 import       Data.Char as C
 import       Twarog
 
-data Stage = OwnerStage | NameStage | AttribStage (Maybe AttribBounce) | RaceStage | BirthStage
-      | ArchetypeStage | AttitudeStage | GodStage | SexStage | HamingjaStage | FlawsAndTalentsStage
-      | RoleStage | SkilsStage 
-      deriving (Show, Eq)
+data Stage = OwnerStage 
+           | NameStage 
+           | AttribStage (Maybe AttribBounce) 
+           | RaceStage 
+           | BirthStage
+           | ArchetypeStage 
+           | AttitudeStage 
+           | GodStage 
+           | SexStage 
+           | HamingjaStage 
+           | FlawsAndTalentsStage
+           | RoleStage | SkilsStage 
+           deriving (Show, Eq)
 
-data AttribBounce = Every | Charisma | Constitution | Dexterity | Inteligence | Strength | WillPower 
-      deriving (Show, Eq)
+data AttribBounce = Every 
+                  | Charisma 
+                  | Constitution 
+                  | Dexterity 
+                  | Inteligence 
+                  | Strength 
+                  | WillPower 
+                  deriving (Show, Eq)
 
 nextStage :: Stage -> Stage
-nextStage s = 
-  case s of 
-    NameStage -> AttribStage Nothing
-    AttribStage _ -> BirthStage
-    BirthStage -> SexStage
-    SexStage -> RaceStage
-    RaceStage -> AttitudeStage
-    AttitudeStage-> ArchetypeStage 
-    ArchetypeStage -> FlawsAndTalentsStage
-    FlawsAndTalentsStage -> RoleStage
-    RoleStage -> SkilsStage
+nextStage s = case s of 
+  NameStage            -> AttribStage Nothing
+  AttribStage _        -> BirthStage
+  BirthStage           -> SexStage
+  SexStage             -> RaceStage
+  RaceStage            -> AttitudeStage
+  AttitudeStage        -> ArchetypeStage 
+  ArchetypeStage       -> FlawsAndTalentsStage
+  RoleStage            -> SkilsStage
+  FlawsAndTalentsStage -> RoleStage
 
 printBounce :: Maybe AttribBounce -> String
-printBounce b = 
-  case b of
-    Just a -> Prelude.map C.toLower $ show a
-    Nothing -> ""
+printBounce b = case b of
+  Just a -> C.toLower <$> show a
+  Nothing -> ""
   
 data Model = Model
   { _currentStage :: Stage

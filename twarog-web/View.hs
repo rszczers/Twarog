@@ -254,7 +254,7 @@ askFlawsAndTalents m =
     , div_ [class_ "columns"] [
         div_ [class_ "column"] [
           displayCheckboxQuestion talents m
-                            characterTalent "What are your talents?" (TalentsMax 3) TalentChecked
+            characterTalent "What are your talents?" (TalentsMax 3) TalentChecked
         ]
         , div_ [class_ "column"] [
             displayCheckboxQuestion [ Alcoholic FlawLevel1
@@ -291,12 +291,10 @@ maxTalentsInfo m max =
           let 
             additionalTalents = 
               quot ( 
-                S.size (
-                  fromMaybe S.empty $ m ^. character . characterFlaws
-                  ) 
+                S.size $ m ^. character . characterFlaws 
               ) 2
             toChoose = a + additionalTalents
-            choosed = S.size $ fromMaybe S.empty $ m ^. character . characterTalent
+            choosed = S.size $ m ^. character . characterTalent
 
           in 
             [ p_ [class_ "subtitle"] 
@@ -311,15 +309,13 @@ maxTalentsInfo m max =
 --dispaleyCheckboxQuestion :: [a] -> Model -> (characterField) -> String -> Int -> (a -> Bool -> View Msg)
 displayCheckboxQuestion valueList model characterField question max msg =
   let 
-    content = fromMaybe S.empty $ model ^. character . characterField
+    content = model ^. character . characterField
 
     additionalTalents = 
       case max of 
         TalentsMax _ -> 
           quot ( 
-            S.size (
-              fromMaybe S.empty $ model ^. character . characterFlaws
-              ) 
+            S.size $ model ^. character . characterFlaws
             ) 2
         otherwise -> 0
 

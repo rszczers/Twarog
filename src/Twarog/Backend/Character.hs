@@ -118,11 +118,11 @@ data NewCharacter = NewCharacter
   , _characterLifeStance :: Maybe LifeStance
   , _characterSex        :: Maybe Sex
   , _characterHamingja   :: Maybe Hamingja
-  , _characterFlaws      :: Maybe (S.Set Flaw)
+  , _characterFlaws      :: S.Set Flaw
   , _characterRole       :: Maybe CharacterRole
-  , _characterSkills     :: Maybe (M.Map Skill CharacterSkill)
-  , _characterTalent     :: Maybe (S.Set Talent)
-  , _characterOther      :: Maybe [Note]
+  , _characterSkills     :: M.Map Skill CharacterSkill
+  , _characterTalent     :: S.Set Talent
+  , _characterOther      :: [Note]
   } deriving (Show, Eq)
 makeLenses ''NewCharacter
  
@@ -137,11 +137,11 @@ emptyNewCharacter =
       _characterGod        = Nothing
       _characterSex        = Nothing
       _characterHamingja   = Just 3
-      _characterFlaws      = Nothing
+      _characterFlaws      = S.empty
       _characterRole       = Nothing
-      _characterSkills     = Nothing
-      _characterTalent     = Nothing
-      _characterOther      = Nothing
+      _characterSkills     = M.empty
+      _characterTalent     = S.empty
+      _characterOther      = []
    in NewCharacter{..}
 
 -- | Maximal age that PC can live up to

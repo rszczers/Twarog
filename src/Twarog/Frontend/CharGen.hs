@@ -229,10 +229,10 @@ genNewCharacter = do
       _characterLifeStance = Just lifestance
       _characterSex        = Just sex
       _characterHamingja   = Just 3
-      _characterFlaws      = Just flaws
+      _characterFlaws      = flaws
       _characterRole       = Just role
-      _characterSkills     = Just skills
-      _characterTalent     = Just talents
-      _characterOther      = Just []
+      _characterSkills     = skills
+      _characterTalent     = talents
+      _characterOther      = []
       initChar             = NewCharacter{..}
   return $ initChar `addMod` race
