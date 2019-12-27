@@ -18,6 +18,7 @@ viewModel m@Model{..} =
   [ section_
     [ class_ "hero is-medium is-light is-bold", style_  $ M.singleton "padding-top" "2rem" ]
       [ navbarElem m
+       , menu
        , div_ [class_ "hero-body"] [
         div_ [class_ "container has-text-centered"] $
           [ breadcrumb (m ^. availableStages) (m ^. currentStage) ]
@@ -430,4 +431,75 @@ breadcrumb stages active =
         stages
     ]
 
+menu = 
+  div_ [class_ "columns is-mobile", style_ $ M.singleton "margin" "0rem 1rem 0rem 0.5rem"] [
+      dropdownMenuItem "Hamingja" "You can spend your hamingja points on folowing benefits." 
+                        "fa-theater-masks" hamingjaOptions
+      , dropdownMenuItem "Gold" "" "fa-coins" []
+      , dropdownMenuItem "Health" "" "fa-heartbeat" []
+      --, dropdownMenuItem "Size" "" "fa-weight" []
+  ]
+
+dropdownMenuItem :: String -> String -> String -> [(Int, String)] -> View Msg  
+dropdownMenuItem title description icon options = 
+  let 
+    formatOption ( points, option ) = 
+        div_ [class_ "dropdown-item"] [
+          div_ [class_ "columns is-mobile" ] [  
+              span_ [class_ "column is-four-fifths"] [text option]
+            , p_ [class_ "column", style_ $ M.singleton "margin" "0rem 0.5rem 0rem 0.5rem"] [
+              text $ ms $ show points
+            ] 
+          ]
+          , hr_ [class_ "dropdown-divider"]
+        ]  
+    dropUp = div_ [class_ ""]
+  in
+    div_ [ class_ "dropdown column"] [
+        div_ [class_ "columns dropdown is-hoverable"] [
+          div_ [class_ "column columns dropdown-trigger is-centered "] [
+              button_ [class_ "button is-light is-rounded column is-large"
+                    , style_ $ M.singleton "margin" "1rem"
+                    , controls_ True
+                      ] [
+                        div_ [class_ "columns is-mobile"] [
+                          span_ [class_ "title icon is-large column"] [
+                            i_ [class_ $ ms $ "fas fa " ++ icon] []
+                          ]
+                          , span_ [class_ "column title"] [ text $ ms $ show 3 ]
+                        ]     
+                      ]  
+          ]
+          
+          , div_ [class_ "dropdown-menu",  id_ "hamingja-menu"] [
+              div_ [class_ "dropdown-content" ] 
+              $ 
+              [
+                div_ [class_ "dropdown-item"] [
+                    p_ [class_ "title"] [text $ ms title]
+                    , p_ [class_ "subtitle"] [text $ ms description] 
+                  ]
+              ]
+              ++ 
+                if options /= [] 
+                then 
+                  [div_ [class_ "dropdown-item"] [
+                    div_ [class_ "columns is-mobile" ] [
+                      div_ [class_ "column is-four-fifths"] [
+                          b_ [] [text "Option"]
+                        ]
+                        , div_ [class_ "column"] [
+                            b_ [] [text "Cost"]
+                        ]
+                      ]
+                    , hr_ [class_ "dropdown-divider"]
+                    ]
+                  ]
+                    ++ (Prelude.map formatOption 
+                        $ Prelude.map (\(x, y) -> (x, ms y)) options)
+                else []
+        ]
+    ]
+  ]
+    
 
