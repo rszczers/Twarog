@@ -39,28 +39,29 @@ viewModel m@Model{..} =
 
 getStage :: Model -> View Msg
 getStage m = case m ^. currentStage of
-        OwnerStage -> askName m
-        NameStage -> askName m
-        AttribStage n -> askAttributes m n
-        RaceStage -> askRace m
-        BirthStage -> askBirthday m
-        AttitudeStage -> askAttitude m
-        --GodStage 
-        SexStage -> askSex m
+        OwnerStage            -> askName m
+        NameStage             -> askName m
+        AttribStage n         -> askAttributes m n
+        RaceStage             -> askRace m
+        BirthStage            -> askBirthday m
+        AttitudeStage         -> askAttitude m
+        GodStage              -> askLifeStance m 
+        SexStage              -> askSex m
       --  HamingjaStage 
-        FlawsAndTalentsStage -> askFlawsAndTalents m
+        FlawsAndTalentsStage False -> flawsAndTalentsFirstScreen m
+        FlawsAndTalentsStage True -> askFlawsAndTalents m
       {-  RoleStage
         SkilsStage -}
 
-nextButton :: Stage -> String -> View Msg                            
-nextButton stage txt = 
+nextButton :: Stage -> View Msg                            
+nextButton stage = 
   div_ [class_ "columns"][
     div_ [class_ "column is-full level"] [
       div_ [ class_ "level-right"] [
         button_ [ class_ "button is-outlined is-medium"
                 , onClick $ ChangeStage $ nextStage stage  ] 
                 [ 
-                  text $ ms $ txt
+                  text $ getNextButtonText $ nextStage stage
                   , span_ [class_ "icon", style_ $ M.singleton "padding-left" "1.5rem"] [
                       i_ [class_ "fas fa-chevron-right"] []
                     ]
@@ -69,6 +70,9 @@ nextButton stage txt =
       ]
     ]
     
+chooseRandomlyButton whatToDo = 
+  button_ [class_ "button", onClick whatToDo] ["Choose randomly"]
+
 askName :: Model -> View Msg
 askName m =
   div_ [class_ "animated fadeIn"]
@@ -82,7 +86,7 @@ askName m =
               ]
           ]
         ]
-        , nextButton NameStage "Go to attributes"
+        , nextButton NameStage
     ]
 
 askAttributes :: Model -> Maybe AttribBounce -> View Msg
@@ -160,7 +164,7 @@ attributesFirstScreen = div_ [class_ "animated fadeIn"] [
                       ] ["Use one click generator"]
                 ]  
               ]
-              , nextButton (AttribStage Nothing) "Go to Birthday"
+              , nextButton (AttribStage Nothing)
             ] 
 
 askBirthday m =
@@ -215,61 +219,127 @@ askBirthday m =
               _ -> [ text $ ""]  
             )
         ]
-        , nextButton BirthStage "Go to Sex"
+        , nextButton BirthStage
     ]
     
 askSex m = 
   div_ [class_ "animated fadeIn"] [    
     displayRadioQuestion (Prelude.map Just sexes) m 
                         characterSex "Your sex?" SexChecked
-    , nextButton SexStage "Go to Race"
+    , chooseRandomlyButton SetRandomSex
+    , nextButton SexStage
     ]
 
 askRace m =
   div_ [class_ "animated fadeIn"] [
     displayRadioQuestion (Prelude.map Just races) m
                   characterRace "Your race?" RaceChecked 
-    , nextButton RaceStage "Go to Life stance"
+    , chooseRandomlyButton SetRandomRace
+    , div_ [class_ "columns is-centered", style_ $ M.singleton "margin-top" "1.5rem"] [
+        div_ [class_ "column is-centered is-one-third"] [ 
+          askLifeStance m
+        ] 
+      ]
+    , nextButton RaceStage
   ]
+
+askLifeStance m = 
+  let 
+    lifeStance = m ^. character . characterLifeStance
+  in
+    article_ 
+      [ class_ $ ms $ "message is-success " ++ if lifeStance /= Nothing then "animated fadeInDown" else ""]
+      (case lifeStance of
+        Just (Religious a) -> 
+          [ div_ [class_ "message-header"] [
+              p_ [] ["You are religious"]    
+            ]
+          , div_ [class_ "message-body",
+                style_  $ M.singleton "padding" "0.5rem"] [
+            text $ ms $ "Your faovrite God is " ++ (show a)
+            ]
+          ]
+        Just Traditional -> [ 
+            div_ [class_ "message-header"] [
+              p_ [] ["You are traditional"]    
+            ]
+            , div_ [class_ "message-body",
+                style_  $ M.singleton "padding" "0.5rem"] [
+            text "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+            ]
+          ]  
+        Nothing -> []
+      )
+
+
 
 askAttitude m = 
   div_ [class_ "animated fadeIn"] [
     --displayRadioQuestion (Prelude.map Just lifeStances) m
-    nextButton AttitudeStage "Go to Archetype"         
+    nextButton AttitudeStage        
   ]
+
+flawsAndTalentsFirstScreen :: Model -> View Msg
+flawsAndTalentsFirstScreen m = 
+  let 
+    flaws = m ^. character . characterFlaws
+    talents = m ^. character . characterTalent
+    isVisible = not $ (S.null flaws) && (S.null talents) 
+  in
+    div_ [class_ "animated fadeIn"] [
+      p_ [class_ "title is-2 has-text-weight-medium"] [text "Choose talents and flaws"] 
+      , div_ [class_ "columns "] [
+        div_ [class_ "level is-mobile column is-three-fifths is-offset-one-fifth"] [
+          button_ [class_ "level-item button is-medium is-black"
+              , onClick $ ChangeStage $ FlawsAndTalentsStage True
+              ] ["Choose from list"]   
+          , label_ [class_ "level-item label is-medium"] [" or "]
+          , button_ [class_ "level-item button is-medium is-black"
+                  , onClick SetRandomFlawsAndTalents
+              ] ["Use one click generator"]
+          ] 
+        ]
+        , div_ [] 
+          ( 
+          if isVisible
+          then
+            [ 
+              div_ [class_ "columns " ] [
+                div_ [class_ "column animated bounceInLeft"] [
+                  h4_ [class_ "title"] ["Talents"]
+                  , div_ [class_ "tags"] $ 
+                      Prelude.map  
+                        (\x -> span_ [class_ "tag is-success is-light is-large"] [text $ ms $ show x]) 
+                        (S.toList $ talents)
+                ]
+                , div_ [class_ "column animated bounceInRight"] [
+                  h4_ [class_ "title"] ["Flaws"]
+                  , div_ [class_ "tags"] $ 
+                      Prelude.map  
+                        (\x -> span_ [class_ "tag is-danger is-light is-large"] [text $ ms $ show x]) 
+                        (S.toList $ flaws)
+                ]
+              ]
+          ]
+          else [] 
+          ) 
+        , nextButton $ FlawsAndTalentsStage True
+    ] 
+
 
 askFlawsAndTalents m = 
   div_ [class_ "animated fadeIn"] [
     h2_ [class_ "title is-2 has-text-weight-medium"] [ "Talents and flaws "]
     , maxTalentsInfo m $ TalentsMax 3 -- This is temporary
     , p_ [class_ "subtitle"] ["If you choose two flaws, you'll gain one additional talent."]
+    , chooseRandomlyButton SetRandomFlawsAndTalents
     , div_ [class_ "columns"] [
         div_ [class_ "column"] [
           displayCheckboxQuestion talents m
             characterTalent "What are your talents?" (TalentsMax 3) TalentChecked
         ]
         , div_ [class_ "column"] [
-            displayCheckboxQuestion [ Alcoholic FlawLevel1
-                        , Annoying FlawLevel1
-                        , BadBack FlawLevel1
-                        , BadSight FlawLevel1
-                        , BadTempered FlawLevel1
-                        , ChronicPain FlawLevel1,  Alcoholic FlawLevel1
-                        , Annoying FlawLevel1
-                        , BadBack FlawLevel1
-                        , BadSight FlawLevel1
-                        , BadTempered FlawLevel1
-                        , ChronicPain FlawLevel1,  Alcoholic FlawLevel1
-                        , Annoying FlawLevel1
-                        , BadBack FlawLevel1
-                        , BadSight FlawLevel1
-                        , BadTempered FlawLevel1
-                        , ChronicPain FlawLevel1, Alcoholic FlawLevel1
-                        , Annoying FlawLevel1
-                        , BadBack FlawLevel1
-                        , BadSight FlawLevel1
-                        , BadTempered FlawLevel1
-                        , ChronicPain FlawLevel1] m characterFlaws "What are your flaws?" NoLimit FlawChecked
+            displayCheckboxQuestion flaws m characterFlaws "What are your flaws?" NoLimit FlawChecked
         ]
     ]
   ]

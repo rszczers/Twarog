@@ -13,12 +13,14 @@ module Model
   , printBounce
   , initialModel
   , nextStage
+  , getNextButtonText
   ) where
 
 import       Control.Lens
 import       Miso
 import       Miso.String
 import       Data.Char as C
+import       Data.Set as S
 import       Twarog
 
 data Stage = OwnerStage 
@@ -29,8 +31,8 @@ data Stage = OwnerStage
            | AttitudeStage 
            | GodStage 
            | SexStage 
-           | HamingjaStage 
-           | FlawsAndTalentsStage
+           | HamingjaStage
+           | FlawsAndTalentsStage Bool
            | RoleStage
            | SkilsStage 
            deriving (Eq)
@@ -45,7 +47,7 @@ instance Show Stage where
   show GodStage = "Life stance"
   show SexStage = "Sex" 
   show HamingjaStage = "Hamingja"
-  show FlawsAndTalentsStage = "Talents & Flaws"
+  show (FlawsAndTalentsStage _) = "Talents & Flaws"
   show RoleStage = "Character's role"
   show SkilsStage = "Skills"
 
@@ -62,12 +64,25 @@ nextStage :: Stage -> Stage
 nextStage s = case s of 
   NameStage            -> AttribStage Nothing
   AttribStage _        -> BirthStage
-  BirthStage           -> SexStage
-  SexStage             -> RaceStage
-  RaceStage            -> AttitudeStage
-  AttitudeStage        -> FlawsAndTalentsStage
+  BirthStage           -> RaceStage 
+  RaceStage            -> SexStage
+  GodStage             -> SexStage
+  SexStage             -> AttitudeStage
+  AttitudeStage        -> FlawsAndTalentsStage False
   RoleStage            -> SkilsStage
-  FlawsAndTalentsStage -> RoleStage
+  FlawsAndTalentsStage  _ -> RoleStage
+
+getNextButtonText s = case s of
+  NameStage               -> ""
+  AttribStage _           -> "Go to Attributes"
+  BirthStage              -> "Go to Birthday"
+  SexStage                -> "Go to Sex" 
+  RaceStage               -> "Go to Race" 
+  AttitudeStage           -> "Go to Attitude"
+  RoleStage               -> "Go to Role"
+  FlawsAndTalentsStage _  -> "Go to Flaws & Talents"
+  GodStage                -> "Go to Life Stance"
+
 
 printBounce :: Maybe AttribBounce -> String
 printBounce b = case b of
@@ -100,6 +115,14 @@ data Msg =  Name MisoString
       | SetRandomAttr
       | SetBirth Birthday
       | SetRandomBirth
+      | SetRandomRace 
+      | SetRace Race
+      | SetRandomSex
+      | SetSex Sex
+      | SetRandomFlawsAndTalents
+      | SetFlawsAndTalents (S.Set Talent) (S.Set Flaw)
+      | SetRandomLifeStance
+      | SetLifeStance LifeStance
       -- No character related msgs
       | NoOp
       | ChangeStage Stage

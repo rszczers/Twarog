@@ -18,7 +18,7 @@ updateModel (Name n) m =
 updateModel NoOp m = noEff m
 
 updateModel (RaceChecked r (Checked True)) m = 
-  noEff $ m & character . characterRace .~ r
+  (m & character . characterRace .~ r) <# do return $ SetRandomLifeStance
 
 updateModel (TalentChecked t max (Checked True)) m =  
   let 
@@ -120,6 +120,56 @@ updateModel (SetBirth b) m =
                                               then S.insert Marked
                                               else S.delete Marked)
 
+updateModel SetRandomRace m = do
+  m <# do
+    race <- sample $ genRace
+    return $ SetRace race
+
+updateModel (SetRace b) m =
+  (m & character . characterRace .~ Just b) <# do return $ SetRandomLifeStance
+
+updateModel SetRandomSex m = do
+  m <# do
+    sex <- sample $ 
+          (case m ^. character . characterRace of 
+            Just r -> genSex' r 
+            Nothing -> genSex
+          ) 
+    return $ SetSex sex
+
+updateModel (SetSex s) m =
+  noEff $ m & character . characterSex .~ Just s
+
+updateModel SetRandomFlawsAndTalents m = do
+  m <# do
+    flaws <- sample $ genFlaws
+    talents <- sample 
+                $ genTalents 
+                    (case (m ^. character . characterRace) of
+                      Just t -> t
+                      Nothing -> Elf)
+                    flaws $ 
+                          if isMarked 
+                            $ fromMaybe (Birthday (CommonDay 1) Valaskjolf) (m ^. character . characterBirth)
+                          then S.singleton Marked
+                          else S.empty
+    return $ SetFlawsAndTalents talents flaws
+
+updateModel (SetFlawsAndTalents t f) m =
+  noEff $ (m & character . characterFlaws .~ f)
+            & character . characterTalent .~ t
+  
+updateModel SetRandomLifeStance m = do
+  m <# do
+    lifeStance <- sample $ 
+                    case (m ^. character .characterRace) of 
+                      Just a -> genLifeStance' a
+                      Nothing -> genLifeStance    
+    return $ SetLifeStance lifeStance
+
+updateModel (SetLifeStance l) m =
+  noEff $ m & character . characterLifeStance .~ Just l
+            
 updateModel (AddAvailableStage s) m =
   let 
     stages =  m ^. availableStages
