@@ -20,6 +20,12 @@ updateModel NoOp m = noEff m
 updateModel (RaceChecked r (Checked True)) m = 
   (m & character . characterRace .~ r) <# do return $ SetRandomLifeStance
 
+updateModel (ArchetypeChecked a (Checked True)) m = 
+  noEff $ (m & character . characterAlignment .~ a)
+
+updateModel (RoleChecked a (Checked True)) m = 
+  noEff $ (m & character . characterRole .~ a)
+
 updateModel (TalentChecked t max (Checked True)) m =  
   let 
     currTalents = m ^. character . characterTalent

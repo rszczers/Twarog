@@ -39,19 +39,19 @@ viewModel m@Model{..} =
 
 getStage :: Model -> View Msg
 getStage m = case m ^. currentStage of
-        OwnerStage            -> askName m
-        NameStage             -> askName m
-        AttribStage n         -> askAttributes m n
-        RaceStage             -> askRace m
-        BirthStage            -> askBirthday m
-        AttitudeStage         -> askAttitude m
-        GodStage              -> askLifeStance m 
-        SexStage              -> askSex m
+        OwnerStage                  -> askName m
+        NameStage                   -> askName m
+        AttribStage n               -> askAttributes m n
+        RaceStage                   -> askRace m
+        BirthStage                  -> askBirthday m
+        AttitudeStage               -> askAttitude m
+        GodStage                    -> askLifeStance m 
+        SexStage                    -> askSex m
       --  HamingjaStage 
-        FlawsAndTalentsStage False -> flawsAndTalentsFirstScreen m
-        FlawsAndTalentsStage True -> askFlawsAndTalents m
-      {-  RoleStage
-        SkilsStage -}
+        FlawsAndTalentsStage False  -> flawsAndTalentsFirstScreen m
+        FlawsAndTalentsStage True   -> askFlawsAndTalents m
+        RoleStage                   -> askRoles m
+       -- SkilsStage 
 
 nextButton :: Stage -> View Msg                            
 nextButton stage = 
@@ -68,10 +68,17 @@ nextButton stage =
                  ]
         ]
       ]
-    ]
-    
+    ]  
+
 chooseRandomlyButton whatToDo = 
-  button_ [class_ "button", onClick whatToDo] ["Choose randomly"]
+  button_ [class_ "button is-medium", onClick whatToDo, style_ $ M.singleton "margin" "1rem"] [
+    div_ [class_ "columns is-mobile"] [
+      span_ [class_ "column title icon is-large column"] [
+        i_ [class_ $ "fas fa-dice"] []
+      ]
+      , span_ [class_ "column"] ["Choose randomly"]
+    ]
+  ]
 
 askName :: Model -> View Msg
 askName m =
@@ -256,7 +263,7 @@ askLifeStance m =
             ]
           , div_ [class_ "message-body",
                 style_  $ M.singleton "padding" "0.5rem"] [
-            text $ ms $ "Your faovrite God is " ++ (show a)
+            text $ ms $ "Your favorite God is " ++ (show a)
             ]
           ]
         Just Traditional -> [ 
@@ -275,8 +282,8 @@ askLifeStance m =
 
 askAttitude m = 
   div_ [class_ "animated fadeIn"] [
-    --displayRadioQuestion (Prelude.map Just lifeStances) m
-    nextButton AttitudeStage        
+    displayRadioQuestion (Prelude.map Just archetypes) m characterAlignment "Your attitude?" $ ArchetypeChecked
+    , nextButton AttitudeStage        
   ]
 
 flawsAndTalentsFirstScreen :: Model -> View Msg
@@ -290,13 +297,18 @@ flawsAndTalentsFirstScreen m =
       p_ [class_ "title is-2 has-text-weight-medium"] [text "Choose talents and flaws"] 
       , div_ [class_ "columns "] [
         div_ [class_ "level is-mobile column is-three-fifths is-offset-one-fifth"] [
-          button_ [class_ "level-item button is-medium is-black"
+          button_ [class_ "level-item button is-medium "
               , onClick $ ChangeStage $ FlawsAndTalentsStage True
-              ] ["Choose from list"]   
+              ] [
+                div_ [class_ "columns is-mobile"] [
+                  span_ [class_ "column title icon is-large column"] [
+                    i_ [class_ $ "fas fa-list"] []
+                  ]
+                  , span_ [class_ "column"] ["Choose from list"]
+                ]
+              ]   
           , label_ [class_ "level-item label is-medium"] [" or "]
-          , button_ [class_ "level-item button is-medium is-black"
-                  , onClick SetRandomFlawsAndTalents
-              ] ["Use one click generator"]
+          , chooseRandomlyButton SetRandomFlawsAndTalents
           ] 
         ]
         , div_ [] 
@@ -366,6 +378,21 @@ maxTalentsInfo m max =
             ]
         NoLimit -> []
     )
+
+askRoles m =
+  let
+      -- Temporary solution
+      attr = fromMaybe (Attributes 0 0 0 0 0 0) $ m ^. character . characterAttr
+      talents = S.toList $ m ^. character . characterTalent
+      lifeStance = fromMaybe Traditional $ m ^. character . characterLifeStance
+      race = fromMaybe Elf $ m ^. character . characterRace
+      sex = fromMaybe Non $ m ^. character . characterSex
+      archetype = fromMaybe Athenic $ m ^. character . characterAlignment
+  in
+    displayRadioQuestion 
+      (Prelude.map Just (availableRoles attr talents lifeStance race sex archetype))
+      m characterRole "Your role?" RoleChecked
+    
 
 --dispaleyCheckboxQuestion :: [a] -> Model -> (characterField) -> String -> Int -> (a -> Bool -> View Msg)
 displayCheckboxQuestion valueList model characterField question max msg =

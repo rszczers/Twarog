@@ -106,6 +106,8 @@ data Msg =  Name MisoString
       -- Radiobox msgs
       | SexChecked (Maybe Sex) Checked
       | RaceChecked (Maybe Race) Checked
+      | ArchetypeChecked (Maybe Archetype) Checked
+      | RoleChecked (Maybe CharacterRole) Checked
       -- Character related msgs
       | AskName
       | AskRace
