@@ -20,10 +20,10 @@ viewModel m@Model{..} =
       [ navbarElem m
        , menu
        , div_ [class_ "hero-body"] [
-        div_ [class_ "container has-text-centered"] $
-          [ breadcrumb (m ^. availableStages) (m ^. currentStage) ]
-          ++ [getStage m]
-        ]
+          div_ [class_ "container has-text-centered"] $
+            [ breadcrumb (m ^. availableStages) (m ^. currentStage) ]
+            ++ [getStage m]
+          ]
       ]
     , div_ [] [text $ ms $ show m]
     , link_
@@ -68,7 +68,6 @@ nextButton stage txt =
         ]
       ]
     ]
-
     
 askName :: Model -> View Msg
 askName m =
@@ -163,7 +162,6 @@ attributesFirstScreen = div_ [class_ "animated fadeIn"] [
               ]
               , nextButton (AttribStage Nothing) "Go to Birthday"
             ] 
-
 
 askBirthday m =
   let
@@ -298,7 +296,6 @@ maxTalentsInfo m max =
             ]
         NoLimit -> []
     )
-
 
 --dispaleyCheckboxQuestion :: [a] -> Model -> (characterField) -> String -> Int -> (a -> Bool -> View Msg)
 displayCheckboxQuestion valueList model characterField question max msg =
@@ -501,5 +498,3 @@ dropdownMenuItem title description icon options =
         ]
     ]
   ]
-    
-
