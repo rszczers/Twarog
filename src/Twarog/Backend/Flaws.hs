@@ -55,12 +55,68 @@ data Flaw = Alcoholic FlawLevel
           | Vulnerable FlawLevel
           | WeakMinded FlawLevel
           | Whiny FlawLevel
-          deriving (Ord, Eq, Show)
+          deriving (Ord, Eq)
+
+instance Show Flaw where
+  show = \case
+    Alcoholic lvl -> "Alcoholic" ++ " " ++ show lvl
+    Annoying lvl -> "Annoying" ++ " " ++ show lvl
+    BadBack lvl -> "Bad Back" ++ " " ++ show lvl
+    BadSight lvl -> "Bad Sight" ++ " " ++ show lvl
+    BadTempered lvl -> "Bad Tempered" ++ " " ++ show lvl
+    ChronicPain lvl -> "Chronic Pain" ++ " " ++ show lvl
+    Clumsy lvl -> "Clumsy" ++ " " ++ show lvl
+    Coward lvl -> "Coward" ++ " " ++ show lvl
+    Delusional lvl -> "Delusional" ++ " " ++ show lvl
+    Depressed lvl -> "Depressed" ++ " " ++ show lvl
+    Dislike lvl -> "Dislike" ++ " " ++ show lvl
+    Dyslexia lvl -> "Dyslexia" ++ " " ++ show lvl
+    Enemy lvl -> "Enemy" ++ " " ++ show lvl
+    Fearful lvl -> "Fearful" ++ " " ++ show lvl
+    Frail lvl -> "Frail" ++ " " ++ show lvl
+    Gluttonous lvl -> "Gluttonous" ++ " " ++ show lvl
+    Greedy lvl -> "Greedy" ++ " " ++ show lvl
+    Gullible lvl -> "Gullible" ++ " " ++ show lvl
+    Haemophilic lvl -> "Haemophilic" ++ " " ++ show lvl
+    Hypersexual lvl -> "Hypersexual"  ++ " " ++ show lvl
+    Jealous lvl -> "Jealous"  ++ " " ++ show lvl
+    LawfulFlaw lvl -> "Lawful"  ++ " " ++ show lvl
+    LazyFlaw lvl -> "LazyFlaw"  ++ " " ++ show lvl
+    Limp lvl -> "Limp"  ++ " " ++ show lvl
+    LowSelfEsteem lvl -> "Low Self-Esteem"  ++ " " ++ show lvl
+    Seasickness lvl -> "Seasickness"  ++ " " ++ show lvl
+    OverConfident lvl -> "Over Confident"  ++ " " ++ show lvl
+    Paranoid lvl -> "Paranoid"  ++ " " ++ show lvl
+    Parasite lvl -> "Parasite"  ++ " " ++ show lvl
+    Philia lvl -> "Philia"  ++ " " ++ show lvl
+    Phobia lvl -> "Phobia"  ++ " " ++ show lvl
+    PhysicalDefect lvl -> "Physical Defect"  ++ " " ++ show lvl
+    PhysicalWeakness lvl -> "Physical Weakness"  ++ " " ++ show lvl
+    PoorHearing lvl -> "Poor Hearing"  ++ " " ++ show lvl
+    Secret lvl -> "Secret"  ++ " " ++ show lvl
+    SelfHating lvl -> "Self Hating"  ++ " " ++ show lvl
+    Selfish lvl -> "Selfish"  ++ " " ++ show lvl
+    Selfless lvl -> "Selfless"  ++ " " ++ show lvl
+    Sickly lvl -> "Sickly"  ++ " " ++ show lvl
+    ShortLived lvl -> "Short Lived"  ++ " " ++ show lvl
+    Shy lvl -> "Shy"  ++ " " ++ show lvl
+    SlaveMinded lvl -> "Slave Minded"  ++ " " ++ show lvl
+    Stubborn lvl -> "Stubborn"  ++ " " ++ show lvl
+    Stuttering lvl -> "Stuttering"  ++ " " ++ show lvl
+    Unlucky lvl -> "Unlucky"  ++ " " ++ show lvl
+    Vulnerable lvl -> "Vulnerable"  ++ " " ++ show lvl
+    WeakMinded lvl -> "Weak Minded"  ++ " " ++ show lvl
+    Whiny lvl -> "Whiny"  ++ " " ++ show lvl
 
 data FlawLevel = FlawLevel1
                | FlawLevel2
                | FlawLevel3
-               deriving (Ord, Eq, Show, Enum)
+               deriving (Ord, Eq, Enum)
+
+instance Show FlawLevel where
+  show FlawLevel1 = "Level 1"
+  show FlawLevel2 = "Level 2"
+  show FlawLevel3 = "Level 3"
 
 -- | Well, not all combinations are available 
 instance Enum Flaw where
