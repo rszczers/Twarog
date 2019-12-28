@@ -2,6 +2,7 @@ module Twarog.Backend.Races
   ( -- * Fictional races
     Race (..)
   , races
+  , playableRaces
   -- ** Characteristics
   , raceHeight
   , raceAdultAge
@@ -58,6 +59,16 @@ instance Show Race where
 -- | List all races
 races :: [Race]
 races = enumFrom (toEnum 0)
+
+playableRaces :: [Race]
+playableRaces =
+  [ Dwarf
+  , Elf
+  , Halfling
+  , CommonMan
+  , LesserMan
+  , HighMan
+  ]
 
 raceSizeMod :: Race -> Sex -> Size -> Size
 raceSizeMod race sex = case race of

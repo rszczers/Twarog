@@ -78,21 +78,21 @@ data CharacterRole = Civilian
                    deriving (Eq, Enum)
 
 instance Show CharacterRole where
-  show Civilian = "Civilian"
-  show Warrior = "Warrior"
-  show Stalker = "Stalker"
-  show Trickster = "Trickster"
-  show Ranger = "Ranger"
-  show Bard = "Bard"
-  show Sorcerer = "Sorcerer"
-  show DwarfRole = "Dwarf"
-  show ElfRole = "Elf"
-  show GnomeRole = "Gnome"
-  show GoblinRole = "Goblin"
-  show HalflingRole = "Halfling"
-  show OrcRole = "Orc"
-  show HalfOrcRole = "Half-orc"
-  show OgreRole = "Ogre"
+  show Civilian      = "Civilian"
+  show Warrior       = "Warrior"
+  show Stalker       = "Stalker"
+  show Trickster     = "Trickster"
+  show Ranger        = "Ranger"
+  show Bard          = "Bard"
+  show Sorcerer      = "Sorcerer"
+  show DwarfRole     = "Dwarf"
+  show ElfRole       = "Elf"
+  show GnomeRole     = "Gnome"
+  show GoblinRole    = "Goblin"
+  show HalflingRole  = "Halfling"
+  show OrcRole       = "Orc"
+  show HalfOrcRole   = "Half-orc"
+  show OgreRole      = "Ogre"
   show HobgoblinRole = "Hobgoblin"
 
 characterRoles :: [CharacterRole]
@@ -187,7 +187,7 @@ isProperRole :: Attributes -> [Talent]
              -> Bool
 isProperRole (Attributes cha con dex int str wil) ts ls race sex arch cr =
   case cr of
-    Civilian -> True
+    Civilian  -> race `elem` [CommonMan, LesserMan, HighMan]
     Warrior   -> con >= 9 
               && str >= 13 
               && wil >= 9 

@@ -79,7 +79,7 @@ genRace' =
         CommonMan -> 8
         LesserMan -> 8
         _ -> 0
-      wRaces = (\r -> (freqs r, Gen.constant r)) <$> races
+      wRaces = (\r -> (freqs r, Gen.constant r)) <$> playableRaces
   in Gen.frequency wRaces
 
 -- | Generate random month
