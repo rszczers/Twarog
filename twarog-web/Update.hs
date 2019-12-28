@@ -18,7 +18,13 @@ updateModel (Name n) m =
 updateModel NoOp m = noEff m
 
 updateModel (RaceChecked r (Checked True)) m = 
-  noEff $ m & character . characterRace .~ r
+  (m & character . characterRace .~ r) <# do return $ SetRandomLifeStance
+
+updateModel (ArchetypeChecked a (Checked True)) m = 
+  noEff $ (m & character . characterAlignment .~ a)
+
+updateModel (RoleChecked a (Checked True)) m = 
+  noEff $ (m & character . characterRole .~ a)
 
 updateModel (TalentChecked t max (Checked True)) m =  
   let 
@@ -120,8 +126,98 @@ updateModel (SetBirth b) m =
                                               then S.insert Marked
                                               else S.delete Marked)
 
+updateModel SetRandomRace m = do
+  m <# do
+    race <- sample $ genRace
+    return $ SetRace race
+
+updateModel (SetRace b) m =
+  (m & character . characterRace .~ Just b) <# do return $ SetRandomLifeStance
+
+updateModel SetRandomSex m = do
+  m <# do
+    sex <- sample $ 
+          (case m ^. character . characterRace of 
+            Just r -> genSex' r 
+            Nothing -> genSex
+          ) 
+    return $ SetSex sex
+
+updateModel (SetSex s) m =
+  noEff $ m & character . characterSex .~ Just s
+
+updateModel SetRandomFlawsAndTalents m = do
+  m <# do
+    flaws <- sample $ genFlaws
+    talents <- sample 
+                $ genTalents 
+                    (case (m ^. character . characterRace) of
+                      Just t -> t
+                      Nothing -> Elf)
+                    flaws $ 
+                          if isMarked 
+                            $ fromMaybe (Birthday (CommonDay 1) Valaskjolf) (m ^. character . characterBirth)
+                          then S.singleton Marked
+                          else S.empty
+    return $ SetFlawsAndTalents talents flaws
+
+updateModel (SetFlawsAndTalents t f) m =
+  noEff $ (m & character . characterFlaws .~ f)
+            & character . characterTalent .~ t
+  
+updateModel SetRandomLifeStance m = do
+  m <# do
+    lifeStance <- sample $ 
+                    case (m ^. character .characterRace) of 
+                      Just a -> genLifeStance' a
+                      Nothing -> genLifeStance    
+    return $ SetLifeStance lifeStance
+
+updateModel (SetLifeStance l) m =
+  noEff $ m & character . characterLifeStance .~ Just l
+            
 updateModel (AddAvailableStage s) m =
   let 
     stages =  m ^. availableStages
   in
     noEff $ (m & availableStages .~ s : stages)
+
+updateModel (SetSociability s) m =
+  noEff $ setModelArchetype (m & sociability .~ s)
+
+updateModel (SetSubmissiveness s) m =
+  noEff $ setModelArchetype $ m & submissiveness .~ s
+
+updateModel (SetOnthology o) m =
+  noEff $ setModelArchetype $ m & ontology .~ o
+
+updateModel (SetEmpathy e) m =
+  noEff $ setModelArchetype $ m & empathy .~ e
+
+updateModel SetRandomArchetype m = do
+  m <# do
+    arch <- sample $ genArchetype
+    return $ SetArchetype arch
+
+updateModel (SetArchetype a) m =
+  noEff $ setModelAttitude (attitude a) $ m & character . characterAlignment .~ Just a
+
+
+setModelArchetype m =
+  let 
+    soc = m ^. sociability
+    sub = m ^. submissiveness
+    ont = m ^. ontology
+    emp = m ^. empathy
+    whatAttitude :: Maybe Sociability -> Maybe Submissiveness -> Maybe Ontology -> Maybe Empathy -> Attitude
+    whatAttitude (Just so) (Just su) (Just o) (Just e) = Attitude so su o e
+    whatAttitude _ _ _ _ = Neutral
+  in 
+    m & character . characterAlignment .~ Just (archetype $ whatAttitude soc sub ont emp)
+
+setModelAttitude (Attitude soc sub ont emp) m = 
+  ((( m & sociability .~ Just soc)
+    & submissiveness .~ Just sub)
+    & ontology .~ Just ont)
+    & empathy .~ Just emp
+setModelAttitude Neutral m = m

@@ -7,6 +7,8 @@ module Twarog.Backend.Archetypes
   , Trait (..)
   , Archetype (..)
   , archetypes
+  , archetype
+  , attitude
   ) where
 
 -- import System.Random

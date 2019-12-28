@@ -18,11 +18,12 @@ viewModel m@Model{..} =
   [ section_
     [ class_ "hero is-medium is-light is-bold", style_  $ M.singleton "padding-top" "2rem" ]
       [ navbarElem m
+       , menu
        , div_ [class_ "hero-body"] [
-        div_ [class_ "container has-text-centered"] $
-          [ breadcrumb (m ^. availableStages) (m ^. currentStage) ]
-          ++ [getStage m]
-        ]
+          div_ [class_ "container has-text-centered"] $
+            [ breadcrumb (m ^. availableStages) (m ^. currentStage) ]
+            ++ [getStage m]
+          ]
       ]
     , div_ [] [text $ ms $ show m]
     , link_
@@ -33,42 +34,52 @@ viewModel m@Model{..} =
     [ rel_ "stylesheet"
     , href_ "https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css"
     ]
-    , script_ [defer_ "True", src_ "https://use.fontawesome.com/releases/v5.3.1/js/all.js"] []
+    , script_ [defer_ "True", src_ "https://use.fontawesome.com/releases/v5.4.2/js/all.js"] []
   ]
 
 getStage :: Model -> View Msg
 getStage m = case m ^. currentStage of
-        OwnerStage -> askName m
-        NameStage -> askName m
-        AttribStage n -> askAttributes m n
-        RaceStage -> askRace m
-        BirthStage -> askBirthday m
-        AttitudeStage -> askAttitude m
-        --GodStage 
-        SexStage -> askSex m
+        OwnerStage                  -> askName m
+        NameStage                   -> askName m
+        AttribStage n               -> askAttributes m n
+        RaceStage                   -> askRace m
+        BirthStage                  -> askBirthday m
+        AttitudeStage               -> askAttitude m
+        GodStage                    -> askLifeStance m 
+        SexStage                    -> askSex m
       --  HamingjaStage 
-        FlawsAndTalentsStage -> askFlawsAndTalents m
-      {-  RoleStage
-        SkilsStage -}
+        FlawsAndTalentsStage False  -> flawsAndTalentsFirstScreen m
+        FlawsAndTalentsStage True   -> askFlawsAndTalents m
+        RoleStage                   -> askRoles m
+        SkillsStage                  -> askSkills m
 
-nextButton :: Stage -> String -> View Msg                            
-nextButton stage txt = 
+nextButton :: Stage -> View Msg                            
+nextButton stage = 
   div_ [class_ "columns"][
     div_ [class_ "column is-full level"] [
       div_ [ class_ "level-right"] [
         button_ [ class_ "button is-outlined is-medium"
                 , onClick $ ChangeStage $ nextStage stage  ] 
                 [ 
-                  text $ ms $ txt
+                  text $ getNextButtonText $ nextStage stage
                   , span_ [class_ "icon", style_ $ M.singleton "padding-left" "1.5rem"] [
                       i_ [class_ "fas fa-chevron-right"] []
                     ]
                  ]
         ]
       ]
-    ]
+    ]  
 
-    
+chooseRandomlyButton whatToDo = 
+  button_ [class_ "button is-medium", onClick whatToDo, style_ $ M.singleton "margin" "1rem"] [
+    div_ [class_ "columns is-mobile"] [
+      span_ [class_ "column title icon is-large column"] [
+        i_ [class_ $ "fas fa-dice"] []
+      ]
+      , span_ [class_ "column"] ["Choose randomly"]
+    ]
+  ]
+
 askName :: Model -> View Msg
 askName m =
   div_ [class_ "animated fadeIn"]
@@ -82,7 +93,7 @@ askName m =
               ]
           ]
         ]
-        , nextButton NameStage "Go to attributes"
+        , nextButton NameStage
     ]
 
 askAttributes :: Model -> Maybe AttribBounce -> View Msg
@@ -160,9 +171,8 @@ attributesFirstScreen = div_ [class_ "animated fadeIn"] [
                       ] ["Use one click generator"]
                 ]  
               ]
-              , nextButton (AttribStage Nothing) "Go to Birthday"
+              , nextButton (AttribStage Nothing)
             ] 
-
 
 askBirthday m =
   let
@@ -216,61 +226,310 @@ askBirthday m =
               _ -> [ text $ ""]  
             )
         ]
-        , nextButton BirthStage "Go to Sex"
+        , nextButton BirthStage
     ]
     
 askSex m = 
   div_ [class_ "animated fadeIn"] [    
     displayRadioQuestion (Prelude.map Just sexes) m 
                         characterSex "Your sex?" SexChecked
-    , nextButton SexStage "Go to Race"
+    , chooseRandomlyButton SetRandomSex
+    , nextButton SexStage
     ]
 
 askRace m =
   div_ [class_ "animated fadeIn"] [
     displayRadioQuestion (Prelude.map Just races) m
                   characterRace "Your race?" RaceChecked 
-    , nextButton RaceStage "Go to Life stance"
+    , chooseRandomlyButton SetRandomRace
+    , div_ [class_ "columns is-centered", style_ $ M.singleton "margin-top" "1.5rem"] [
+        div_ [class_ "column is-centered is-one-third"] [ 
+          askLifeStance m
+        ] 
+      ]
+    , nextButton RaceStage
   ]
 
+askLifeStance m = 
+  let 
+    lifeStance = m ^. character . characterLifeStance
+  in
+    article_ 
+      [ class_ $ ms $ "message is-success " ++ if lifeStance /= Nothing then "animated fadeInDown" else ""]
+      (case lifeStance of
+        Just (Religious a) -> 
+          [ div_ [class_ "message-header"] [
+              p_ [] ["You are religious"]    
+            ]
+          , div_ [class_ "message-body",
+                style_  $ M.singleton "padding" "0.5rem"] [
+            text $ ms $ "Your favorite God is " ++ (show a)
+            ]
+          ]
+        Just Traditional -> [ 
+            div_ [class_ "message-header"] [
+              p_ [] ["You are traditional"]    
+            ]
+            , div_ [class_ "message-body",
+                style_  $ M.singleton "padding" "0.5rem"] [
+            text "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+            ]
+          ]  
+        Nothing -> []
+      )
+
 askAttitude m = 
-  div_ [class_ "animated fadeIn"] [
-    --displayRadioQuestion (Prelude.map Just lifeStances) m
-    nextButton AttitudeStage "Go to Archetype"         
+  div_ [] [
+    p_ [class_ "title is-2 has-text-weight-medium"] ["Your attitude?"]
+    , chooseAttitide m
+    , showArchetype m
+    , chooseRandomlyButton SetRandomArchetype
+    , nextButton AttitudeStage
   ]
+
+showArchetype m =
+  let 
+    arch  = m ^. character . characterAlignment
+  in
+    p_ [class_ "subtitle"] [
+      ( case arch of 
+          Just a ->  (text $ ms $ "Your archetype is "  ++ show a)
+          Nothing -> (text $ "Your character is neutral")
+        )
+    ]
+
+chooseAttitide m =
+  let
+    social = m ^. sociability
+    submiss = m ^. submissiveness
+    ont = m ^. ontology
+    emp = m ^. empathy
+  in
+    div_ [class_ "columns is-centered"] [
+      div_ [class_ "column"] []
+      , div_ [class_ "column"] [
+        div_ [class_ "buttons has-addons is-centered"] [
+          button_ 
+          [
+            class_ 
+              (ms $ "button"  
+              ++ if social == (Just Introvert) then " is-link" else "")
+              , onClick $ SetSociability $ Just Introvert
+          ] 
+          [
+            span_ [class_ "icon"] [
+              i_ [class_ "fas fa-user"] []
+            ]
+            , span_ [] ["Introvert" ]
+          ]
+          , button_ 
+          [
+            class_ 
+              (ms $ "button"  
+              ++ if social == (Nothing) then " is-link" else "")
+              , onClick $ SetSociability $ Nothing
+          ] 
+          [
+            span_ [] ["Neutral" ]
+          ]
+          , button_ 
+            [
+              class_ 
+                (ms $ "button"  
+                ++ if social == (Just Extravert) then " is-link" else "")
+                , onClick $ SetSociability $ Just Extravert
+            ] 
+            [
+              span_ [] ["Extravert"]
+              , span_ [class_ "icon"] [
+                i_ [class_ "fas fa-users"] []
+                ]
+            ]
+        ]
+        , div_ [class_ "buttons has-addons is-centered"] [
+          button_ 
+          [
+            class_ 
+              (ms $ "button"  
+              ++ if submiss == (Just Lawful) then " is-link" else "")
+              , onClick $ SetSubmissiveness $ Just Lawful
+          ] 
+          [
+            span_ [class_ "icon"] [
+              i_ [class_ "fas fa-gavel"] []
+            ]
+            , span_ [] ["Lawful" ]
+          ]
+          , button_ 
+          [
+            class_ 
+              (ms $ "button"  
+              ++ if submiss == (Nothing) then " is-link" else "")
+              , onClick $ SetSubmissiveness $ Nothing
+          ] 
+          [
+            span_ [] ["Neutral" ]
+          ]
+          , button_ 
+            [
+              class_ 
+                (ms $ "button"  
+                ++ if submiss == (Just Anarchic) then " is-link" else "")
+                , onClick $ SetSubmissiveness $ Just Anarchic
+            ] 
+            [
+              span_ [] ["Anarchic"]
+              , span_ [class_ "icon"] [
+                i_ [class_ "fab fa-freebsd"] []
+                ]
+            ]
+          ]
+          , div_ [class_ "buttons has-addons is-centered"] [
+            button_ 
+            [
+              class_ 
+                (ms $ "button"  
+                ++ if ont == (Just Spiritual) then " is-link" else "")
+                , onClick $ SetOnthology $ Just Spiritual
+            ] 
+            [
+              span_ [class_ "icon"] [
+                i_ [class_ "fas fa-ghost"] []
+              ]
+              , span_ [] ["Spiritual" ]
+            ]
+            , button_ 
+            [
+              class_ 
+                (ms $ "button"  
+                ++ if ont == (Nothing) then " is-link" else "")
+                , onClick $ SetOnthology $ Nothing
+            ] 
+            [
+              span_ [] ["Neutral" ]
+            ]
+            , button_ 
+              [
+                class_ 
+                  (ms $ "button"  
+                  ++ if ont == (Just Materialistic) then " is-link" else "")
+                  , onClick $ SetOnthology $ Just Materialistic
+              ] 
+              [
+                span_ [] ["Materialistic"]
+                , span_ [class_ "icon"] [
+                  i_ [class_ "fas fa-dollar-sign"] []
+                  ]
+              ]
+            ]
+            , div_ [class_ "buttons has-addons is-centered"] [
+              button_ 
+              [
+                class_ 
+                  (ms $ "button"  
+                  ++ if emp == (Just Compasionate) then " is-link" else "")
+                  , onClick $ SetEmpathy $ Just Compasionate
+              ] 
+              [
+                span_ [class_ "icon"] [
+                  i_ [class_ "fas fa-hand-holding-heart"] []
+                ]
+                , span_ [] ["Compasionate" ]
+              ]
+              , button_ 
+              [
+                class_ 
+                  (ms $ "button"  
+                  ++ if emp == (Nothing) then " is-link" else "")
+                  , onClick $ SetEmpathy $ Nothing
+              ] 
+              [
+                span_ [] ["Neutral" ]
+              ]
+              , button_ 
+                [
+                  class_ 
+                    (ms $ "button"  
+                    ++ if emp == (Just Cruel) then " is-link" else "")
+                    , onClick $ SetEmpathy $ Just Cruel
+                ] 
+                [
+                  span_ [] ["Cruel"]
+                  , span_ [class_ "icon"] [
+                    i_ [class_ "fas fa-hand-rock"] []
+                    ]
+                ]
+              ]
+      ]
+      , div_ [class_ "column"] []
+    ]
+
+flawsAndTalentsFirstScreen :: Model -> View Msg
+flawsAndTalentsFirstScreen m = 
+  let 
+    flaws = m ^. character . characterFlaws
+    talents = m ^. character . characterTalent
+    isVisible = not $ (S.null flaws) && (S.null talents) 
+  in
+    div_ [class_ "animated fadeIn"] [
+      p_ [class_ "title is-2 has-text-weight-medium"] [text "Choose talents and flaws"] 
+      , div_ [class_ "columns "] [
+        div_ [class_ "level is-mobile column is-three-fifths is-offset-one-fifth"] [
+          button_ [class_ "level-item button is-medium "
+              , onClick $ ChangeStage $ FlawsAndTalentsStage True
+              ] [
+                div_ [class_ "columns is-mobile"] [
+                  span_ [class_ "column title icon is-large column"] [
+                    i_ [class_ $ "fas fa-list"] []
+                  ]
+                  , span_ [class_ "column"] ["Choose from list"]
+                ]
+              ]   
+          , label_ [class_ "level-item label is-medium"] [" or "]
+          , chooseRandomlyButton SetRandomFlawsAndTalents
+          ] 
+        ]
+        , div_ [] 
+          ( 
+          if isVisible
+          then
+            [ 
+              div_ [class_ "columns " ] [
+                div_ [class_ "column animated bounceInLeft"] [
+                  h4_ [class_ "title"] ["Talents"]
+                  , div_ [class_ "tags"] $ 
+                      Prelude.map  
+                        (\x -> span_ [class_ "tag is-success is-light is-large"] [text $ ms $ show x]) 
+                        (S.toList $ talents)
+                ]
+                , div_ [class_ "column animated bounceInRight"] [
+                  h4_ [class_ "title"] ["Flaws"]
+                  , div_ [class_ "tags"] $ 
+                      Prelude.map  
+                        (\x -> span_ [class_ "tag is-danger is-light is-large"] [text $ ms $ show x]) 
+                        (S.toList $ flaws)
+                ]
+              ]
+          ]
+          else [] 
+          ) 
+        , nextButton $ FlawsAndTalentsStage True
+    ] 
+
 
 askFlawsAndTalents m = 
   div_ [class_ "animated fadeIn"] [
     h2_ [class_ "title is-2 has-text-weight-medium"] [ "Talents and flaws "]
     , maxTalentsInfo m $ TalentsMax 3 -- This is temporary
     , p_ [class_ "subtitle"] ["If you choose two flaws, you'll gain one additional talent."]
+    , chooseRandomlyButton SetRandomFlawsAndTalents
     , div_ [class_ "columns"] [
         div_ [class_ "column"] [
           displayCheckboxQuestion talents m
             characterTalent "What are your talents?" (TalentsMax 3) TalentChecked
         ]
         , div_ [class_ "column"] [
-            displayCheckboxQuestion [ Alcoholic FlawLevel1
-                        , Annoying FlawLevel1
-                        , BadBack FlawLevel1
-                        , BadSight FlawLevel1
-                        , BadTempered FlawLevel1
-                        , ChronicPain FlawLevel1,  Alcoholic FlawLevel1
-                        , Annoying FlawLevel1
-                        , BadBack FlawLevel1
-                        , BadSight FlawLevel1
-                        , BadTempered FlawLevel1
-                        , ChronicPain FlawLevel1,  Alcoholic FlawLevel1
-                        , Annoying FlawLevel1
-                        , BadBack FlawLevel1
-                        , BadSight FlawLevel1
-                        , BadTempered FlawLevel1
-                        , ChronicPain FlawLevel1, Alcoholic FlawLevel1
-                        , Annoying FlawLevel1
-                        , BadBack FlawLevel1
-                        , BadSight FlawLevel1
-                        , BadTempered FlawLevel1
-                        , ChronicPain FlawLevel1] m characterFlaws "What are your flaws?" NoLimit FlawChecked
+            displayCheckboxQuestion flaws m characterFlaws "What are your flaws?" NoLimit FlawChecked
         ]
     ]
   ]
@@ -298,6 +557,30 @@ maxTalentsInfo m max =
         NoLimit -> []
     )
 
+askRoles m =
+  let
+      -- Temporary solution
+      attr = fromMaybe (Attributes 0 0 0 0 0 0) $ m ^. character . characterAttr
+      talents = S.toList $ m ^. character . characterTalent
+      lifeStance = fromMaybe Traditional $ m ^. character . characterLifeStance
+      race = fromMaybe Elf $ m ^. character . characterRace
+      sex = fromMaybe Non $ m ^. character . characterSex
+      archetype = fromMaybe Athenic $ m ^. character . characterAlignment
+  in
+    div_ [] [
+      displayRadioQuestion 
+          (Prelude.map Just (availableRoles attr talents lifeStance race sex archetype))
+          m characterRole "Your role?" RoleChecked
+      , nextButton RoleStage
+    ]
+    
+askSkills m =
+  let
+    role = m ^. character . characterRole
+    sex = fromMaybe Non $ m ^. character . characterSex
+    attr = fromMaybe (Attributes 0 0 0 0 0 0) $ m ^. character . characterAttr
+  in
+    div_ [] []
 
 --dispaleyCheckboxQuestion :: [a] -> Model -> (characterField) -> String -> Int -> (a -> Bool -> View Msg)
 displayCheckboxQuestion valueList model characterField question max msg =
@@ -430,4 +713,73 @@ breadcrumb stages active =
         stages
     ]
 
+menu = 
+  div_ [class_ "columns is-mobile", style_ $ M.singleton "margin" "0rem 1rem 0rem 0.5rem"] [
+      dropdownMenuItem "Hamingja" "You can spend your hamingja points on folowing benefits." 
+                        "fa-theater-masks" hamingjaOptions
+      , dropdownMenuItem "Gold" "" "fa-coins" []
+      , dropdownMenuItem "Health" "" "fa-heartbeat" []
+      --, dropdownMenuItem "Size" "" "fa-weight" []
+  ]
 
+dropdownMenuItem :: String -> String -> String -> [(Int, String)] -> View Msg  
+dropdownMenuItem title description icon options = 
+  let 
+    formatOption ( points, option ) = 
+        div_ [class_ "dropdown-item"] [
+          div_ [class_ "columns is-mobile" ] [  
+              span_ [class_ "column is-four-fifths"] [text option]
+            , p_ [class_ "column", style_ $ M.singleton "margin" "0rem 0.5rem 0rem 0.5rem"] [
+              text $ ms $ show points
+            ] 
+          ]
+          , hr_ [class_ "dropdown-divider"]
+        ]  
+    dropUp = div_ [class_ ""]
+  in
+    div_ [ class_ "dropdown column"] [
+        div_ [class_ "columns dropdown is-hoverable"] [
+          div_ [class_ "column columns dropdown-trigger is-centered "] [
+              button_ [class_ "button is-light is-rounded column is-large"
+                    , style_ $ M.singleton "margin" "1rem"
+                    , controls_ True
+                      ] [
+                        div_ [class_ "columns is-mobile"] [
+                          span_ [class_ "title icon is-large column"] [
+                            i_ [class_ $ ms $ "fas fa " ++ icon] []
+                          ]
+                          , span_ [class_ "column title"] [ text $ ms $ show 3 ]
+                        ]     
+                      ]  
+          ]
+          
+          , div_ [class_ "dropdown-menu",  id_ "hamingja-menu"] [
+              div_ [class_ "dropdown-content" ] 
+              $ 
+              [
+                div_ [class_ "dropdown-item"] [
+                    p_ [class_ "title"] [text $ ms title]
+                    , p_ [class_ "subtitle"] [text $ ms description] 
+                  ]
+              ]
+              ++ 
+                if options /= [] 
+                then 
+                  [div_ [class_ "dropdown-item"] [
+                    div_ [class_ "columns is-mobile" ] [
+                      div_ [class_ "column is-four-fifths"] [
+                          b_ [] [text "Option"]
+                        ]
+                        , div_ [class_ "column"] [
+                            b_ [] [text "Cost"]
+                        ]
+                      ]
+                    , hr_ [class_ "dropdown-divider"]
+                    ]
+                  ]
+                    ++ (Prelude.map formatOption 
+                        $ Prelude.map (\(x, y) -> (x, ms y)) options)
+                else []
+        ]
+    ]
+  ]

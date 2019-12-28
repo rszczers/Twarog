@@ -13,7 +13,10 @@ module Twarog.Frontend.CharGen
   , genFlaw
   , genFlaws
   , genTalent
+  , genTalents
   , genGod
+  , genLifeStance
+  , genLifeStance'
   , genNewCharacter
   ) where
 
