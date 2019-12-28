@@ -8,8 +8,7 @@ module Twarog.Backend.Skills
   , Proficiency (..)
   , skillType
   , typeSkill
-  )
-  where
+  ) where
 
 import Control.Lens
 import Twarog.Backend.Types
@@ -45,7 +44,40 @@ data Skill = Acrobatics
            | Tracking
            | Trickery
            | WorldLore
-           deriving (Eq, Ord, Enum, Show)
+           deriving (Eq, Ord, Enum)
+
+instance Show Skill where
+  show Acrobatics = "Acrobatics"
+  show Acting = "Acting"
+  show Alchemy = "Alchemy"
+  show Climbing = "Climbing"
+  show Crafts = "Crafts"
+  show Dancing = "Dancing"
+  show Dodging = "Dodging"
+  show FlutePlaying = "Flute Playing"
+  show Foraging = "Foraging"
+  show Fortitude = "Fortitude"
+  show Healing = "Healing"
+  show LyrePlaying = "Lyre Playing"
+  show Mechanics = "Mechanics"
+  show Melee = "Melee"
+  show Missile = "Missile"
+  show Navigation = "Navigation"
+  show Perception = "Perception"
+  show Poetry = "Poetry"
+  show ReligiousTradition = "Religious Tradition"
+  show Riding = "Riding"
+  show RuneLore = "Rune Lore"
+  show Seamanship = "Seamanship"
+  show Singing = "Singing"
+  show SocialSkills = "Social Skills"
+  show Stamina = "Stamina"
+  show Stealth = "Stealth"
+  show Swimming = "Swimming"
+  show Tempo = "Tempo"
+  show Tracking = "Tracking"
+  show Trickery = "Trickery"
+  show WorldLore = "World Lore"
 
 skills :: [Skill]
 skills = enumFrom $ toEnum 0

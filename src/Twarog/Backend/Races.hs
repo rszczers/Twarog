@@ -39,7 +39,21 @@ data Race = Dwarf
           | CommonMan
           | LesserMan
           | HighMan
-          deriving (Eq, Show, Enum)
+          deriving (Eq, Enum)
+
+instance Show Race where
+  show Dwarf = "Dwarf"
+  show Elf = "Elf"
+  show Hobgoblin = "Hobgoblin"
+  show HalfOrc = "Half-orc"
+  show Goblin = "Goblin"
+  show Ogre = "Ogre"
+  show CommonOrc = "Orc"
+  show Gnome = "Gnome"
+  show Halfling = "Halfling"
+  show CommonMan = "Common man"
+  show LesserMan = "Lesser man"
+  show HighMan = "High man"
 
 -- | List all races
 races :: [Race]
