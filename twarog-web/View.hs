@@ -291,10 +291,10 @@ showArchetype m =
   let 
     arch  = m ^. character . characterAlignment
   in
-    p_ [class_ "subtitle"] [text $ ms $ "Your archetype is " 
-      ++ ( case arch of 
-              Just a ->  show a
-              Nothing -> ""
+    p_ [class_ "subtitle"] [
+      ( case arch of 
+          Just a ->  (text $ ms $ "Your archetype is "  ++ show a)
+          Nothing -> (text $ "Your character is neutral")
         )
     ]
 

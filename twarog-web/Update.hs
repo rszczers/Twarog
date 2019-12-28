@@ -220,3 +220,4 @@ setModelAttitude (Attitude soc sub ont emp) m =
     & submissiveness .~ Just sub)
     & ontology .~ Just ont)
     & empathy .~ Just emp
+setModelAttitude Neutral m = m
