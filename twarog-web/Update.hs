@@ -181,3 +181,42 @@ updateModel (AddAvailableStage s) m =
     stages =  m ^. availableStages
   in
     noEff $ (m & availableStages .~ s : stages)
+
+updateModel (SetSociability s) m =
+  noEff $ setModelArchetype (m & sociability .~ s)
+
+updateModel (SetSubmissiveness s) m =
+  noEff $ setModelArchetype $ m & submissiveness .~ s
+
+updateModel (SetOnthology o) m =
+  noEff $ setModelArchetype $ m & ontology .~ o
+
+updateModel (SetEmpathy e) m =
+  noEff $ setModelArchetype $ m & empathy .~ e
+
+updateModel SetRandomArchetype m = do
+  m <# do
+    arch <- sample $ genArchetype
+    return $ SetArchetype arch
+
+updateModel (SetArchetype a) m =
+  noEff $ setModelAttitude (attitude a) $ m & character . characterAlignment .~ Just a
+
+
+setModelArchetype m =
+  let 
+    soc = m ^. sociability
+    sub = m ^. submissiveness
+    ont = m ^. ontology
+    emp = m ^. empathy
+    whatAttitude :: Maybe Sociability -> Maybe Submissiveness -> Maybe Ontology -> Maybe Empathy -> Attitude
+    whatAttitude (Just so) (Just su) (Just o) (Just e) = Attitude so su o e
+    whatAttitude _ _ _ _ = Neutral
+  in 
+    m & character . characterAlignment .~ Just (archetype $ whatAttitude soc sub ont emp)
+
+setModelAttitude (Attitude soc sub ont emp) m = 
+  ((( m & sociability .~ Just soc)
+    & submissiveness .~ Just sub)
+    & ontology .~ Just ont)
+    & empathy .~ Just emp

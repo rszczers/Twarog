@@ -34,7 +34,7 @@ viewModel m@Model{..} =
     [ rel_ "stylesheet"
     , href_ "https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css"
     ]
-    , script_ [defer_ "True", src_ "https://use.fontawesome.com/releases/v5.3.1/js/all.js"] []
+    , script_ [defer_ "True", src_ "https://use.fontawesome.com/releases/v5.4.2/js/all.js"] []
   ]
 
 getStage :: Model -> View Msg
@@ -51,7 +51,7 @@ getStage m = case m ^. currentStage of
         FlawsAndTalentsStage False  -> flawsAndTalentsFirstScreen m
         FlawsAndTalentsStage True   -> askFlawsAndTalents m
         RoleStage                   -> askRoles m
-       -- SkilsStage 
+        SkillsStage                  -> askSkills m
 
 nextButton :: Stage -> View Msg                            
 nextButton stage = 
@@ -278,13 +278,191 @@ askLifeStance m =
         Nothing -> []
       )
 
-
-
 askAttitude m = 
-  div_ [class_ "animated fadeIn"] [
-    displayRadioQuestion (Prelude.map Just archetypes) m characterAlignment "Your attitude?" $ ArchetypeChecked
-    , nextButton AttitudeStage        
+  div_ [] [
+    p_ [class_ "title is-2 has-text-weight-medium"] ["Your attitude?"]
+    , chooseAttitide m
+    , showArchetype m
+    , chooseRandomlyButton SetRandomArchetype
+    , nextButton AttitudeStage
   ]
+
+showArchetype m =
+  let 
+    arch  = m ^. character . characterAlignment
+  in
+    p_ [class_ "subtitle"] [text $ ms $ "Your archetype is " 
+      ++ ( case arch of 
+              Just a ->  show a
+              Nothing -> ""
+        )
+    ]
+
+chooseAttitide m =
+  let
+    social = m ^. sociability
+    submiss = m ^. submissiveness
+    ont = m ^. ontology
+    emp = m ^. empathy
+  in
+    div_ [class_ "columns is-centered"] [
+      div_ [class_ "column"] []
+      , div_ [class_ "column"] [
+        div_ [class_ "buttons has-addons is-centered"] [
+          button_ 
+          [
+            class_ 
+              (ms $ "button"  
+              ++ if social == (Just Introvert) then " is-link" else "")
+              , onClick $ SetSociability $ Just Introvert
+          ] 
+          [
+            span_ [class_ "icon"] [
+              i_ [class_ "fas fa-user"] []
+            ]
+            , span_ [] ["Introvert" ]
+          ]
+          , button_ 
+          [
+            class_ 
+              (ms $ "button"  
+              ++ if social == (Nothing) then " is-link" else "")
+              , onClick $ SetSociability $ Nothing
+          ] 
+          [
+            span_ [] ["Neutral" ]
+          ]
+          , button_ 
+            [
+              class_ 
+                (ms $ "button"  
+                ++ if social == (Just Extravert) then " is-link" else "")
+                , onClick $ SetSociability $ Just Extravert
+            ] 
+            [
+              span_ [] ["Extravert"]
+              , span_ [class_ "icon"] [
+                i_ [class_ "fas fa-users"] []
+                ]
+            ]
+        ]
+        , div_ [class_ "buttons has-addons is-centered"] [
+          button_ 
+          [
+            class_ 
+              (ms $ "button"  
+              ++ if submiss == (Just Lawful) then " is-link" else "")
+              , onClick $ SetSubmissiveness $ Just Lawful
+          ] 
+          [
+            span_ [class_ "icon"] [
+              i_ [class_ "fas fa-gavel"] []
+            ]
+            , span_ [] ["Lawful" ]
+          ]
+          , button_ 
+          [
+            class_ 
+              (ms $ "button"  
+              ++ if submiss == (Nothing) then " is-link" else "")
+              , onClick $ SetSubmissiveness $ Nothing
+          ] 
+          [
+            span_ [] ["Neutral" ]
+          ]
+          , button_ 
+            [
+              class_ 
+                (ms $ "button"  
+                ++ if submiss == (Just Anarchic) then " is-link" else "")
+                , onClick $ SetSubmissiveness $ Just Anarchic
+            ] 
+            [
+              span_ [] ["Anarchic"]
+              , span_ [class_ "icon"] [
+                i_ [class_ "fab fa-freebsd"] []
+                ]
+            ]
+          ]
+          , div_ [class_ "buttons has-addons is-centered"] [
+            button_ 
+            [
+              class_ 
+                (ms $ "button"  
+                ++ if ont == (Just Spiritual) then " is-link" else "")
+                , onClick $ SetOnthology $ Just Spiritual
+            ] 
+            [
+              span_ [class_ "icon"] [
+                i_ [class_ "fas fa-ghost"] []
+              ]
+              , span_ [] ["Spiritual" ]
+            ]
+            , button_ 
+            [
+              class_ 
+                (ms $ "button"  
+                ++ if ont == (Nothing) then " is-link" else "")
+                , onClick $ SetOnthology $ Nothing
+            ] 
+            [
+              span_ [] ["Neutral" ]
+            ]
+            , button_ 
+              [
+                class_ 
+                  (ms $ "button"  
+                  ++ if ont == (Just Materialistic) then " is-link" else "")
+                  , onClick $ SetOnthology $ Just Materialistic
+              ] 
+              [
+                span_ [] ["Materialistic"]
+                , span_ [class_ "icon"] [
+                  i_ [class_ "fas fa-dollar-sign"] []
+                  ]
+              ]
+            ]
+            , div_ [class_ "buttons has-addons is-centered"] [
+              button_ 
+              [
+                class_ 
+                  (ms $ "button"  
+                  ++ if emp == (Just Compasionate) then " is-link" else "")
+                  , onClick $ SetEmpathy $ Just Compasionate
+              ] 
+              [
+                span_ [class_ "icon"] [
+                  i_ [class_ "fas fa-hand-holding-heart"] []
+                ]
+                , span_ [] ["Compasionate" ]
+              ]
+              , button_ 
+              [
+                class_ 
+                  (ms $ "button"  
+                  ++ if emp == (Nothing) then " is-link" else "")
+                  , onClick $ SetEmpathy $ Nothing
+              ] 
+              [
+                span_ [] ["Neutral" ]
+              ]
+              , button_ 
+                [
+                  class_ 
+                    (ms $ "button"  
+                    ++ if emp == (Just Cruel) then " is-link" else "")
+                    , onClick $ SetEmpathy $ Just Cruel
+                ] 
+                [
+                  span_ [] ["Cruel"]
+                  , span_ [class_ "icon"] [
+                    i_ [class_ "fas fa-hand-rock"] []
+                    ]
+                ]
+              ]
+      ]
+      , div_ [class_ "column"] []
+    ]
 
 flawsAndTalentsFirstScreen :: Model -> View Msg
 flawsAndTalentsFirstScreen m = 
@@ -389,10 +567,20 @@ askRoles m =
       sex = fromMaybe Non $ m ^. character . characterSex
       archetype = fromMaybe Athenic $ m ^. character . characterAlignment
   in
-    displayRadioQuestion 
-      (Prelude.map Just (availableRoles attr talents lifeStance race sex archetype))
-      m characterRole "Your role?" RoleChecked
+    div_ [] [
+      displayRadioQuestion 
+          (Prelude.map Just (availableRoles attr talents lifeStance race sex archetype))
+          m characterRole "Your role?" RoleChecked
+      , nextButton RoleStage
+    ]
     
+askSkills m =
+  let
+    role = m ^. character . characterRole
+    sex = fromMaybe Non $ m ^. character . characterSex
+    attr = fromMaybe (Attributes 0 0 0 0 0 0) $ m ^. character . characterAttr
+  in
+    div_ [] []
 
 --dispaleyCheckboxQuestion :: [a] -> Model -> (characterField) -> String -> Int -> (a -> Bool -> View Msg)
 displayCheckboxQuestion valueList model characterField question max msg =

@@ -6,6 +6,10 @@ module Model
   , currentAttribBounce
   , currentRoll1
   , currentRoll2
+  , sociability
+  , submissiveness
+  , ontology
+  , empathy
   , Msg (..)
   , Stage (..)
   , AttribBounce (..)
@@ -34,7 +38,7 @@ data Stage = OwnerStage
            | HamingjaStage
            | FlawsAndTalentsStage Bool
            | RoleStage
-           | SkilsStage 
+           | SkillsStage 
            deriving (Eq)
 
 instance Show Stage where
@@ -49,7 +53,7 @@ instance Show Stage where
   show HamingjaStage = "Hamingja"
   show (FlawsAndTalentsStage _) = "Talents & Flaws"
   show RoleStage = "Character's role"
-  show SkilsStage = "Skills"
+  show SkillsStage = "Skills"
 
 data AttribBounce = Every 
                   | Charisma 
@@ -69,8 +73,10 @@ nextStage s = case s of
   GodStage             -> SexStage
   SexStage             -> AttitudeStage
   AttitudeStage        -> FlawsAndTalentsStage False
-  RoleStage            -> SkilsStage
   FlawsAndTalentsStage  _ -> RoleStage
+  RoleStage            -> SkillsStage
+  SkillsStage          -> NameStage
+  
 
 getNextButtonText s = case s of
   NameStage               -> ""
@@ -82,6 +88,7 @@ getNextButtonText s = case s of
   RoleStage               -> "Go to Role"
   FlawsAndTalentsStage _  -> "Go to Flaws & Talents"
   GodStage                -> "Go to Life Stance"
+  SkillsStage             -> "Go to Skills"
 
 
 printBounce :: Maybe AttribBounce -> String
@@ -95,6 +102,10 @@ data Model = Model
   , _currentAttribBounce :: Maybe AttribBounce
   , _currentRoll1 :: Int
   , _currentRoll2 :: Int
+  , _sociability :: Maybe Sociability
+  , _submissiveness :: Maybe Submissiveness
+  , _ontology :: Maybe Ontology
+  , _empathy :: Maybe Empathy
   , _character  :: NewCharacter
   } deriving (Show, Eq)
 makeLenses ''Model
@@ -125,6 +136,8 @@ data Msg =  Name MisoString
       | SetFlawsAndTalents (S.Set Talent) (S.Set Flaw)
       | SetRandomLifeStance
       | SetLifeStance LifeStance
+      | SetRandomArchetype
+      | SetArchetype Archetype
       -- No character related msgs
       | NoOp
       | ChangeStage Stage
@@ -132,6 +145,10 @@ data Msg =  Name MisoString
       | SetCurrentRoll1 MisoString
       | SetCurrentRoll2 MisoString
       | SetAttrBounce AttribBounce
+      | SetSociability (Maybe Sociability)
+      | SetSubmissiveness (Maybe Submissiveness)
+      | SetOnthology (Maybe Ontology)
+      | SetEmpathy (Maybe Empathy)
       deriving (Show, Eq)
 
 data MaxCheckbox = TalentsMax Int | NoLimit
@@ -143,6 +160,10 @@ initialModel =
       _availableStages = []
       _currentRoll1 = 0
       _currentRoll2 = 0
+      _sociability = Nothing
+      _submissiveness = Nothing
+      _ontology = Nothing
+      _empathy = Nothing
       _character = emptyNewCharacter
    in Model{..}
 
