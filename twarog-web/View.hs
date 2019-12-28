@@ -239,7 +239,7 @@ askSex m =
 
 askRace m =
   div_ [class_ "animated fadeIn"] [
-    displayRadioQuestion (Prelude.map Just races) m
+    displayRadioQuestion (Prelude.map Just playableRaces) m
                   characterRace "Your race?" RaceChecked 
     , chooseRandomlyButton SetRandomRace
     , div_ [class_ "columns is-centered", style_ $ M.singleton "margin-top" "1.5rem"] [

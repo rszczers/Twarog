@@ -198,7 +198,12 @@ type Lvl = Int
 data Sex = Male
          | Female
          | Non
-         deriving (Eq, Show, Enum)
+         deriving (Eq, Enum)
+
+instance Show Sex where
+  show Male = "Male"
+  show Female = "Female"
+  show Non = "Nonbinary"
 
 sexes :: [Sex]
 sexes = enumFrom (toEnum 0)

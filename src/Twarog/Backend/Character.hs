@@ -75,7 +75,25 @@ data CharacterRole = Civilian
                    | HalfOrcRole
                    | OgreRole
                    | HobgoblinRole
-                   deriving (Eq, Show, Enum)
+                   deriving (Eq, Enum)
+
+instance Show CharacterRole where
+  show Civilian      = "Civilian"
+  show Warrior       = "Warrior"
+  show Stalker       = "Stalker"
+  show Trickster     = "Trickster"
+  show Ranger        = "Ranger"
+  show Bard          = "Bard"
+  show Sorcerer      = "Sorcerer"
+  show DwarfRole     = "Dwarf"
+  show ElfRole       = "Elf"
+  show GnomeRole     = "Gnome"
+  show GoblinRole    = "Goblin"
+  show HalflingRole  = "Halfling"
+  show OrcRole       = "Orc"
+  show HalfOrcRole   = "Half-orc"
+  show OgreRole      = "Ogre"
+  show HobgoblinRole = "Hobgoblin"
 
 characterRoles :: [CharacterRole]
 characterRoles = enumFrom (toEnum 0)
@@ -169,17 +187,20 @@ isProperRole :: Attributes -> [Talent]
              -> Bool
 isProperRole (Attributes cha con dex int str wil) ts ls race sex arch cr =
   case cr of
-    Civilian -> True
+    Civilian  -> race `elem` [CommonMan, LesserMan, HighMan]
     Warrior   -> con >= 9 
               && str >= 13 
               && wil >= 9 
               && sex == Male
+              && race `elem` [CommonMan, LesserMan, HighMan]
     Stalker   -> con >= 9 
               && dex >= 9 
               && int >= 9
+              && race `elem` [CommonMan, LesserMan, HighMan]
     Trickster -> con >= 9 
               && dex >= 9 
               && int >= 9
+              && race `elem` [CommonMan, LesserMan, HighMan]
     Ranger    -> race == HighMan 
               && ls == (Religious Skadi)
               && arch == Artemisian
@@ -188,15 +209,18 @@ isProperRole (Attributes cha con dex int str wil) ts ls race sex arch cr =
               && dex >= 9
               && int >= 9
               && wil >= 9
+              && race `elem` [CommonMan, LesserMan, HighMan]
     Bard      -> race == HighMan
               && ls /= Traditional
               && cha >= 16
               && Marked `elem` ts
+              && race `elem` [CommonMan, LesserMan, HighMan]
     Sorcerer  -> race == HighMan
               && ls == Traditional
               && int >= 13
               && wil >= 13
               && Marked `elem` ts
+              && race `elem` [CommonMan, LesserMan, HighMan]
     DwarfRole -> race == Dwarf
     ElfRole   -> race == Elf
     GnomeRole -> race == Gnome
