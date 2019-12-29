@@ -1,7 +1,9 @@
 module Twarog.Backend.Flaws
   ( Flaw (..)
   , flaws
+  , flaws'
   , FlawLevel (..)
+  , flawTree
   )
   where
 
@@ -56,6 +58,64 @@ data Flaw = Alcoholic FlawLevel
           | WeakMinded FlawLevel
           | Whiny FlawLevel
           deriving (Ord, Eq)
+
+flawTree :: [(FlawLevel -> Flaw, [FlawLevel])]
+flawTree = 
+  [ ( Alcoholic, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Annoying, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( BadBack, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( BadSight, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( BadTempered, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( ChronicPain, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Clumsy, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Coward, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Delusional, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Depressed, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Dislike, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Dyslexia, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Enemy, [FlawLevel1] )
+  , ( Fearful, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Frail, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Gluttonous, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Greedy, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Gullible, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Haemophilic, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Hypersexual, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Jealous, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( LawfulFlaw, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( LazyFlaw, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Limp, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( LowSelfEsteem, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Seasickness, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( OverConfident, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Paranoid, [FlawLevel1] )
+  , ( Parasite, [FlawLevel1] )
+  , ( Philia, [FlawLevel1] )
+  , ( Phobia, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( PhysicalDefect, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( PhysicalWeakness, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( PoorHearing, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Secret, [FlawLevel1] )
+  , ( SelfHating, [FlawLevel1] )
+  , ( Selfish, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Selfless, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Sickly, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( ShortLived, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Shy, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( SlaveMinded, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Stubborn, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Stuttering, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Unlucky, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Vulnerable, [FlawLevel1] )
+  , ( WeakMinded, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  , ( Whiny, [FlawLevel1, FlawLevel2, FlawLevel3] )
+  ]
+
+instance Eq (FlawLevel -> Flaw) where
+  f == g = f FlawLevel1 == g FlawLevel1
+
+instance Ord (FlawLevel -> Flaw) where
+  f <= g = f FlawLevel1 <= g FlawLevel1
 
 instance Show Flaw where
   show = \case
@@ -390,3 +450,54 @@ instance Bounded Flaw where
 -- | Lists all _available_ flaws in lexicographic order
 flaws :: [Flaw]
 flaws = [minBound .. maxBound]
+
+flaws' :: [FlawLevel -> Flaw]
+flaws' = [ Alcoholic
+         , Annoying
+         , BadBack
+         , BadSight
+         , BadTempered
+         , ChronicPain
+         , Clumsy
+         , Coward
+         , Delusional
+         , Depressed
+         , Dislike
+         , Dyslexia
+         , Enemy
+         , Fearful
+         , Frail
+         , Gluttonous
+         , Greedy
+         , Gullible
+         , Haemophilic
+         , Hypersexual
+         , Jealous
+         , LawfulFlaw
+         , LazyFlaw
+         , Limp
+         , LowSelfEsteem
+         , Seasickness
+         , OverConfident
+         , Paranoid
+         , Parasite
+         , Philia
+         , Phobia
+         , PhysicalDefect
+         , PhysicalWeakness
+         , PoorHearing
+         , Secret
+         , SelfHating
+         , Selfish
+         , Selfless
+         , Sickly
+         , ShortLived
+         , Shy
+         , SlaveMinded
+         , Stubborn
+         , Stuttering
+         , Unlucky
+         , Vulnerable
+         , WeakMinded
+         , Whiny
+         ]
