@@ -116,9 +116,15 @@ genFlaw :: Gen Flaw
 genFlaw = Gen.choice $ Gen.constant <$> flaws
 
 genFlaws :: Gen (S.Set Flaw)
-genFlaws = 
-  let n = length flaws 
-   in Gen.set (Range.linear 0 n) genFlaw
+genFlaws = do
+  let n = length flawTree 
+  let genFlaw = Gen.choice $ Gen.constant <$> flaws'
+  flaws <- Gen.set (Range.linear 0 n) genFlaw
+  let s = S.size flaws
+      genLevel = Gen.choice $ 
+        Gen.constant <$> [FlawLevel1, FlawLevel2, FlawLevel3]
+  levels <- Gen.list (Range.singleton s) genLevel
+  return . S.fromList $ zipWith ($) (S.toList flaws) levels 
 
 genGod :: Gen God
 genGod = Gen.choice $ Gen.constant <$> gods
