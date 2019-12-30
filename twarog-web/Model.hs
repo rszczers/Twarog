@@ -113,7 +113,7 @@ makeLenses ''Model
 data Msg =  Name MisoString
       -- Checkbox msgs
       | TalentChecked Talent (Maybe Int) Checked
-      | FlawChecked Flaw (Maybe Int) Checked
+      | FlawChecked (FlawLevel -> Flaw) FlawLevel (Maybe Int) Checked
       -- Radiobox msgs
       | SexChecked (Maybe Sex) Checked
       | RaceChecked (Maybe Race) Checked
@@ -147,7 +147,7 @@ data Msg =  Name MisoString
       | SetSubmissiveness (Maybe Submissiveness)
       | SetOnthology (Maybe Ontology)
       | SetEmpathy (Maybe Empathy)
-      deriving (Show, Eq)
+      deriving (Eq)
 
 data MaxCheckbox = TalentsMax Int | NoLimit
 

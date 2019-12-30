@@ -102,13 +102,21 @@ updateModel (SetAttribute n t) m =
 
 updateModel (SexChecked s (Checked True)) m = 
   noEff $ m & character . characterSex .~ s
-     
-updateModel (FlawChecked f _ (Checked True)) m =  
-  noEff 
-    $ m & character . characterFlaws %~ S.insert f
 
-updateModel (FlawChecked f _ (Checked False)) m = 
-  noEff $ m & character . characterFlaws %~ S.delete f
+updateModel (FlawChecked flawConstructor flawLvl _ (Checked True)) m =  
+  let 
+    flaws = m ^. character . characterFlaws
+  in
+    noEff 
+      $ m & character . characterFlaws .~ 
+        (S.insert (flawConstructor flawLvl) 
+          $ newFlawSet flaws flawConstructor flawLvl )
+
+updateModel (FlawChecked flawConstructor flawLvl _ (Checked False)) m =
+  let 
+    flaws = m ^. character . characterFlaws
+  in 
+    noEff $ m & character . characterFlaws .~ newFlawSet flaws flawConstructor flawLvl
 
 updateModel (SetAllAttributes attr) m = 
   noEff  ((m & character . characterAttr .~ Just attr) 
@@ -207,6 +215,11 @@ updateModel SetRandomArchetype m = do
 updateModel (SetArchetype a) m =
   noEff $ setModelAttitude (attitude a) $ m & character . characterAlignment .~ Just a
 
+
+newFlawSet :: S.Set Flaw -> (FlawLevel -> Flaw) -> FlawLevel -> S.Set Flaw
+newFlawSet fList f l =
+    Prelude.foldr S.delete fList 
+      $ (Prelude.map f [FlawLevel1, FlawLevel2, FlawLevel3])
 
 setModelArchetype m =
   let 

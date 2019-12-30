@@ -45,7 +45,7 @@ getStage m = case m ^. currentStage of
         RaceStage                   -> askRace m
         BirthStage                  -> askBirthday m
         AttitudeStage               -> askAttitude m
-        GodStage                    -> askLifeStan m 
+        GodStage                    -> askLifeStance m 
         SexStage                    -> askSex m
       --  HamingjaStage 
         FlawsAndTalentsStage False  -> flawsAndTalentsFirstScreen m
@@ -175,6 +175,7 @@ attributesFirstScreen = div_ [class_ "animated fadeIn"] [
               , nextButton (AttribStage Nothing)
             ] 
 
+askBirthday ::  Model -> View Msg
 askBirthday m =
   let
     birthday = m ^. character . characterBirth
@@ -229,7 +230,8 @@ askBirthday m =
         ]
         , nextButton BirthStage
     ]
-    
+
+askSex :: Model -> View Msg
 askSex m = 
   div_ [class_ "animated fadeIn"] [    
     displayRadioQuestion (Prelude.map Just sexes) m 
@@ -238,6 +240,7 @@ askSex m =
     , nextButton SexStage
     ]
 
+askRace :: Model -> View Msg
 askRace m =
   div_ [class_ "animated fadeIn"] [
     displayRadioQuestion (Prelude.map Just playableRaces) m
@@ -246,7 +249,8 @@ askRace m =
     , nextButton RaceStage
   ]
 
-askLifeStan m = 
+askLifeStance :: Model -> View Msg
+askLifeStance m = 
   let 
     race = m ^. character . characterRace
     valueList = case race of
@@ -260,6 +264,7 @@ askLifeStan m =
      , nextButton GodStage
     ]
 
+askAttitude :: Model -> View Msg
 askAttitude m = 
   div_ [] [
     p_ [class_ "title is-2 has-text-weight-medium"] ["Your attitude?"]
@@ -269,6 +274,7 @@ askAttitude m =
     , nextButton AttitudeStage
   ]
 
+showArchetype :: Model -> View Msg
 showArchetype m =
   let 
     arch  = m ^. character . characterAlignment
@@ -280,6 +286,7 @@ showArchetype m =
         )
     ]
 
+chooseAttitide :: Model -> View Msg
 chooseAttitide m =
   let
     social = m ^. sociability
@@ -498,7 +505,7 @@ flawsAndTalentsFirstScreen m =
         , nextButton $ FlawsAndTalentsStage True
     ] 
 
-
+askFlawsAndTalents :: Model -> View Msg
 askFlawsAndTalents m = 
   div_ [class_ "animated fadeIn"] [
     h2_ [class_ "title is-2 has-text-weight-medium"] [ "Talents and flaws "]
@@ -511,10 +518,53 @@ askFlawsAndTalents m =
             characterTalent "What are your talents?" (TalentsMax 3) TalentChecked
         ]
         , div_ [class_ "column"] [
-            displayCheckboxQuestion flaws m characterFlaws "What are your flaws?" NoLimit FlawChecked
+            askFlaws m
+            --displayCheckboxQuestion flaws m characterFlaws "What are your flaws?" NoLimit FlawChecked
         ]
     ]
   ]
+
+  --[(FlawLevel -> Flaw, [FlawLevel])]
+
+askFlaws :: Model -> View Msg
+askFlaws m = 
+  let 
+    content = m ^. character . characterFlaws
+
+    fromTree :: (FlawLevel -> Flaw, [FlawLevel]) -> View Msg
+    fromTree (flawConstructor, levels) = 
+      div_ [class_ "level"] [
+        div_ [class_ "level-item"] [
+          p_ [class_ "control"] [
+            input_ [ 
+              type_ "checkbox", name_ "talent"
+              , style_  $ M.singleton "margin" "0.5rem"
+              , checked_ $ Prelude.any (\x -> S.member x content) ( Prelude.map flawConstructor [FlawLevel1, FlawLevel2, FlawLevel3]) 
+              , onChecked $ FlawChecked flawConstructor FlawLevel1 Nothing
+            ]
+            , text $ ms $ show $ flawConstructor FlawLevel1
+          ]
+        ]
+        , div_ [class_ "level-item"] [
+            div_ [class_ "buttons has-addons"] $
+              Prelude.map 
+              (\level -> button_ [class_ $ ms $ "button" 
+                                  ++ if S.member (flawConstructor level) content then " is-link" else "" 
+                                  , onClick $ FlawChecked flawConstructor level Nothing $ Checked $ not (S.member (flawConstructor level) content)
+                                  ] 
+                [text $ ms $ show level]) 
+              levels
+            
+        ] 
+      ]
+  in
+    div_ [] $
+      [ p_ [class_ "title is-3 is-full has-text-weight-medium"] 
+          [ "Your flaws?" ]
+      ] 
+        ++ (Prelude.map fromTree flawTree)
+  
+
 
 maxTalentsInfo :: Model -> MaxCheckbox -> View Msg
 maxTalentsInfo m max = 
@@ -539,6 +589,7 @@ maxTalentsInfo m max =
         NoLimit -> []
     )
 
+askRoles :: Model -> View Msg
 askRoles m =
   let
       -- Temporary solution
@@ -555,7 +606,8 @@ askRoles m =
           m characterRole "Your role?" RoleChecked
       , nextButton RoleStage
     ]
-    
+
+askSkills :: Model -> View Msg
 askSkills m =
   let
     role = m ^. character . characterRole
@@ -647,6 +699,7 @@ displayRadioQuestion valueList model characterField question msg =
 attribToBounce :: Model -> Maybe AttribBounce
 attribToBounce m = m ^. currentAttribBounce
 
+navbarElem :: Model -> View Msg
 navbarElem m =
   let
     getAttr f = case m ^. character . characterAttr of
@@ -695,6 +748,7 @@ breadcrumb stages active =
         stages
     ]
 
+menu :: View Msg
 menu = 
   div_ [class_ "columns is-mobile", style_ $ M.singleton "margin" "0rem 1rem 0rem 0.5rem"] [
       dropdownMenuItem "Hamingja" "You can spend your hamingja points on folowing benefits." 
