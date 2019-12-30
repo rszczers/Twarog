@@ -45,7 +45,7 @@ getStage m = case m ^. currentStage of
         RaceStage                   -> askRace m
         BirthStage                  -> askBirthday m
         AttitudeStage               -> askAttitude m
-        GodStage                    -> askLifeStance m 
+        GodStage                    -> askLifeStan m 
         SexStage                    -> askSex m
       --  HamingjaStage 
         FlawsAndTalentsStage False  -> flawsAndTalentsFirstScreen m
@@ -70,6 +70,7 @@ nextButton stage =
       ]
     ]  
 
+chooseRandomlyButton :: Msg -> View Msg
 chooseRandomlyButton whatToDo = 
   button_ [class_ "button is-medium", onClick whatToDo, style_ $ M.singleton "margin" "1rem"] [
     div_ [class_ "columns is-mobile"] [
@@ -242,41 +243,22 @@ askRace m =
     displayRadioQuestion (Prelude.map Just playableRaces) m
                   characterRace "Your race?" RaceChecked 
     , chooseRandomlyButton SetRandomRace
-    , div_ [class_ "columns is-centered", style_ $ M.singleton "margin-top" "1.5rem"] [
-        div_ [class_ "column is-centered is-one-third"] [ 
-          askLifeStance m
-        ] 
-      ]
     , nextButton RaceStage
   ]
 
-askLifeStance m = 
+askLifeStan m = 
   let 
-    lifeStance = m ^. character . characterLifeStance
+    race = m ^. character . characterRace
+    valueList = case race of
+                  Just r -> if (isRaceTraditionalOnly r) then [Just Traditional] else [Just Traditional] 
+                    ++ Prelude.map (\g -> Just $ Religious g ) gods
+                  Nothing -> []
   in
-    article_ 
-      [ class_ $ ms $ "message is-success " ++ if lifeStance /= Nothing then "animated fadeInDown" else ""]
-      (case lifeStance of
-        Just (Religious a) -> 
-          [ div_ [class_ "message-header"] [
-              p_ [] ["You are religious"]    
-            ]
-          , div_ [class_ "message-body",
-                style_  $ M.singleton "padding" "0.5rem"] [
-            text $ ms $ "Your favorite God is " ++ (show a)
-            ]
-          ]
-        Just Traditional -> [ 
-            div_ [class_ "message-header"] [
-              p_ [] ["You are traditional"]    
-            ]
-            , div_ [class_ "message-body",
-                style_  $ M.singleton "padding" "0.5rem"] [
-            text "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-            ]
-          ]  
-        Nothing -> []
-      )
+    div_ [] [
+     displayRadioQuestion valueList m characterLifeStance "Your life stance?" LifeStanceChecked 
+     , chooseRandomlyButton SetRandomLifeStance
+     , nextButton GodStage
+    ]
 
 askAttitude m = 
   div_ [] [

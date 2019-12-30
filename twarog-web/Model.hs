@@ -69,7 +69,7 @@ nextStage s = case s of
   NameStage            -> AttribStage Nothing
   AttribStage _        -> BirthStage
   BirthStage           -> RaceStage 
-  RaceStage            -> SexStage
+  RaceStage            -> GodStage
   GodStage             -> SexStage
   SexStage             -> AttitudeStage
   AttitudeStage        -> FlawsAndTalentsStage False
@@ -119,10 +119,8 @@ data Msg =  Name MisoString
       | RaceChecked (Maybe Race) Checked
       | ArchetypeChecked (Maybe Archetype) Checked
       | RoleChecked (Maybe CharacterRole) Checked
+      | LifeStanceChecked (Maybe LifeStance) Checked
       -- Character related msgs
-      | AskName
-      | AskRace
-      | AskTalents
       | SetAttribute Int (Maybe AttribBounce)
       | SetAllAttributes Attributes
       | SetRandomAttr

@@ -18,7 +18,11 @@ updateModel (Name n) m =
 updateModel NoOp m = noEff m
 
 updateModel (RaceChecked r (Checked True)) m = 
-  (m & character . characterRace .~ r) <# do return $ SetRandomLifeStance
+  noEff (m & character . characterRace .~ r)
+  --(m & character . characterRace .~ r) <# do return $ SetRandomLifeStance
+
+updateModel (LifeStanceChecked l (Checked True)) m = 
+  noEff (m & character . characterLifeStance .~ l)
 
 updateModel (ArchetypeChecked a (Checked True)) m = 
   noEff $ (m & character . characterAlignment .~ a)
@@ -128,11 +132,12 @@ updateModel (SetBirth b) m =
 
 updateModel SetRandomRace m = do
   m <# do
-    race <- sample $ genRace
+    race <- sample $ genRace'
     return $ SetRace race
 
 updateModel (SetRace b) m =
-  (m & character . characterRace .~ Just b) <# do return $ SetRandomLifeStance
+  noEff (m & character . characterRace .~ Just b)
+  -- (m & character . characterRace .~ Just b) <# do return $ SetRandomLifeStance
 
 updateModel SetRandomSex m = do
   m <# do
