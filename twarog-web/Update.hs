@@ -1,9 +1,10 @@
 module Update (updateModel) where
 
-import       Control.Lens
+import       Control.Lens as L
 import       Control.Monad.IO.Class
 import       Data.Maybe
 import qualified Data.Set as S
+import       Data.Map     as M
 import       Miso
 import       Miso.String
 import       Model
@@ -117,6 +118,27 @@ updateModel (FlawChecked flawConstructor flawLvl _ (Checked False)) m =
     flaws = m ^. character . characterFlaws
   in 
     noEff $ m & character . characterFlaws .~ newFlawSet flaws flawConstructor flawLvl
+
+updateModel (SkillChecked s p (Checked True)) m =
+  let 
+    chSkills = m ^. character . characterSkills
+    model = if (M.null chSkills) 
+      then  m & character . characterSkills 
+            .~ (M.fromList $ Prelude.zip skills $ repeat (CharacterSkill 0 Untrained) )
+      else m
+  in 
+    noEff $ model & character . characterSkills . L.at s . _Just . proficiency .~ p
+
+updateModel (SkillChecked s p (Checked False)) m =
+  let 
+    chSkills = m ^. character . characterSkills
+    model = if (M.null chSkills) 
+      then  m & character . characterSkills 
+            .~ (M.fromList $ Prelude.zip skills $ repeat (CharacterSkill 0 Untrained) )
+      else m
+  in 
+    noEff $ model & character . characterSkills . L.at s . _Just . proficiency .~ Untrained
+
 
 updateModel (SetAllAttributes attr) m = 
   noEff  ((m & character . characterAttr .~ Just attr) 

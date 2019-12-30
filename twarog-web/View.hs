@@ -10,6 +10,7 @@ import qualified Data.Map         as M
 import       Data.Maybe
 import       Data.Typeable
 import qualified Data.Set         as S
+import qualified Data.List        as L
 
 viewModel :: Model -> View Msg
 viewModel m@Model{..} =
@@ -51,7 +52,8 @@ getStage m = case m ^. currentStage of
         FlawsAndTalentsStage False  -> flawsAndTalentsFirstScreen m
         FlawsAndTalentsStage True   -> askFlawsAndTalents m
         RoleStage                   -> askRoles m
-        SkillsStage                  -> askSkills m
+        SkillsStage Untrained       -> skillsSummary m
+        SkillsStage prof            -> askSkills m prof
 
 nextButton :: Stage -> View Msg                            
 nextButton stage = 
@@ -607,14 +609,75 @@ askRoles m =
       , nextButton RoleStage
     ]
 
-askSkills :: Model -> View Msg
-askSkills m =
+skillsSummary m = 
+  let 
+    roleSkills = M.keys $ M.filterWithKey (\_ k -> (k ^. proficiency) == CharacterRoleSkill) 
+        $ m ^. character . characterSkills
+    trainedSkills = M.keys $ M.filterWithKey (\_ k -> (k ^. proficiency) == Trained) 
+        $ m ^. character . characterSkills
+    untrainedSkills = M.keys $ M.filterWithKey (\_ k -> (k ^. proficiency) == Untrained) 
+        $ m ^. character . characterSkills
+    showList l = 
+      div_ [] $
+        Prelude.map 
+        (\x -> div_ [] [text $ ms $ show x]) l
+  in
+    div_ [] [
+      p_ [class_ "title is-4"] ["Character role skills: "]
+      , showList roleSkills
+      , p_ [class_ "title is-4"] ["Trained role skills: "]
+      , showList trainedSkills
+      , p_ [class_ "title is-4"] ["Untrained role skills: "]
+      , showList untrainedSkills
+    ]
+    
+askSkills :: Model -> Proficiency -> View Msg
+askSkills m p =
   let
     role = m ^. character . characterRole
     sex = fromMaybe Non $ m ^. character . characterSex
     attr = fromMaybe (Attributes 0 0 0 0 0 0) $ m ^. character . characterAttr
+    roleSkills = M.keys $ M.filterWithKey (\_ k -> (k ^. proficiency) == CharacterRoleSkill) 
+        $ m ^. character . characterSkills
+    trainedSkills = M.keys $ M.filterWithKey (\_ k -> (k ^. proficiency) == Trained) 
+        $ m ^. character . characterSkills
+    choosedSkills = 
+      case p of
+        CharacterRoleSkill  -> roleSkills
+        Trained             -> trainedSkills
+        Untrained           -> []
+
+    skillList = case p of
+            CharacterRoleSkill -> crSkills $ fromMaybe Civilian role
+            Trained             -> (additionalTrainedSkills sex) L.\\ roleSkills
+            Untrained           -> []
+
   in
-    div_ [] []
+    div_ [] [
+      p_ [class_ "title is-3 is-full has-text-weight-medium"] [ "Your Class Skills?" ]
+      , div_ [ class_ "columns has-text-centered is-multiline is-mobile"]
+        $ Prelude.map 
+          ( \x ->
+            label_ [class_ "label has-text-weight-normal"] [
+              div_ [class_ "field has-addons column has-text-centered is-one-fifth-tablet is-one-quarters-mobile"] [ 
+                p_ [class_ "control"] [
+                  input_ [ 
+                    type_ "checkbox", name_ "skill"
+                    , style_  $ M.singleton "margin" "0.5rem"
+                    , checked_ $ elem x choosedSkills
+                    --, disabled_ $ isDisabled x
+                    , onChecked $ SkillChecked x p
+                  ]
+                  ]
+                , p_ [class_ "control"] [ 
+                  text $ ms $ show x
+                  ]
+                ]
+              ]
+          ) skillList
+          , nextButton (SkillsStage p )
+    ]
+
 
 --dispaleyCheckboxQuestion :: [a] -> Model -> (characterField) -> String -> Int -> (a -> Bool -> View Msg)
 displayCheckboxQuestion valueList model characterField question max msg =
