@@ -38,7 +38,7 @@ data Stage = OwnerStage
            | HamingjaStage
            | FlawsAndTalentsStage Bool
            | RoleStage
-           | SkillsStage 
+           | SkillsStage Proficiency
            deriving (Eq)
 
 instance Show Stage where
@@ -53,7 +53,9 @@ instance Show Stage where
   show HamingjaStage = "Hamingja"
   show (FlawsAndTalentsStage _) = "Talents & Flaws"
   show RoleStage = "Character's role"
-  show SkillsStage = "Skills"
+  show (SkillsStage Trained) = "Trained Skills"
+  show (SkillsStage Untrained) = "Untrained Skills"
+  show (SkillsStage CharacterRoleSkill) = "Character Role Skills"
 
 data AttribBounce = Every 
                   | Charisma 
@@ -69,13 +71,15 @@ nextStage s = case s of
   NameStage            -> AttribStage Nothing
   AttribStage _        -> BirthStage
   BirthStage           -> RaceStage 
-  RaceStage            -> SexStage
+  RaceStage            -> GodStage
   GodStage             -> SexStage
   SexStage             -> AttitudeStage
   AttitudeStage        -> FlawsAndTalentsStage False
   FlawsAndTalentsStage  _ -> RoleStage
-  RoleStage            -> SkillsStage
-  SkillsStage          -> NameStage
+  RoleStage            -> SkillsStage CharacterRoleSkill
+  SkillsStage CharacterRoleSkill -> SkillsStage Trained 
+  SkillsStage Trained   -> SkillsStage Untrained
+  SkillsStage Untrained -> NameStage
   
 
 getNextButtonText s = case s of
@@ -88,8 +92,9 @@ getNextButtonText s = case s of
   RoleStage               -> "Go to Role"
   FlawsAndTalentsStage _  -> "Go to Flaws & Talents"
   GodStage                -> "Go to Life Stance"
-  SkillsStage             -> "Go to Skills"
-
+  SkillsStage Untrained   -> "Go to Untrained Skills"
+  SkillsStage Trained     -> "Go to Trained Skills"
+  SkillsStage CharacterRoleSkill     -> "Go to Role Skills"
 
 printBounce :: Maybe AttribBounce -> String
 printBounce b = case b of
@@ -113,16 +118,15 @@ makeLenses ''Model
 data Msg =  Name MisoString
       -- Checkbox msgs
       | TalentChecked Talent (Maybe Int) Checked
-      | FlawChecked Flaw (Maybe Int) Checked
+      | FlawChecked (FlawLevel -> Flaw) FlawLevel (Maybe Int) Checked
+      | SkillChecked Skill Proficiency Checked
       -- Radiobox msgs
       | SexChecked (Maybe Sex) Checked
       | RaceChecked (Maybe Race) Checked
       | ArchetypeChecked (Maybe Archetype) Checked
       | RoleChecked (Maybe CharacterRole) Checked
+      | LifeStanceChecked (Maybe LifeStance) Checked
       -- Character related msgs
-      | AskName
-      | AskRace
-      | AskTalents
       | SetAttribute Int (Maybe AttribBounce)
       | SetAllAttributes Attributes
       | SetRandomAttr
@@ -149,7 +153,7 @@ data Msg =  Name MisoString
       | SetSubmissiveness (Maybe Submissiveness)
       | SetOnthology (Maybe Ontology)
       | SetEmpathy (Maybe Empathy)
-      deriving (Show, Eq)
+      deriving (Eq)
 
 data MaxCheckbox = TalentsMax Int | NoLimit
 

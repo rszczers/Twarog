@@ -1,9 +1,10 @@
 module Update (updateModel) where
 
-import       Control.Lens
+import       Control.Lens as L
 import       Control.Monad.IO.Class
 import       Data.Maybe
 import qualified Data.Set as S
+import       Data.Map     as M
 import       Miso
 import       Miso.String
 import       Model
@@ -18,7 +19,11 @@ updateModel (Name n) m =
 updateModel NoOp m = noEff m
 
 updateModel (RaceChecked r (Checked True)) m = 
-  (m & character . characterRace .~ r) <# do return $ SetRandomLifeStance
+  noEff (m & character . characterRace .~ r)
+  --(m & character . characterRace .~ r) <# do return $ SetRandomLifeStance
+
+updateModel (LifeStanceChecked l (Checked True)) m = 
+  noEff (m & character . characterLifeStance .~ l)
 
 updateModel (ArchetypeChecked a (Checked True)) m = 
   noEff $ (m & character . characterAlignment .~ a)
@@ -98,13 +103,42 @@ updateModel (SetAttribute n t) m =
 
 updateModel (SexChecked s (Checked True)) m = 
   noEff $ m & character . characterSex .~ s
-     
-updateModel (FlawChecked f _ (Checked True)) m =  
-  noEff 
-    $ m & character . characterFlaws %~ S.insert f
 
-updateModel (FlawChecked f _ (Checked False)) m = 
-  noEff $ m & character . characterFlaws %~ S.delete f
+updateModel (FlawChecked flawConstructor flawLvl _ (Checked True)) m =  
+  let 
+    flaws = m ^. character . characterFlaws
+  in
+    noEff 
+      $ m & character . characterFlaws .~ 
+        (S.insert (flawConstructor flawLvl) 
+          $ newFlawSet flaws flawConstructor flawLvl )
+
+updateModel (FlawChecked flawConstructor flawLvl _ (Checked False)) m =
+  let 
+    flaws = m ^. character . characterFlaws
+  in 
+    noEff $ m & character . characterFlaws .~ newFlawSet flaws flawConstructor flawLvl
+
+updateModel (SkillChecked s p (Checked True)) m =
+  let 
+    chSkills = m ^. character . characterSkills
+    model = if (M.null chSkills) 
+      then  m & character . characterSkills 
+            .~ (M.fromList $ Prelude.zip skills $ repeat (CharacterSkill 0 Untrained) )
+      else m
+  in 
+    noEff $ model & character . characterSkills . L.at s . _Just . proficiency .~ p
+
+updateModel (SkillChecked s p (Checked False)) m =
+  let 
+    chSkills = m ^. character . characterSkills
+    model = if (M.null chSkills) 
+      then  m & character . characterSkills 
+            .~ (M.fromList $ Prelude.zip skills $ repeat (CharacterSkill 0 Untrained) )
+      else m
+  in 
+    noEff $ model & character . characterSkills . L.at s . _Just . proficiency .~ Untrained
+
 
 updateModel (SetAllAttributes attr) m = 
   noEff  ((m & character . characterAttr .~ Just attr) 
@@ -128,11 +162,12 @@ updateModel (SetBirth b) m =
 
 updateModel SetRandomRace m = do
   m <# do
-    race <- sample $ genRace
+    race <- sample $ genRace'
     return $ SetRace race
 
 updateModel (SetRace b) m =
-  (m & character . characterRace .~ Just b) <# do return $ SetRandomLifeStance
+  noEff (m & character . characterRace .~ Just b)
+  -- (m & character . characterRace .~ Just b) <# do return $ SetRandomLifeStance
 
 updateModel SetRandomSex m = do
   m <# do
@@ -202,6 +237,11 @@ updateModel SetRandomArchetype m = do
 updateModel (SetArchetype a) m =
   noEff $ setModelAttitude (attitude a) $ m & character . characterAlignment .~ Just a
 
+
+newFlawSet :: S.Set Flaw -> (FlawLevel -> Flaw) -> FlawLevel -> S.Set Flaw
+newFlawSet fList f l =
+    Prelude.foldr S.delete fList 
+      $ (Prelude.map f [FlawLevel1, FlawLevel2, FlawLevel3])
 
 setModelArchetype m =
   let 

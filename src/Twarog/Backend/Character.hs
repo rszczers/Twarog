@@ -41,6 +41,7 @@ module Twarog.Backend.Character
   , maximumAge
   , crHPBonus
   , defaultCrSkillChoices 
+  , additionalTrainedSkills
   , crSkills 
   )
   where
@@ -323,6 +324,7 @@ additionalTrainedSkills = \case
             , Swimming
             , WorldLore
             ]
+  Non     -> []
 
 -- | Player can choose his Character Skills
 -- with regard to his PC role.
