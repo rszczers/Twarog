@@ -616,6 +616,7 @@ askRoles m =
       displayRadioQuestion 
           (Prelude.map Just (availableRoles attr talents lifeStance race sex archetype))
           m characterRole "Your role?" RoleChecked
+      , chooseRandomlyButton SetRandomRole
       , nextButton RoleStage $ isNothing $ m ^. character . characterRole
     ]
 
@@ -657,6 +658,11 @@ askSkills m p =
         Trained             -> trainedSkills
         Untrained           -> []
 
+    question = case p of 
+                  CharacterRoleSkill -> "Your role skills?"
+                  Trained -> "Your trained skills?"
+                  Untrained -> ""
+
     skillList = case p of
             CharacterRoleSkill -> crSkills $ fromMaybe Civilian role
             Trained             -> (additionalTrainedSkills sex) L.\\ roleSkills
@@ -664,7 +670,7 @@ askSkills m p =
 
   in
     div_ [] [
-      p_ [class_ "title is-3 is-full has-text-weight-medium"] [ "Your Class Skills?" ]
+      p_ [class_ "title is-3 is-full has-text-weight-medium"] [ question]
       , div_ [ class_ "columns has-text-centered is-multiline is-mobile"]
         $ Prelude.map 
           ( \x ->

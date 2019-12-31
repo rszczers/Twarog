@@ -160,6 +160,21 @@ updateModel (SetBirth b) m =
                                               then S.insert Marked
                                               else S.delete Marked)
 
+updateModel SetRandomRole m = do
+    m <# do
+      let 
+        attr = fromMaybe (Attributes 0 0 0 0 0 0) $ m ^. character . characterAttr
+        talents = S.toList $ m ^. character . characterTalent
+        lifeStance = fromMaybe Traditional $ m ^. character . characterLifeStance
+        race = fromMaybe Gnome $ m ^. character . characterRace
+        sex = fromMaybe Non $ m ^. character . characterSex
+        archetype = fromMaybe Kronic $ m ^. character . characterAlignment
+      role <- sample $ genCharacterRole attr talents lifeStance race sex archetype
+      return $ SetRole role
+
+updateModel (SetRole r) m =
+  noEff $ m & (character . characterRole .~ Just r)
+
 updateModel SetRandomRace m = do
   m <# do
     race <- sample $ genRace'

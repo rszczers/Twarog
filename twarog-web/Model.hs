@@ -142,6 +142,8 @@ data Msg =  Name MisoString
       | SetLifeStance LifeStance
       | SetRandomArchetype
       | SetArchetype Archetype
+      | SetRandomRole
+      | SetRole CharacterRole
       -- No character related msgs
       | NoOp
       | ChangeStage Stage
