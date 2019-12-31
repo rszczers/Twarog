@@ -4,7 +4,7 @@
 
 *Tiny* web-based manager/toolset for [MYFAROG](https://myfarog.org/) tabletop rpg. Project aims to help with:
 
-- [ ] Generating new character sheets
+- [ ] Getting new players through process of creating new characters
 - [ ] Generating random items
 - [ ] Drawing random dungeons
 - [ ] Generating random backstories for given characters
