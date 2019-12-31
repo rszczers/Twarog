@@ -55,13 +55,15 @@ getStage m = case m ^. currentStage of
         SkillsStage Untrained       -> skillsSummary m
         SkillsStage prof            -> askSkills m prof
 
-nextButton :: Stage -> View Msg                            
-nextButton stage = 
+nextButton :: Stage -> Bool -> View Msg                            
+nextButton stage isActive = 
   div_ [class_ "columns"][
     div_ [class_ "column is-full level"] [
       div_ [ class_ "level-right"] [
-        button_ [ class_ "button is-outlined is-medium"
-                , onClick $ ChangeStage $ nextStage stage  ] 
+        button_ [ class_ $ ms $ "button is-outlined is-medium " 
+                            ++ if not isActive then "animated tada" else "" 
+                , onClick $ ChangeStage $ nextStage stage
+                , disabled_  isActive ] 
                 [ 
                   text $ getNextButtonText $ nextStage stage
                   , span_ [class_ "icon", style_ $ M.singleton "padding-left" "1.5rem"] [
@@ -85,19 +87,22 @@ chooseRandomlyButton whatToDo =
 
 askName :: Model -> View Msg
 askName m =
-  div_ [class_ "animated fadeIn"]
-    [ h2_ [class_ "title is-2 has-text-weight-medium"] [ "Your name? "]
-    , div_ [class_ "columns is-centered"] [
-        div_ [ class_ "column is-two-fifths"] [
-            input_ [ class_ "input is-medium"
-              , value_ $ ms
-                $ fromMaybe "" (m^.character.characterName)
-              , onInput Name 
-              ]
+  let 
+    name = m^.character.characterName
+  in
+    div_ [class_ "animated fadeIn"]
+      [ h2_ [class_ "title is-2 has-text-weight-medium"] [ "Your name? "]
+      , div_ [class_ "columns is-centered"] [
+          div_ [ class_ "column is-two-fifths"] [
+              input_ [ class_ "input is-medium"
+                , value_ $ ms
+                  $ fromMaybe "" name
+                , onInput Name 
+                ]
+            ]
           ]
-        ]
-        , nextButton NameStage
-    ]
+          , nextButton NameStage (name ==  Nothing || name == Just "")
+      ]
 
 askAttributes :: Model -> Maybe AttribBounce -> View Msg
 askAttributes m bounce = 
@@ -105,10 +110,14 @@ askAttributes m bounce =
     firstScreen = isNothing bounce
     attr = printBounce bounce
     max3D6 = 18
+    isBtnActive = case m ^. character . characterAttr of  
+                    Nothing -> True
+                    Just (Attributes 0 0 0 0 0 0) -> True
+                    otherwise -> False
     isNotValid = not $ (Prelude.foldr max max3D6 [m ^. currentRoll1, m ^. currentRoll2]) == max3D6
   in  
     if firstScreen 
-    then attributesFirstScreen
+    then attributesFirstScreen isBtnActive
     else   
       div_ [class_ "animated fadeIn"] [
         p_ [class_ "title is-2 has-text-weight-medium"] [text "Roll your dice!"]
@@ -160,8 +169,8 @@ askAttributes m bounce =
               [text "Calculate"]
         ]
 
-attributesFirstScreen :: View Msg
-attributesFirstScreen = div_ [class_ "animated fadeIn"] [
+attributesFirstScreen :: Bool -> View Msg
+attributesFirstScreen isBtnActive = div_ [class_ "animated fadeIn"] [
               p_ [class_ "title is-2 has-text-weight-medium"] [text "Your attributes"] 
               , div_ [class_ "columns "] [
                 div_ [class_ "level is-mobile column is-three-fifths is-offset-one-fifth"] [
@@ -174,13 +183,14 @@ attributesFirstScreen = div_ [class_ "animated fadeIn"] [
                       ] ["Use one click generator"]
                 ]  
               ]
-              , nextButton (AttribStage Nothing)
+              , nextButton (AttribStage Nothing) isBtnActive
             ] 
 
 askBirthday ::  Model -> View Msg
 askBirthday m =
   let
     birthday = m ^. character . characterBirth
+    isBtnActive = isNothing birthday
     day =  case birthday of
           Nothing -> ""
           Just a -> show $ a ^. birthdayDay
@@ -230,7 +240,7 @@ askBirthday m =
               _ -> [ text $ ""]  
             )
         ]
-        , nextButton BirthStage
+        , nextButton BirthStage isBtnActive
     ]
 
 askSex :: Model -> View Msg
@@ -239,7 +249,7 @@ askSex m =
     displayRadioQuestion (Prelude.map Just sexes) m 
                         characterSex "Your sex?" SexChecked
     , chooseRandomlyButton SetRandomSex
-    , nextButton SexStage
+    , nextButton SexStage $ isNothing $ m ^. character . characterSex
     ]
 
 askRace :: Model -> View Msg
@@ -248,7 +258,7 @@ askRace m =
     displayRadioQuestion (Prelude.map Just playableRaces) m
                   characterRace "Your race?" RaceChecked 
     , chooseRandomlyButton SetRandomRace
-    , nextButton RaceStage
+    , nextButton RaceStage $ isNothing $ m ^. character . characterRace
   ]
 
 askLifeStance :: Model -> View Msg
@@ -263,7 +273,7 @@ askLifeStance m =
     div_ [] [
      displayRadioQuestion valueList m characterLifeStance "Your life stance?" LifeStanceChecked 
      , chooseRandomlyButton SetRandomLifeStance
-     , nextButton GodStage
+     , nextButton GodStage $ isNothing $ m ^. character . characterLifeStance
     ]
 
 askAttitude :: Model -> View Msg
@@ -273,7 +283,7 @@ askAttitude m =
     , chooseAttitide m
     , showArchetype m
     , chooseRandomlyButton SetRandomArchetype
-    , nextButton AttitudeStage
+    , nextButton AttitudeStage $ isNothing $ m ^. character . characterAlignment
   ]
 
 showArchetype :: Model -> View Msg
@@ -504,7 +514,7 @@ flawsAndTalentsFirstScreen m =
           ]
           else [] 
           ) 
-        , nextButton $ FlawsAndTalentsStage True
+        , nextButton (FlawsAndTalentsStage True) $ (S.null talents) 
     ] 
 
 askFlawsAndTalents :: Model -> View Msg
@@ -523,10 +533,10 @@ askFlawsAndTalents m =
             askFlaws m
             --displayCheckboxQuestion flaws m characterFlaws "What are your flaws?" NoLimit FlawChecked
         ]
-    ]
+    ] 
+    , nextButton (FlawsAndTalentsStage True) $ ((talents) == []) 
+                                              || ( S.null $ m ^. character . characterTalent)
   ]
-
-  --[(FlawLevel -> Flaw, [FlawLevel])]
 
 askFlaws :: Model -> View Msg
 askFlaws m = 
@@ -606,7 +616,7 @@ askRoles m =
       displayRadioQuestion 
           (Prelude.map Just (availableRoles attr talents lifeStance race sex archetype))
           m characterRole "Your role?" RoleChecked
-      , nextButton RoleStage
+      , nextButton RoleStage $ isNothing $ m ^. character . characterRole
     ]
 
 skillsSummary m = 
@@ -675,7 +685,7 @@ askSkills m p =
                 ]
               ]
           ) skillList
-          , nextButton (SkillsStage p )
+          , nextButton (SkillsStage p ) $ choosedSkills == []
     ]
 
 
