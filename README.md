@@ -1,12 +1,21 @@
-# TWAROG [wip]
+# TWAROG
 
 [![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)[![Build Status](https://travis-ci.org/rszczers/Twarog.svg?branch=master)](https://travis-ci.org/rszczers/Twarog)
 
-*Tiny* web-based player character creator/manager for [MYFAROG](https://myfarog.org/) tabletop rpg.
+*Tiny* web-based manager/toolset for [MYFAROG](https://myfarog.org/) tabletop rpg. Project aims to help with:
 
-Well, it does nothing spectacular yet. Come back here in a few days :neckbeard:
+- [x] Generating new character sheets
+- [ ] Generating random items
+- [ ] Drawing random dungeons
+- [ ] Generating random backstories for given characters
 
-## Dev environment
+Project is under active development. Come back here in a few days :neckbeard:
+
+## Getting started
+
+To get project running, you need [nix](https://nixos.org/nix/) package manager installed on your machine.
+
+### Dev environment
 
 ```
 nix-shell --run reload
@@ -14,7 +23,7 @@ nix-shell --run reload
 
 App runs on `localhost:8080`.
 
-## Build
+### Build
 
 ```
 nix-build -A release
