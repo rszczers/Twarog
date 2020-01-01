@@ -52,8 +52,8 @@ getStage m = case m ^. currentStage of
         FlawsAndTalentsStage False  -> flawsAndTalentsFirstScreen m
         FlawsAndTalentsStage True   -> askFlawsAndTalents m
         RoleStage                   -> askRoles m
-        SkillsStage Untrained       -> skillsSummary m
-        SkillsStage prof            -> askSkills m prof
+        RandomSkillsStage           -> skillsFirstScreen m
+        SkillsStage                 -> askSkills m
 
 nextButton :: Stage -> Bool -> View Msg                            
 nextButton stage isActive = 
@@ -631,19 +631,74 @@ skillsSummary m =
     showList l = 
       div_ [] $
         Prelude.map 
-        (\x -> div_ [] [text $ ms $ show x]) l
+        (\x -> p_ [class_ "tag is-medium"] [text $ ms $ show x]) l
+        
+    animation = not (L.null roleSkills || L.null trainedSkills || L.null untrainedSkills)
+  in
+    if animation then
+      div_ [class_ "animated slideInUp", style_  $ M.singleton "margin-top" "1.5rem"] [
+        div_ [class_ "columns"] [
+          div_ [class_ "column is-one-third"] [
+            p_ [class_ "title is-4"] ["Character role skills: "]
+            , div_ [class_ "tags"] [ 
+                showList roleSkills
+            ]
+          ]
+          , div_ [class_ "column is-one-third"] [
+            p_ [class_ "title is-4"] ["Trained role skills: "]
+            , div_ [class_ "tags"] [ 
+                showList trainedSkills
+            ]
+          ]
+          , div_ [class_ "column"] [
+            p_ [class_ "title is-4"] ["Untrained role skills: "]
+            , div_ [class_ "tags"] [ 
+                showList untrainedSkills
+            ]
+          ]
+        ]
+        , nextButton SkillsStage False
+      ]
+    else div_ [] [] 
+    
+skillsFirstScreen m = 
+  div_ [class_ "animated fadeIn"] [
+    p_ [class_ "title is-2 has-text-weight-medium"] [text "Your skills"] 
+    , div_ [class_ "columns "] [
+      div_ [class_ "level is-mobile column is-three-fifths is-offset-one-fifth"] [
+        button_ [class_ "level-item button is-medium is-black"
+            , onClick $ ChangeStage $ SkillsStage
+            ] ["Choose skills by yourself"]   
+        , label_ [class_ "level-item label is-medium"] [" or "]
+        , button_ [class_ "level-item button is-medium is-black"
+                , onClick SetRandomSkills
+            ] ["Generate your skills"]
+      ]  
+    ]
+    , div_ [] [
+      skillsSummary m
+    ]
+    --, nextButton RandomSkillsStage isBtnActive
+  ] 
+
+askSkills m =
+  let 
+    role = m ^. character . characterRole 
+    sex = fromMaybe Non $ m ^. character . characterSex
   in
     div_ [] [
-      p_ [class_ "title is-4"] ["Character role skills: "]
-      , showList roleSkills
-      , p_ [class_ "title is-4"] ["Trained role skills: "]
-      , showList trainedSkills
-      , p_ [class_ "title is-4"] ["Untrained role skills: "]
-      , showList untrainedSkills
-    ]
-    
-askSkills :: Model -> Proficiency -> View Msg
-askSkills m p =
+      chooseSkills m CharacterRoleSkill 
+          $ case role of
+            Nothing -> 0
+            Just a -> defaultCrSkillChoices a
+      , chooseSkills m Trained $ if sex == Male then 1 else 2
+      , chooseSkills m Untrained 0
+      , button_ [class_ "button", onClick $ ChangeStage RandomSkillsStage  ] ["Ready!"]
+    ] 
+
+
+chooseSkills :: Model -> Proficiency -> Int -> View Msg
+chooseSkills m p n =
   let
     role = m ^. character . characterRole
     sex = fromMaybe Non $ m ^. character . characterSex
@@ -658,30 +713,56 @@ askSkills m p =
         Trained             -> trainedSkills
         Untrained           -> []
 
+    isActive = 
+      n <= (case p of
+            CharacterRoleSkill -> L.length roleSkills
+            Trained -> L.length trainedSkills
+            Untrained -> 0
+            )
+
     question = case p of 
                   CharacterRoleSkill -> "Your role skills?"
-                  Trained -> "Your trained skills?"
-                  Untrained -> ""
+                  Trained -> "Your additional trained skills?"
+                  Untrained -> "Your untrained skills"
+
+    comment = case p of 
+                CharacterRoleSkill -> ("Unchoosen skills will become your trained skills." 
+                                      ++ "\n You can choose ") 
+                                      ++ (show n 
+                                      ++ " skills")
+                Trained -> ("You can choose " 
+                            ++ show n )
+                            ++ " skills"
+                Untrained -> ""
 
     skillList = case p of
             CharacterRoleSkill -> crSkills $ fromMaybe Civilian role
-            Trained             -> (additionalTrainedSkills sex) L.\\ roleSkills
-            Untrained           -> []
+            Trained             -> (additionalTrainedSkills sex) L.\\ roleSkills 
+            Untrained           -> skills L.\\ (crSkills $ fromMaybe Civilian role)
 
   in
-    div_ [] [
+    div_ [class_ "is-centered", style_  $ M.singleton "margin" "0.5rem"] [
       p_ [class_ "title is-3 is-full has-text-weight-medium"] [ question]
+      , p_ [class_ "subtitle is-5"] [text $ ms comment]
       , div_ [ class_ "columns has-text-centered is-multiline is-mobile"]
         $ Prelude.map 
-          ( \x ->
+          (( \prof x ->
             label_ [class_ "label has-text-weight-normal"] [
+              if prof == Untrained then
+                div_ [class_ "tags" ] [ 
+                  span_ [class_ "tag is-light is-medium "
+                        , style_  $ M.singleton "margin" "0.5rem"] [ 
+                    text $ ms $ show x
+                  ]
+                ]
+              else
               div_ [class_ "field has-addons column has-text-centered is-one-fifth-tablet is-one-quarters-mobile"] [ 
                 p_ [class_ "control"] [
                   input_ [ 
                     type_ "checkbox", name_ "skill"
                     , style_  $ M.singleton "margin" "0.5rem"
                     , checked_ $ elem x choosedSkills
-                    --, disabled_ $ isDisabled x
+                    , disabled_ $ isActive && (not $ elem x choosedSkills)
                     , onChecked $ SkillChecked x p
                   ]
                   ]
@@ -689,11 +770,9 @@ askSkills m p =
                   text $ ms $ show x
                   ]
                 ]
-              ]
-          ) skillList
-          , nextButton (SkillsStage p ) $ choosedSkills == []
+            ]
+          ) p) skillList
     ]
-
 
 --dispaleyCheckboxQuestion :: [a] -> Model -> (characterField) -> String -> Int -> (a -> Bool -> View Msg)
 displayCheckboxQuestion valueList model characterField question max msg =

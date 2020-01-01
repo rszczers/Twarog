@@ -18,6 +18,7 @@ module Twarog.Frontend.CharGen
   , genLifeStance
   , genLifeStance'
   , genCharacterRole
+  , genInitCharacterSkills
   , genNewCharacter
   ) where
 

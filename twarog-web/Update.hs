@@ -175,6 +175,18 @@ updateModel SetRandomRole m = do
 updateModel (SetRole r) m =
   noEff $ m & (character . characterRole .~ Just r)
 
+updateModel SetRandomSkills m = do
+    m <# do
+      let 
+        attr = fromMaybe (Attributes 0 0 0 0 0 0) $ m ^. character . characterAttr
+        sex = fromMaybe Non $ m ^. character . characterSex
+        role = fromMaybe Civilian $ m ^. character . characterRole
+      skills <- sample $ genInitCharacterSkills role sex (modifiers attr)
+      return $ SetSkills skills
+
+updateModel (SetSkills s) m =
+  noEff $ m & (character . characterSkills .~ s)
+
 updateModel SetRandomRace m = do
   m <# do
     race <- sample $ genRace'
