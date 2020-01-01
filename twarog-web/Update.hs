@@ -45,12 +45,21 @@ updateModel (TalentChecked r _ (Checked False)) m =
   noEff $ m & character . characterTalent %~ S.delete r
 
 updateModel (ChangeStage s) m = 
-  let availableS = m ^. availableStages
-      isNewStage = not $ elem s availableS
-      current = m & currentStage .~ s
-  in if isNewStage 
-     then noEff $ current & availableStages .~ ( availableS ++ [s] )
-     else noEff current
+  let 
+    availableS = m ^. availableStages
+    
+    isNewStage a m = 
+      if not $ elem a availableS
+      then current & availableStages .~ ( availableS ++ [s] )
+      else current
+    current = m & currentStage .~ s
+    skillStage a m = 
+      if a == SkillsStage 
+      then m & character.characterSkills .~ 
+            (M.fromList . Prelude.zip skills $ repeat (CharacterSkill 0 Untrained))
+      else m
+  in
+    noEff $ skillStage s $ isNewStage s m
 
 updateModel (SetCurrentRoll1 n) m = 
   let

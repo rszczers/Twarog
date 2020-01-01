@@ -633,10 +633,10 @@ skillsSummary m =
         Prelude.map 
         (\x -> p_ [class_ "tag is-medium"] [text $ ms $ show x]) l
         
-    animation = not (L.null roleSkills || L.null trainedSkills || L.null untrainedSkills)
+    animation = not (L.null roleSkills || L.null trainedSkills)
   in
     if animation then
-      div_ [class_ "animated slideInUp", style_  $ M.singleton "margin-top" "1.5rem"] [
+      div_ [class_ "animated fadeIn", style_  $ M.singleton "margin-top" "1.5rem"] [
         div_ [class_ "columns"] [
           div_ [class_ "column is-one-third"] [
             p_ [class_ "title is-4"] ["Character role skills: "]
@@ -678,7 +678,6 @@ skillsFirstScreen m =
     , div_ [] [
       skillsSummary m
     ]
-    --, nextButton RandomSkillsStage isBtnActive
   ] 
 
 askSkills m =
@@ -693,7 +692,7 @@ askSkills m =
             Just a -> defaultCrSkillChoices a
       , chooseSkills m Trained $ if sex == Male then 1 else 2
       , chooseSkills m Untrained 0
-      , button_ [class_ "button", onClick $ ChangeStage RandomSkillsStage  ] ["Ready!"]
+      , button_ [class_ "button is-medium", onClick $ ChangeStage RandomSkillsStage  ] ["Ready!"]
     ] 
 
 
@@ -721,7 +720,7 @@ chooseSkills m p n =
             )
 
     question = case p of 
-                  CharacterRoleSkill -> "Your role skills?"
+                  CharacterRoleSkill -> "Choose your role skills."
                   Trained -> "Your additional trained skills?"
                   Untrained -> "Your untrained skills"
 
@@ -729,10 +728,10 @@ chooseSkills m p n =
                 CharacterRoleSkill -> ("Unchoosen skills will become your trained skills." 
                                       ++ "\n You can choose ") 
                                       ++ (show n 
-                                      ++ " skills")
+                                      ++ " role skills")
                 Trained -> ("You can choose " 
                             ++ show n )
-                            ++ " skills"
+                            ++ " addidional trained skills"
                 Untrained -> ""
 
     skillList = case p of
@@ -872,7 +871,7 @@ navbarElem m =
 
     printAttribute attr bounce = 
       div_ [class_ "level-item has-text-centered"] [
-        div_ [ class_ 
+        div_ [ class_
           (if attribToBounce m == bounce
           then "animated bounce"
           else "")
@@ -897,14 +896,23 @@ navbarElem m =
 
 breadcrumb :: [Stage] -> Stage -> View Msg
 breadcrumb stages active = 
-  nav_ [class_ "breadcrumb is-centered"] [
-    ul_ [] $ Prelude.map
-        ( \x -> li_ [class_ 
-                    (if (active == x) then "is-active" else "") ] [
-          a_ [ onClick (ChangeStage x) ] [ text $ ms $ show x ]
-        ])
-        stages
-    ]
+  let 
+    cleanStages :: [Stage] -> [Stage]
+    cleanStages s = 
+      ((s L.\\ [AttribStage (Just a) | a <- attrBounce])
+      L.\\ [FlawsAndTalentsStage True])
+      L.\\ [SkillsStage]
+
+
+  in
+    nav_ [class_ "breadcrumb is-centered"] [
+      ul_ [] $ Prelude.map
+          ( \x -> li_ [class_ 
+                      (if (active == x) then "is-active" else "") ] [
+            a_ [ onClick (ChangeStage x) ] [ text $ ms $ show x ]
+          ])
+          $ cleanStages stages
+      ]
 
 menu :: View Msg
 menu = 

@@ -18,6 +18,7 @@ module Model
   , initialModel
   , nextStage
   , getNextButtonText
+  , attrBounce
   ) where
 
 import       Control.Lens
@@ -65,7 +66,10 @@ data AttribBounce = Every
                   | Inteligence 
                   | Strength 
                   | WillPower 
-                  deriving (Show, Eq)
+                  deriving (Show, Eq, Enum)
+        
+attrBounce :: [AttribBounce]
+attrBounce = enumFrom (toEnum 0)
 
 nextStage :: Stage -> Stage
 nextStage s = case s of 
@@ -77,8 +81,8 @@ nextStage s = case s of
   SexStage             -> AttitudeStage
   AttitudeStage        -> FlawsAndTalentsStage False
   FlawsAndTalentsStage  _ -> RoleStage
-  RoleStage            -> RandomSkillsStage
-  RandomSkillsStage    -> SkillsStage
+  RoleStage             -> RandomSkillsStage
+  RandomSkillsStage     -> SkillsStage
   SkillsStage           -> RandomSkillsStage
  
   
@@ -93,8 +97,9 @@ getNextButtonText s = case s of
   RoleStage               -> "Go to Role"
   FlawsAndTalentsStage _  -> "Go to Flaws & Talents"
   GodStage                -> "Go to Life Stance"
-  SkillsStage             -> "Go to Skills"
   RandomSkillsStage       -> "Go to Skills"
+  SkillsStage             -> "Ready! "
+  
 
 printBounce :: Maybe AttribBounce -> String
 printBounce b = case b of
