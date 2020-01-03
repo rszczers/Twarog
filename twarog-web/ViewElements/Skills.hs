@@ -53,7 +53,6 @@ skillsSummary m =
             ]
           ]
         ]
-        , nextButton SkillsStage False
       ]
     else div_ [] [] 
     
@@ -74,6 +73,7 @@ skillsFirstScreen m =
     , div_ [] [
       skillsSummary m
     ]
+    , nextButton SkillsStage False
   ] 
 
 askSkills m =
