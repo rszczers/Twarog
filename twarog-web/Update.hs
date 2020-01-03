@@ -273,6 +273,13 @@ updateModel SetRandomArchetype m = do
 updateModel (SetArchetype a) m =
   noEff $ setModelAttitude (attitude a) $ m & character . characterAlignment .~ Just a
 
+updateModel SetRandomCharacter m = do
+  (m & currentStage .~ SummaryStage) <# do
+    char <- sample $ genNewCharacter
+    return $ SetCharacter $ char
+
+updateModel (SetCharacter ch) m =
+  noEff $ m & character .~ ch
 
 newFlawSet :: S.Set Flaw -> (FlawLevel -> Flaw) -> FlawLevel -> S.Set Flaw
 newFlawSet fList f l =
@@ -297,3 +304,4 @@ setModelAttitude (Attitude soc sub ont emp) m =
     & ontology .~ Just ont)
     & empathy .~ Just emp
 setModelAttitude Neutral m = m
+

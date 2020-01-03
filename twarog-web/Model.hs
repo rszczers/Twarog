@@ -42,6 +42,8 @@ data Stage = OwnerStage
            | RoleStage
            | SkillsStage
            | RandomSkillsStage
+           | SummaryStage
+           | GenCharacterStage
            deriving (Eq)
 
 instance Show Stage where
@@ -58,6 +60,8 @@ instance Show Stage where
   show RoleStage = "Character's role"
   show SkillsStage = "Skills"
   show RandomSkillsStage = "Character Skills"
+  show SummaryStage = "Character Summary"
+  show GenCharacterStage = "Way of creation"
 
 data AttribBounce = Every 
                   | Charisma 
@@ -84,6 +88,8 @@ nextStage s = case s of
   RoleStage             -> RandomSkillsStage
   RandomSkillsStage     -> SkillsStage
   SkillsStage           -> RandomSkillsStage
+  GenCharacterStage     -> AttribStage Nothing
+  SummaryStage          -> SummaryStage
  
   
 
@@ -99,6 +105,8 @@ getNextButtonText s = case s of
   GodStage                -> "Go to Life Stance"
   RandomSkillsStage       -> "Go to Skills"
   SkillsStage             -> "Ready! "
+  GenCharacterStage       -> ""
+  SummaryStage            -> ""
   
 
 printBounce :: Maybe AttribBounce -> String
@@ -151,6 +159,8 @@ data Msg =  Name MisoString
       | SetRole CharacterRole
       | SetRandomSkills
       | SetSkills (M.Map Skill CharacterSkill)
+      | SetRandomCharacter 
+      | SetCharacter NewCharacter
       -- No character related msgs
       | NoOp
       | ChangeStage Stage
@@ -168,7 +178,7 @@ data MaxCheckbox = TalentsMax Int | NoLimit
 
 initialModel :: Model
 initialModel =
-  let _currentStage = NameStage 
+  let _currentStage = GenCharacterStage
       _currentAttribBounce = Nothing 
       _availableStages = []
       _currentRoll1 = 0
