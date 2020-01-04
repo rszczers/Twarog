@@ -1,4 +1,4 @@
-module ViewElements.Character (
+module View.Character (
   characterSummary
   , genCharacterScreen
 ) where
@@ -6,12 +6,13 @@ module ViewElements.Character (
 import      Miso
 import      Miso.String
 import      Model
+import      Data.Text
 import      Twarog
 
 import      Control.Lens
 import      Data.Maybe
-import      ViewElements.FlawsAndTalents
-import      ViewElements.Skills
+import      View.FlawsAndTalents
+import      View.Skills
 import      Data.Map as M
 
 characterSummary :: Model -> View Msg
@@ -34,6 +35,7 @@ characterSummary m =
     role = characterFiledText m characterRole
     flaws = m ^. character . characterFlaws
     talents = m ^. character . characterTalent
+    notes = m ^. character . characterOther
   
     combatStats = sheet ^. sheetCombatStats
     toughness = sheet ^. sheetToughness
@@ -56,11 +58,13 @@ characterSummary m =
       
   in 
     div_ [] [
-      p_ [class_ "title"] ["Summary"] 
-      , div_ [class_ "tile is-ancestor is-12"] [ 
-          div_ [class_ "tile is-centered box"] [
+      p_ [class_ "title is-2 has-text-weight-light"] ["Summary"] 
+      , div_ [class_ "tile is-ancestor"] [ 
+          div_ [class_ "tile is-parent"] [
+            div_ [class_ "tile is-child box"] [
               p_ [class_ "heading"] ["Name"] 
               , p_ [class_ "title is-4"] [text $ ms $ name]
+            ]
           ]
       ]
       , div_ [class_ "tile is-ancestor"] [ 
@@ -154,29 +158,31 @@ characterSummary m =
             -- Show attributes and mods
             div_ [class_ "tile is-child"] [
               p_ [class_ "title is-4"] ["Attributes: "]
-              , table_ [class_ "table is-narrow column"] $
-              [
-                thead_ [] [
-                  tr_ [] [
-                    th_ [] ["Attribute"]
-                    , th_ [] [""]
-                    , th_ [] ["Modificator"]
-                    , th_ [] [""]
+              , div_ [class_ "columns is-centered"] [
+                  table_ [class_ "table is-narrow column"] $
+                [
+                  thead_ [] [
+                    tr_ [] [
+                      th_ [] ["Attribute"]
+                      , th_ [] [""]
+                      , th_ [] ["Modificator"]
+                      , th_ [] [""]
+                    ]
                   ]
                 ]
+                ++
+                  (Prelude.map 
+                    (\(w, x, y, z) -> 
+                                    tr_ [] [ 
+                                      td_ [] [text $ ms $ w]
+                                      , td_ [] [text $ ms $ show x]
+                                      , td_ [] [text $ ms $ y]
+                                      , td_ [class_ "has-text-right"] [text $ ms z]
+                                      ]
+                    )
+                    $ toTable $ fromMaybe (Attributes 0 0 0 0 0 0) attr  
+                  )    
               ]
-              ++
-                (Prelude.map 
-                  (\(w, x, y, z) -> 
-                                  tr_ [] [ 
-                                    td_ [] [text $ ms $ w]
-                                    , td_ [] [text $ ms $ show x]
-                                    , td_ [] [text $ ms $ y]
-                                    , td_ [class_ "has-text-right"] [text $ ms z]
-                                    ]
-                  )
-                  $ toTable $ fromMaybe (Attributes 0 0 0 0 0 0) attr  
-                )    
             ]
             , div_ [class_ "tile is-parent"][
                 div_ [class_ "tile is-parent"] [
@@ -210,7 +216,18 @@ characterSummary m =
                   flawsAndTallentsSummary flaws talents
                   ]
               ]
-            ] 
+          ]
+          , div_ [class_ "tile is-ancestor"] [
+              div_ [class_ "tile is-parent" ] [ 
+                div_ [class_ "tile is-child"] [
+              -- Show Notes
+                  p_ [class_ "title is-5"] ["Notes"]
+                  , div_ [] $                    
+                    showNotes notes 
+                  ]
+              ]
+            ]
+             
           ]
 
 
@@ -275,3 +292,10 @@ showResistance resistance =
       ]
   in
     showStats $ res resistance
+
+showNotes notes =
+  let 
+    note :: Text -> View Msg
+    note n = p_ [] [ text $ ms $ n ]
+  in
+    Prelude.map note notes

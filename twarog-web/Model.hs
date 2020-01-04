@@ -86,7 +86,7 @@ nextStage s = case s of
   AttitudeStage        -> FlawsAndTalentsStage False
   FlawsAndTalentsStage  _ -> RoleStage
   RoleStage             -> RandomSkillsStage
-  RandomSkillsStage     -> SkillsStage
+  RandomSkillsStage     -> SummaryStage
   SkillsStage           -> RandomSkillsStage
   GenCharacterStage     -> AttribStage Nothing
   SummaryStage          -> SummaryStage
@@ -106,7 +106,7 @@ getNextButtonText s = case s of
   RandomSkillsStage       -> "Go to Skills"
   SkillsStage             -> "Ready! "
   GenCharacterStage       -> ""
-  SummaryStage            -> ""
+  SummaryStage            -> "Go to Summary "
   
 
 printBounce :: Maybe AttribBounce -> String
@@ -188,5 +188,6 @@ initialModel =
       _ontology = Nothing
       _empathy = Nothing
       _character = emptyNewCharacter
+      _sheet = emptySheet
    in Model{..}
 

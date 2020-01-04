@@ -1,4 +1,4 @@
-module ViewElements.Menu (
+module View.Menu (
   menu
   , navbarElem
   , breadcrumb

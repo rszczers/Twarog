@@ -10,14 +10,14 @@ import       Data.Maybe
 import qualified Data.Set         as S
 import qualified Data.Map         as M
 
-import      ViewElements.Attributes
-import      ViewElements.Birthday 
-import      ViewElements.Buttons
-import      ViewElements.Attitude
-import      ViewElements.FlawsAndTalents
-import      ViewElements.Skills
-import      ViewElements.Menu
-import      ViewElements.Character
+import      View.Attributes
+import      View.Birthday 
+import      View.Buttons
+import      View.Attitude
+import      View.FlawsAndTalents
+import      View.Skills
+import      View.Menu
+import      View.Character
 
 viewModel :: Model -> View Msg
 viewModel m@Model{..} =

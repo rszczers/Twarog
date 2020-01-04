@@ -1,4 +1,4 @@
-module ViewElements.Attributes 
+module View.Attributes 
 ( 
   askAttributes
 , attributesFirstScreen 
@@ -13,7 +13,7 @@ import       Control.Lens
 import qualified Data.Map         as M
 import       Data.Maybe
 
-import       ViewElements.Buttons
+import       View.Buttons
 
 askAttributes :: Model -> Maybe AttribBounce -> View Msg
 askAttributes m bounce = 

@@ -1,4 +1,4 @@
-module ViewElements.Attitude (
+module View.Attitude (
   askAttitude
 ) where
 
@@ -10,7 +10,7 @@ import       Twarog
 import       Control.Lens
 import       Data.Maybe
 
-import       ViewElements.Buttons
+import       View.Buttons
 
 askAttitude :: Model -> View Msg
 askAttitude m = 

@@ -1,4 +1,4 @@
-module ViewElements.Skills (
+module View.Skills (
   askSkills
   , skillsSummary
   , skillsFirstScreen
@@ -14,7 +14,7 @@ import       Data.Maybe
 import qualified Data.Map         as M
 import qualified Data.List        as L
 
-import       ViewElements.Buttons
+import       View.Buttons
 
 skillsSummary m = 
   let 
@@ -73,7 +73,7 @@ skillsFirstScreen m =
     , div_ [] [
       skillsSummary m
     ]
-    , nextButton SkillsStage False
+    , nextButton RandomSkillsStage False
   ] 
 
 askSkills m =

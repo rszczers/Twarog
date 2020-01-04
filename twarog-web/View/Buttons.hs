@@ -1,4 +1,4 @@
-module ViewElements.Buttons 
+module View.Buttons 
 (
   nextButton
   , chooseRandomlyButton
@@ -73,7 +73,7 @@ displayCheckboxQuestion valueList model characterField question max msg =
     div_ [ class_ "control has-text-centered" ] [
       div_ [] [
         p_ [class_ "title is-3 is-full has-text-weight-medium"] [ question ]
-        , div_ [ class_ "columns has-text-centered is-multiline is-mobile"]
+        , div_ [ class_ "columns is-multiline is-mobile"]
           $ Prelude.map 
             ( \x ->
               label_ [class_ "label has-text-weight-normal"] [
@@ -103,7 +103,7 @@ displayRadioQuestion valueList model characterField question msg =
   in
     div_ [ class_ "control has-text-centered" ] [
       h2_ [class_ "title is-2 has-text-weight-medium"] [ question ]
-      , div_ [ class_ "columns has-text-centered is-multiline is-mobile" ]
+      , div_ [ class_ "columns is-centered is-multiline is-mobile" ]
       $ Prelude.map
         (\x ->
           label_ [class_ "label has-text-weight-normal"] [

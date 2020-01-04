@@ -1,4 +1,4 @@
-module ViewElements.Birthday
+module View.Birthday
 (
   askBirthday
 ) where
@@ -12,7 +12,7 @@ import       Control.Lens
 import       Data.Maybe
 import qualified Data.Map         as M
 
-import      ViewElements.Buttons
+import      View.Buttons
 
 askBirthday ::  Model -> View Msg
 askBirthday m =

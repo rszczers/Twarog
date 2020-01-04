@@ -1,4 +1,4 @@
-module ViewElements.FlawsAndTalents(
+module View.FlawsAndTalents(
   askFlawsAndTalents
   , flawsAndTalentsFirstScreen
   , flawsAndTallentsSummary
@@ -10,10 +10,11 @@ import       Model
 import       Twarog
 
 import       Control.Lens
+import       Data.Maybe
 import qualified Data.Map         as M
 import qualified Data.Set         as S
 
-import       ViewElements.Buttons
+import       View.Buttons
 
 askFlawsAndTalents :: Model -> View Msg
 askFlawsAndTalents m = 
