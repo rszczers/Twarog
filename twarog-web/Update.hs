@@ -45,12 +45,21 @@ updateModel (TalentChecked r _ (Checked False)) m =
   noEff $ m & character . characterTalent %~ S.delete r
 
 updateModel (ChangeStage s) m = 
-  let availableS = m ^. availableStages
-      isNewStage = not $ elem s availableS
-      current = m & currentStage .~ s
-  in if isNewStage 
-     then noEff $ current & availableStages .~ ( availableS ++ [s] )
-     else noEff current
+  let 
+    availableS = m ^. availableStages
+    
+    isNewStage a m = 
+      if not $ elem a availableS
+      then current & availableStages .~ ( availableS ++ [s] )
+      else current
+    current = m & currentStage .~ s
+    skillStage a m = 
+      if a == SkillsStage 
+      then m & character.characterSkills .~ 
+            (M.fromList . Prelude.zip skills $ repeat (CharacterSkill 0 Untrained))
+      else m
+  in
+    noEff $ skillStage s $ isNewStage s m
 
 updateModel (SetCurrentRoll1 n) m = 
   let
@@ -175,6 +184,18 @@ updateModel SetRandomRole m = do
 updateModel (SetRole r) m =
   noEff $ m & (character . characterRole .~ Just r)
 
+updateModel SetRandomSkills m = do
+    m <# do
+      let 
+        attr = fromMaybe (Attributes 0 0 0 0 0 0) $ m ^. character . characterAttr
+        sex = fromMaybe Non $ m ^. character . characterSex
+        role = fromMaybe Civilian $ m ^. character . characterRole
+      skills <- sample $ genInitCharacterSkills role sex (modifiers attr)
+      return $ SetSkills skills
+
+updateModel (SetSkills s) m =
+  noEff $ m & (character . characterSkills .~ s)
+
 updateModel SetRandomRace m = do
   m <# do
     race <- sample $ genRace'
@@ -252,6 +273,13 @@ updateModel SetRandomArchetype m = do
 updateModel (SetArchetype a) m =
   noEff $ setModelAttitude (attitude a) $ m & character . characterAlignment .~ Just a
 
+updateModel SetRandomCharacter m = do
+  (m & currentStage .~ SummaryStage) <# do
+    char <- sample $ genNewCharacter
+    return $ SetCharacter $ char
+
+updateModel (SetCharacter ch) m =
+  noEff $ m & character .~ ch
 
 newFlawSet :: S.Set Flaw -> (FlawLevel -> Flaw) -> FlawLevel -> S.Set Flaw
 newFlawSet fList f l =
@@ -276,3 +304,4 @@ setModelAttitude (Attitude soc sub ont emp) m =
     & ontology .~ Just ont)
     & empathy .~ Just emp
 setModelAttitude Neutral m = m
+

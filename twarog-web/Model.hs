@@ -18,6 +18,7 @@ module Model
   , initialModel
   , nextStage
   , getNextButtonText
+  , attrBounce
   ) where
 
 import       Control.Lens
@@ -25,6 +26,7 @@ import       Miso
 import       Miso.String
 import       Data.Char as C
 import       Data.Set as S
+import       Data.Map as M
 import       Twarog
 
 data Stage = OwnerStage 
@@ -38,7 +40,10 @@ data Stage = OwnerStage
            | HamingjaStage
            | FlawsAndTalentsStage Bool
            | RoleStage
-           | SkillsStage Proficiency
+           | SkillsStage
+           | RandomSkillsStage
+           | SummaryStage
+           | GenCharacterStage
            deriving (Eq)
 
 instance Show Stage where
@@ -53,9 +58,10 @@ instance Show Stage where
   show HamingjaStage = "Hamingja"
   show (FlawsAndTalentsStage _) = "Talents & Flaws"
   show RoleStage = "Character's role"
-  show (SkillsStage Trained) = "Trained Skills"
-  show (SkillsStage Untrained) = "Untrained Skills"
-  show (SkillsStage CharacterRoleSkill) = "Character Role Skills"
+  show SkillsStage = "Skills"
+  show RandomSkillsStage = "Character Skills"
+  show SummaryStage = "Character Summary"
+  show GenCharacterStage = "Way of creation"
 
 data AttribBounce = Every 
                   | Charisma 
@@ -64,7 +70,10 @@ data AttribBounce = Every
                   | Inteligence 
                   | Strength 
                   | WillPower 
-                  deriving (Show, Eq)
+                  deriving (Show, Eq, Enum)
+        
+attrBounce :: [AttribBounce]
+attrBounce = enumFrom (toEnum 0)
 
 nextStage :: Stage -> Stage
 nextStage s = case s of 
@@ -76,14 +85,16 @@ nextStage s = case s of
   SexStage             -> AttitudeStage
   AttitudeStage        -> FlawsAndTalentsStage False
   FlawsAndTalentsStage  _ -> RoleStage
-  RoleStage            -> SkillsStage CharacterRoleSkill
-  SkillsStage CharacterRoleSkill -> SkillsStage Trained 
-  SkillsStage Trained   -> SkillsStage Untrained
-  SkillsStage Untrained -> NameStage
+  RoleStage             -> RandomSkillsStage
+  RandomSkillsStage     -> SummaryStage
+  SkillsStage           -> RandomSkillsStage
+  GenCharacterStage     -> AttribStage Nothing
+  SummaryStage          -> SummaryStage
+ 
   
 
 getNextButtonText s = case s of
-  NameStage               -> ""
+  NameStage               -> "Go to Name"
   AttribStage _           -> "Go to Attributes"
   BirthStage              -> "Go to Birthday"
   SexStage                -> "Go to Sex" 
@@ -92,9 +103,11 @@ getNextButtonText s = case s of
   RoleStage               -> "Go to Role"
   FlawsAndTalentsStage _  -> "Go to Flaws & Talents"
   GodStage                -> "Go to Life Stance"
-  SkillsStage Untrained   -> "Go to Untrained Skills"
-  SkillsStage Trained     -> "Go to Trained Skills"
-  SkillsStage CharacterRoleSkill     -> "Go to Role Skills"
+  RandomSkillsStage       -> "Go to Skills"
+  SkillsStage             -> "Ready! "
+  GenCharacterStage       -> ""
+  SummaryStage            -> "Go to Summary "
+  
 
 printBounce :: Maybe AttribBounce -> String
 printBounce b = case b of
@@ -144,6 +157,10 @@ data Msg =  Name MisoString
       | SetArchetype Archetype
       | SetRandomRole
       | SetRole CharacterRole
+      | SetRandomSkills
+      | SetSkills (M.Map Skill CharacterSkill)
+      | SetRandomCharacter 
+      | SetCharacter NewCharacter
       -- No character related msgs
       | NoOp
       | ChangeStage Stage
@@ -161,7 +178,7 @@ data MaxCheckbox = TalentsMax Int | NoLimit
 
 initialModel :: Model
 initialModel =
-  let _currentStage = NameStage 
+  let _currentStage = GenCharacterStage
       _currentAttribBounce = Nothing 
       _availableStages = []
       _currentRoll1 = 0
@@ -171,5 +188,6 @@ initialModel =
       _ontology = Nothing
       _empathy = Nothing
       _character = emptyNewCharacter
+      _sheet = emptySheet
    in Model{..}
 

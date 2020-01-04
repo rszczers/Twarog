@@ -60,8 +60,11 @@ data Season = NewYear
 data Birthday =
   Birthday { _birthdayDay :: Day
            , _birthdayMonth :: Month
-           } deriving (Eq, Show)
+           } deriving (Eq)
 makeLenses ''Birthday
+
+instance Show Birthday where
+  show b = show (b ^. birthdayDay) ++ " " ++ show (b ^. birthdayMonth) 
 
 -- | Get list of months.
 months :: [Month]

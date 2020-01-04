@@ -2,6 +2,7 @@ module Twarog.Backend.CharacterSheet
   (
   -- * Character sheet
     CharacterSheet (..)
+  ,  emptySheet
   -- ** Character lenses
   , sheetPlayerName
   , sheetCharName
@@ -16,6 +17,7 @@ module Twarog.Backend.CharacterSheet
   , sheetCombatStats
   , sheetAlignment
   , sheetSex
+  , sheetHamingja
   , sheetHealth
   , sheetToughness
   , sheetExperience
