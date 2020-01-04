@@ -13,7 +13,7 @@ Project is under active development. Come back here in a few days :neckbeard:
 
 ## Getting started
 
-To get project running, you need [nix](https://nixos.org/nix/) package manager installed on your machine.
+To get the project running, you need [nix](https://nixos.org/nix/) package manager installed on your machine.
 
 ### Dev environment
 
