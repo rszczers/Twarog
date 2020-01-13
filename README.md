@@ -30,4 +30,4 @@ nix-build -A release
 ```
 
 ### Preview
-[Here](szczerski.pl/twarog) you can preview the current build.
+[Here](http://szczerski.pl/twarog) you can preview the current build.
