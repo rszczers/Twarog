@@ -28,3 +28,6 @@ App runs on `localhost:8080`.
 ```
 nix-build -A release
 ```
+
+### Preview
+[Here](szczerski.pl/twarog) you can preview the current build.
