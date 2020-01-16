@@ -90,6 +90,12 @@ library
                      , Twarog.Backend.Encumbrance
                      , Twarog.Backend.Types
                      , Twarog.Backend.Units
+                     , Twarog.Backend.Units.Capacity
+                     , Twarog.Backend.Units.Distance
+                     , Twarog.Backend.Units.Time
+                     , Twarog.Backend.Units.Value
+                     , Twarog.Backend.Units.Weight
+                     , Twarog.Backend.Units.Common
                      , Twarog.Backend.Modifier
                      , Twarog.Frontend.HamingjaStore
                      , Twarog.Frontend.DiceGen
