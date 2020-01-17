@@ -18,6 +18,7 @@ import      View.FlawsAndTalents
 import      View.Skills
 import      View.Menu
 import      View.Character
+import      View.Race
 
 viewModel :: Model -> View Msg
 viewModel m@Model{..} =
@@ -91,15 +92,6 @@ askSex m =
     , chooseRandomlyButton SetRandomSex
     , nextButton SexStage $ isNothing $ m ^. character . characterSex
     ]
-
-askRace :: Model -> View Msg
-askRace m =
-  div_ [class_ "animated fadeIn"] [
-    displayRadioQuestion (Prelude.map Just playableRaces) m
-                  characterRace "Your race?" RaceChecked 
-    , chooseRandomlyButton SetRandomRace
-    , nextButton RaceStage $ isNothing $ m ^. character . characterRace
-  ]
 
 askLifeStance :: Model -> View Msg
 askLifeStance m = 
