@@ -1,6 +1,7 @@
 module Model
   ( Model(..)
   , character
+  , prevCharacter
   , currentStage
   , availableStages
   , currentAttribBounce
@@ -125,6 +126,7 @@ data Model = Model
   , _ontology :: Maybe Ontology
   , _empathy :: Maybe Empathy
   , _character  :: NewCharacter
+  , _prevCharacter :: NewCharacter
   } deriving (Show, Eq)
 makeLenses ''Model
 
@@ -188,6 +190,7 @@ initialModel =
       _ontology = Nothing
       _empathy = Nothing
       _character = emptyNewCharacter
+      _prevCharacter = emptyNewCharacter
       _sheet = emptySheet
    in Model{..}
 

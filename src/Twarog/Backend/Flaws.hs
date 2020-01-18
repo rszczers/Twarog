@@ -119,54 +119,54 @@ instance Ord (FlawLevel -> Flaw) where
 
 instance Show Flaw where
   show = \case
-    Alcoholic lvl -> "Alcoholic" ++ " " ++ show lvl
-    Annoying lvl -> "Annoying" ++ " " ++ show lvl
-    BadBack lvl -> "Bad Back" ++ " " ++ show lvl
-    BadSight lvl -> "Bad Sight" ++ " " ++ show lvl
-    BadTempered lvl -> "Bad Tempered" ++ " " ++ show lvl
-    ChronicPain lvl -> "Chronic Pain" ++ " " ++ show lvl
-    Clumsy lvl -> "Clumsy" ++ " " ++ show lvl
-    Coward lvl -> "Coward" ++ " " ++ show lvl
-    Delusional lvl -> "Delusional" ++ " " ++ show lvl
-    Depressed lvl -> "Depressed" ++ " " ++ show lvl
-    Dislike lvl -> "Dislike" ++ " " ++ show lvl
-    Dyslexia lvl -> "Dyslexia" ++ " " ++ show lvl
-    Enemy lvl -> "Enemy" ++ " " ++ show lvl
-    Fearful lvl -> "Fearful" ++ " " ++ show lvl
-    Frail lvl -> "Frail" ++ " " ++ show lvl
-    Gluttonous lvl -> "Gluttonous" ++ " " ++ show lvl
-    Greedy lvl -> "Greedy" ++ " " ++ show lvl
-    Gullible lvl -> "Gullible" ++ " " ++ show lvl
-    Haemophilic lvl -> "Haemophilic" ++ " " ++ show lvl
-    Hypersexual lvl -> "Hypersexual"  ++ " " ++ show lvl
-    Jealous lvl -> "Jealous"  ++ " " ++ show lvl
-    LawfulFlaw lvl -> "Lawful"  ++ " " ++ show lvl
-    LazyFlaw lvl -> "LazyFlaw"  ++ " " ++ show lvl
-    Limp lvl -> "Limp"  ++ " " ++ show lvl
-    LowSelfEsteem lvl -> "Low Self-Esteem"  ++ " " ++ show lvl
-    Seasickness lvl -> "Seasickness"  ++ " " ++ show lvl
-    OverConfident lvl -> "Over Confident"  ++ " " ++ show lvl
-    Paranoid lvl -> "Paranoid"  ++ " " ++ show lvl
-    Parasite lvl -> "Parasite"  ++ " " ++ show lvl
-    Philia lvl -> "Philia"  ++ " " ++ show lvl
-    Phobia lvl -> "Phobia"  ++ " " ++ show lvl
-    PhysicalDefect lvl -> "Physical Defect"  ++ " " ++ show lvl
-    PhysicalWeakness lvl -> "Physical Weakness"  ++ " " ++ show lvl
-    PoorHearing lvl -> "Poor Hearing"  ++ " " ++ show lvl
-    Secret lvl -> "Secret"  ++ " " ++ show lvl
-    SelfHating lvl -> "Self Hating"  ++ " " ++ show lvl
-    Selfish lvl -> "Selfish"  ++ " " ++ show lvl
-    Selfless lvl -> "Selfless"  ++ " " ++ show lvl
-    Sickly lvl -> "Sickly"  ++ " " ++ show lvl
-    ShortLived lvl -> "Short Lived"  ++ " " ++ show lvl
-    Shy lvl -> "Shy"  ++ " " ++ show lvl
-    SlaveMinded lvl -> "Slave Minded"  ++ " " ++ show lvl
-    Stubborn lvl -> "Stubborn"  ++ " " ++ show lvl
-    Stuttering lvl -> "Stuttering"  ++ " " ++ show lvl
-    Unlucky lvl -> "Unlucky"  ++ " " ++ show lvl
-    Vulnerable lvl -> "Vulnerable"  ++ " " ++ show lvl
-    WeakMinded lvl -> "Weak Minded"  ++ " " ++ show lvl
-    Whiny lvl -> "Whiny"  ++ " " ++ show lvl
+    Alcoholic _ -> "Alcoholic"  
+    Annoying _ -> "Annoying"  
+    BadBack _ -> "Bad Back"  
+    BadSight _ -> "Bad Sight"  
+    BadTempered _ -> "Bad Tempered"  
+    ChronicPain _ -> "Chronic Pain"  
+    Clumsy _ -> "Clumsy"  
+    Coward _ -> "Coward"  
+    Delusional _ -> "Delusional"  
+    Depressed _ -> "Depressed"  
+    Dislike _ -> "Dislike"  
+    Dyslexia _ -> "Dyslexia"  
+    Enemy _ -> "Enemy"  
+    Fearful _ -> "Fearful"  
+    Frail _ -> "Frail"  
+    Gluttonous _ -> "Gluttonous"  
+    Greedy _ -> "Greedy"  
+    Gullible _ -> "Gullible"  
+    Haemophilic _ -> "Haemophilic"  
+    Hypersexual _ -> "Hypersexual"   
+    Jealous _ -> "Jealous"   
+    LawfulFlaw _ -> "Lawful"   
+    LazyFlaw _ -> "LazyFlaw"   
+    Limp _ -> "Limp"   
+    LowSelfEsteem _ -> "Low Self-Esteem"   
+    Seasickness _ -> "Seasickness"   
+    OverConfident _ -> "Over Confident"   
+    Paranoid _ -> "Paranoid"   
+    Parasite _ -> "Parasite"   
+    Philia _ -> "Philia"   
+    Phobia _ -> "Phobia"   
+    PhysicalDefect _ -> "Physical Defect"   
+    PhysicalWeakness _ -> "Physical Weakness"   
+    PoorHearing _ -> "Poor Hearing"   
+    Secret _ -> "Secret"   
+    SelfHating _ -> "Self Hating"   
+    Selfish _ -> "Selfish"   
+    Selfless _ -> "Selfless"   
+    Sickly _ -> "Sickly"   
+    ShortLived _ -> "Short Lived"   
+    Shy _ -> "Shy"   
+    SlaveMinded _ -> "Slave Minded"   
+    Stubborn _ -> "Stubborn"   
+    Stuttering _ -> "Stuttering"   
+    Unlucky _ -> "Unlucky"   
+    Vulnerable _ -> "Vulnerable"   
+    WeakMinded _ -> "Weak Minded"   
+    Whiny _ -> "Whiny"   
 
 data FlawLevel = FlawLevel1
                | FlawLevel2

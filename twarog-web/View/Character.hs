@@ -25,7 +25,7 @@ characterSummary m =
           Nothing -> ""
     sheet = fromMaybe emptySheet $ mkCharacterSheet $ m ^. character
       
-    name = characterFiledText m characterName
+    name = fromMaybe "" $ m ^. character . characterName
     attr = m ^. character . characterAttr
     race = characterFiledText m characterRace
     birth = characterFiledText m characterBirth
