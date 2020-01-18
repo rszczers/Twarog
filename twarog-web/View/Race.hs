@@ -21,11 +21,20 @@ askRace m =
 
 previewReace :: NewCharacter -> View Msg
 previewReace ch = 
-  div_ [class_ "columns is-centered"] [
-    div_ [class_ "column is-10 content has-text-left"] [
-      ul_ [] $
-        Prelude.map 
-          (\x -> li_ [] [ text $ ms $ show x ])
-          $ (addMod ch (fromMaybe Elf (ch ^. characterRace))) ^. characterOther 
+  let 
+    notes = (addMod ch (fromMaybe HighMan (ch ^. characterRace))) ^. characterOther 
+  in
+    if notes == [] 
+    then div_ [] []
+    else
+      div_ [class_ "columns is-centered"] [
+        div_ [class_ "column is-10 content has-text-left"] [
+          p_ [class_ "title" ] ["Race features: "] 
+          , ul_ [] $
+            Prelude.map 
+              (\x -> li_ [] [ 
+                text $ ms x 
+              ])
+              $ notes
+          ]
       ]
-  ]

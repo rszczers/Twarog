@@ -34,12 +34,13 @@ updateModel (RoleChecked a (Checked True)) m =
 updateModel (TalentChecked t max (Checked True)) m =  
   let 
     currTalents = m ^. character . characterTalent
-    maxTalents = fromMaybe 0 max
+    --maxTalents = fromMaybe 0 max
   in
     noEff ( 
-        if Prelude.length currTalents < maxTalents
-        then m & character . characterTalent %~ S.insert t 
-        else m 
+        --if Prelude.length currTalents < maxTalents
+        --then 
+          m & character . characterTalent %~ S.insert t 
+        --else m 
         )
 updateModel (TalentChecked r _ (Checked False)) m = 
   noEff $ m & character . characterTalent %~ S.delete r
