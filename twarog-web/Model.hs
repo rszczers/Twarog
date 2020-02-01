@@ -11,6 +11,7 @@ module Model
   , submissiveness
   , ontology
   , empathy
+  , possibleNames
   , Msg (..)
   , Stage (..)
   , AttribBounce (..)
@@ -28,6 +29,7 @@ import       Miso.String
 import       Data.Char as C
 import       Data.Set as S
 import       Data.Map as M
+import       Data.Text as T
 import       Twarog
 
 data Stage = OwnerStage 
@@ -127,6 +129,7 @@ data Model = Model
   , _empathy :: Maybe Empathy
   , _character  :: NewCharacter
   , _prevCharacter :: NewCharacter
+  , _possibleNames :: [(Text, Sex, NameRace)]
   } deriving (Show, Eq)
 makeLenses ''Model
 
@@ -174,6 +177,8 @@ data Msg =  Name MisoString
       | SetSubmissiveness (Maybe Submissiveness)
       | SetOnthology (Maybe Ontology)
       | SetEmpathy (Maybe Empathy)
+      | SuggestRandomNames MisoString
+      | SetSugestedNames [(Text, Sex, NameRace)] MisoString
       deriving (Eq)
 
 data MaxCheckbox = TalentsMax Int | NoLimit
@@ -192,5 +197,6 @@ initialModel =
       _character = emptyNewCharacter
       _prevCharacter = emptyNewCharacter
       _sheet = emptySheet
+      _possibleNames = []
    in Model{..}
 

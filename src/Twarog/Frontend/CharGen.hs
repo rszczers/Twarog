@@ -4,6 +4,7 @@ module Twarog.Frontend.CharGen
   , genRace
   , genRace'
   , genMonth
+  , genNames
   , genBirthday
   , genArchetype
   , genExp
@@ -25,6 +26,7 @@ module Twarog.Frontend.CharGen
 import qualified Data.Set as S
 import qualified Data.Map.Strict as M
 import Data.List ((\\))
+import qualified Data.Text as T
 
 import Twarog.Backend.Types
 import Twarog.Backend.Races
@@ -38,6 +40,7 @@ import Twarog.Backend.Character
 import Twarog.Backend.Archetypes
 import Twarog.Backend.Gods
 
+import Twarog.Frontend.NameGen 
 import Twarog.Frontend.DiceGen
 
 import Hedgehog
@@ -127,6 +130,12 @@ genFlaws = do
         Gen.constant <$> [FlawLevel1, FlawLevel2, FlawLevel3]
   levels <- Gen.list (Range.singleton s) genLevel
   return . S.fromList $ zipWith ($) (S.toList flaws) levels 
+
+genNames :: T.Text -> Gen [(T.Text, Sex, NameRace)]
+genNames str = do
+  let possible_names = filterNames str
+  names <- Gen.shuffle possible_names
+  return names
 
 genGod :: Gen God
 genGod = Gen.choice $ Gen.constant <$> gods
