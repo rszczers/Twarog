@@ -4,6 +4,7 @@ import       Miso
 import       Miso.String
 import       Model
 import       Twarog
+import       Data.Text as T
 
 import       Control.Lens
 import       Data.Maybe
@@ -68,20 +69,48 @@ getStage m = case m ^. currentStage of
 askName :: Model -> View Msg
 askName m =
   let 
-    name = m^.character.characterName
+    name = m ^. character . characterName
+    nameSugestion = m ^. possibleNames
   in
-    div_ [class_ "animated fadeIn"]
-      [ h2_ [class_ "title is-2 has-text-weight-medium"] [ "Your name? "]
+    div_ [class_ "animated fadeIn"] [ 
+      h2_ [class_ "title is-2 has-text-weight-medium"] [ "Your name? "]
       , div_ [class_ "columns is-centered"] [
           div_ [ class_ "column is-two-fifths"] [
-              input_ [ class_ "input is-medium"
-                , value_ $ ms
-                  $ fromMaybe "" name
-                , onInput Name 
-                ]
+            input_ [ class_ "input is-medium"
+            , value_ $ ms
+                $ fromMaybe "" name
+            , onInput $ SuggestRandomNames
             ]
           ]
-          , nextButton NameStage (name ==  Nothing || name == Just "")
+        ]
+      , div_ [class_ "columns ", onCreated $ SuggestRandomNames "" ] [
+        div_ [class_ "column animated bounceInLeft"] [
+          h4_ [class_ "title"] ["Consider choosing…"]
+          , div_ [class_ "tags"] $ 
+              Prelude.map  
+                (\(n, s, r) ->
+                  case s of
+                    Female ->  
+                      a_ [onClick $ Name (ms n)] [
+                        span_ [class_ "tag is-danger is-light is-medium"
+                              , style_ $ M.singleton "margin" "0.1rem"] [
+                        text $ ms $ n
+                        ]
+                      ]
+                    Male -> 
+                      a_ [onClick $ Name (ms n)] [
+                        span_ [class_ "tag is-primary is-light is-medium"
+                              , style_ $ M.singleton "margin" "0.1rem"] [
+                        text $ ms $ n
+                        ]
+                      ]
+                    Non -> text ""
+
+                ) 
+                nameSugestion
+          ]
+        ] 
+        , nextButton NameStage (name ==  Nothing || name == Just "")
       ]
 
 askSex :: Model -> View Msg

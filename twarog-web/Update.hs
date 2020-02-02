@@ -10,11 +10,20 @@ import       Miso.String
 import       Model
 import       Twarog
 import qualified Twarog as T
+import qualified Data.Text as Tx
 
 -- | Updates model, optionally introduces side effects
 updateModel :: Msg -> Model -> Effect Msg Model
 updateModel (Name n) m = 
   noEff $ m & character . characterName .~ (Just $ fromMisoString n)
+
+updateModel (SuggestRandomNames name) m = 
+   m <# do
+    names <- sample $ genNames (Tx.pack $ fromMisoString name) 
+    return $ SetSugestedNames names name
+
+updateModel (SetSugestedNames n name) m = 
+  noEff $ (m & possibleNames .~ (Prelude.take 20 n)) & character . characterName .~ (Just $ fromMisoString name)
 
 updateModel NoOp m = noEff m
 
